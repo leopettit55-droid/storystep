@@ -48,9 +48,11 @@ export async function predownloadArea(
 }
 
 /**
- * `audioSource` is either a bundled `require(...)` result (already local —
- * react-native-track-player accepts the module id directly, no download
- * needed) or a remote URL string that needs caching to disk first.
+ * `audioSource` is either a bundled `require(...)` result — a numeric asset
+ * id on native, but a plain (already-local) URL string on web, where Metro
+ * resolves bundled assets to strings instead — or a genuine remote
+ * http(s) URL that needs caching to disk first. Only the latter touches the
+ * native-only file-system caching path.
  */
 export async function resolveAudioSource(
   waypointId: string,
@@ -58,5 +60,6 @@ export async function resolveAudioSource(
 ): Promise<number | string | null> {
   if (audioSource == null) return null;
   if (typeof audioSource === "number") return audioSource;
+  if (!/^https?:\/\//i.test(audioSource)) return audioSource;
   return getCachedOrDownload(waypointId, audioSource);
 }

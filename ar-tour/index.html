@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<title>StoryStep AR Walk</title>
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!-- Camera passthrough + AR overlay — hidden until the user opts in via the
+       camera toggle. The tour itself (audio, GPS tracking) runs independently
+       of whether this is open. -->
+  <video id="camera-feed" autoplay muted playsinline hidden></video>
+  <canvas id="three-canvas" hidden></canvas>
+
+  <!-- Default background view: a simple flat map + walking penguin icon,
+       shown whenever the camera/AR view isn't open. -->
+  <canvas id="background-canvas"></canvas>
+
+  <!-- Start screen — camera is NOT requested here. Only geolocation (and, on
+       iOS, device-orientation, needed for the compass either way) are
+       requested up front, since those are what the audio tour itself needs;
+       the camera is requested later, only if/when the user opens it. -->
+  <div id="start-screen">
+    <div class="start-card">
+      <div class="penguin-emoji">🐧</div>
+      <h1 id="tour-title">StoryStep AR Walk</h1>
+      <p id="tour-subtitle">Follow your guide down the street — point your camera up and around.</p>
+      <button id="start-button">Begin the tour</button>
+      <p class="start-hint">Narration plays as you walk. Open your camera any time to see your guide walking ahead of you in AR.</p>
+    </div>
+  </div>
+
+  <!-- Heads-up display: waypoint prompts, turn arrows, distance readout,
+       camera toggle. Present in both background and AR view. -->
+  <div id="hud" hidden>
+    <div id="hud-top">
+      <div id="waypoint-label"></div>
+      <div id="hud-buttons">
+        <button id="camera-toggle-button" aria-label="Open camera">📷</button>
+        <button id="mute-button" aria-label="Mute narration">🔊</button>
+      </div>
+    </div>
+    <div id="turn-prompt" hidden>
+      <span id="turn-arrow">↑</span>
+      <span id="turn-text"></span>
+    </div>
+    <div id="arrival-banner" hidden>You've arrived — listen in</div>
+    <div id="distance-readout"></div>
+    <div id="tour-complete-banner" hidden>
+      <div>🐧 That's the tour — thanks for walking with me!</div>
+    </div>
+  </div>
+
+  <!-- Lightweight, non-blocking toast for camera-open failures — the tour
+       keeps running in the background either way, so this never takes over
+       the whole screen. -->
+  <div id="toast" hidden></div>
+
+  <audio id="narration-audio" playsinline></audio>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

@@ -21,9 +21,15 @@ export interface Waypoint {
   narration: NarrationSegment;
 }
 
+export type PriceTier = {
+  /** One-off price in GBP for this single tour. */
+  singleTour: number;
+};
+
 export interface Area {
   id: string;
   name: string;
+  city: "London" | "Paris" | "Oxford";
   description: string;
   estimatedDurationMin: number;
   estimatedDistanceKm: number;
@@ -31,6 +37,14 @@ export interface Area {
   /** Where the tour actually begins — the app routes the user here first. */
   startingPoint: Coordinates & { label: string };
   route: Waypoint[];
+  /** Real street-following walking path from startingPoint through each waypoint
+   * in order (from a routing service) — used for the map polyline so the line
+   * follows actual roads/paths instead of cutting straight through buildings.
+   * Falls back to straight waypoint-to-waypoint segments when absent. */
+  path?: Coordinates[];
   /** false for areas that only have a route stub so far (no narration content yet). */
   isContentComplete: boolean;
+  /** Local asset module (require(...)) shown as the card thumbnail. */
+  image: number | null;
+  price: PriceTier;
 }

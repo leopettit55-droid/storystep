@@ -1,7 +1,10 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useEffect, useRef } from "react";
-import { Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { useEffect, useMemo, useRef } from "react";
+import { Platform, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import PressScale from "../components/PressScale";
+import { notifySuccess } from "../haptics";
 import {
   pauseNarration,
   playWaypointNarration,
@@ -18,6 +21,8 @@ import {
   stopWaypointGeofencing,
 } from "../geofencing/geofenceManager";
 import { ProximityTracker } from "../geofencing/proximityTracker";
+import { localizedAreaText } from "../i18n/areaTranslations";
+import { useLanguage } from "../i18n/LanguageContext";
 import type { RootStackParamList } from "../navigation/types";
 import {
   selectCurrentWaypoint,
@@ -25,6 +30,9 @@ import {
   selectProgress,
   useTourStore,
 } from "../state/tourStore";
+import { useTheme } from "../ThemeContext";
+import type { ThemeColors } from "../theme";
+import CharacterGuide from "../components/CharacterGuide";
 
 type Nav = NativeStackNavigationProp<RootStackParamList, "ActiveTour">;
 type RouteProp = { params: { areaId: string } };
@@ -33,6 +41,9 @@ export default function ActiveTourScreen() {
   const navigation = useNavigation<Nav>();
   const { params } = useRoute() as unknown as RouteProp;
   const area = getAreaById(params.areaId);
+  const { language, t } = useLanguage();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const status = useTourStore((s) => s.status);
   const isOffRoute = useTourStore((s) => s.isOffRoute);
@@ -69,7 +80,10 @@ export default function ActiveTourScreen() {
       const current = selectCurrentWaypoint(useTourStore.getState());
       if (!current) return;
       const isLast = current.id === area.route[area.route.length - 1]?.id;
-      if (isLast) completeTour();
+      if (isLast) {
+        notifySuccess();
+        completeTour();
+      }
     };
 
     (async () => {
@@ -78,14 +92,26 @@ export default function ActiveTourScreen() {
 
       setGeofenceEnterHandler(handleWaypointEnter);
       setNarrationEndedHandler(handleNarrationEnded);
-      await startWaypointGeofencing(area.route);
 
-      trackerRef.current = new ProximityTracker(area.route, {
-        onNearWaypoint: (waypoint) => handleWaypointEnter(waypoint.id),
-        onOffRoute: setOffRoute,
-        onLocationUpdate: setLastKnownLocation,
-      });
-      await trackerRef.current.start();
+      // Each of these depends on platform capabilities that can be partial
+      // (e.g. no OS geofencing on web) — isolate failures so one missing
+      // capability never blocks narration from playing at all.
+      try {
+        await startWaypointGeofencing(area.route);
+      } catch (e) {
+        console.warn("[ActiveTourScreen] geofencing unavailable:", e);
+      }
+
+      try {
+        trackerRef.current = new ProximityTracker(area.route, {
+          onNearWaypoint: (waypoint) => handleWaypointEnter(waypoint.id),
+          onOffRoute: setOffRoute,
+          onLocationUpdate: setLastKnownLocation,
+        });
+        await trackerRef.current.start();
+      } catch (e) {
+        console.warn("[ActiveTourScreen] location tracking unavailable:", e);
+      }
 
       // First waypoint is usually right at the starting point — trigger it
       // immediately rather than waiting for the next GPS fix.
@@ -106,24 +132,26 @@ export default function ActiveTourScreen() {
   if (!area) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.waypointName}>Area not found</Text>
+        <Text style={styles.waypointName}>{t("activeTour.areaNotFound")}</Text>
       </SafeAreaView>
     );
   }
+
+  const areaText = localizedAreaText(area.id, language, area);
 
   if (status === "complete") {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <Text style={styles.completeTitle}>Tour complete</Text>
+          <Text style={styles.completeTitle}>{t("activeTour.tourComplete")}</Text>
           <Text style={styles.completeSubtitle}>
-            You've walked all of {area.name}. Hope you enjoyed it.
+            {t("activeTour.tourCompleteBody", { area: areaText.name })}
           </Text>
           <Pressable
             style={styles.cta}
             onPress={() => navigation.popToTop()}
           >
-            <Text style={styles.ctaText}>Back to areas</Text>
+            <Text style={styles.ctaText}>{t("activeTour.backToAreas")}</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -164,72 +192,152 @@ export default function ActiveTourScreen() {
     }
   };
 
+  // iOS Safari requires DeviceOrientationEvent.requestPermission() to be
+  // called essentially synchronously from within the original tap — calling
+  // it after any other awaits (e.g. after a screen transition) causes it to
+  // fail silently with no prompt at all. So it's requested here, first,
+  // directly in this button's press handler, before navigating to the AR
+  // camera screen — the narration keeps playing underneath either way, since
+  // this screen stays mounted while ARCamera sits on top of it.
+  const handleOpenARGuide = async () => {
+    let orientationGranted = true;
+    try {
+      const DOEvent = (window as any).DeviceOrientationEvent;
+      if (DOEvent && typeof DOEvent.requestPermission === "function") {
+        const result = await DOEvent.requestPermission();
+        orientationGranted = result === "granted";
+      }
+    } catch (e) {
+      orientationGranted = false;
+    }
+    navigation.navigate("ARCamera", { areaId: area.id, orientationGranted });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.progressTrack}>
         <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
       </View>
 
+      <View style={styles.scanRow}>
+        <PressScale style={styles.exitButton} scaleTo={0.9} onPress={() => navigation.goBack()} hitSlop={8}>
+          <Ionicons name="close" size={20} color={colors.textMid} />
+        </PressScale>
+        <PressScale style={styles.scanButton} scaleTo={0.94} onPress={() => navigation.navigate("CameraTour")}>
+          <Ionicons name="camera" size={16} color={colors.onPrimary} />
+          <Text style={styles.scanButtonText}>{t("activeTour.scanLandmarks")}</Text>
+        </PressScale>
+      </View>
+
       {isOffRoute && (
         <View style={styles.offRouteBanner}>
           <Text style={styles.offRouteText}>
-            Looks like you've wandered off the route — head back toward{" "}
-            {currentWaypoint?.name ?? "the last stop"} when you can.
+            {t("activeTour.offRoute", {
+              waypoint: currentWaypoint?.name ?? t("activeTour.offRouteFallback"),
+            })}
           </Text>
         </View>
       )}
 
       <View style={styles.centered}>
+        <CharacterGuide isTalking={isPlaying} size={110} />
         <Text style={styles.stopLabel}>
-          Stop {(currentWaypoint?.order ?? 0)} of {area.route.length}
+          {t("activeTour.stopOf", { current: currentWaypoint?.order ?? 0, total: area.route.length })}
         </Text>
         <Text style={styles.waypointName}>
-          {currentWaypoint?.name ?? "Walking to the first stop…"}
+          {currentWaypoint?.name ?? t("activeTour.walkingToFirst")}
         </Text>
       </View>
 
+      {Platform.OS === "web" && (
+        <PressScale style={styles.arGuideButton} scaleTo={0.96} onPress={handleOpenARGuide}>
+          <Ionicons name="camera" size={18} color={colors.onPrimary} />
+          <Text style={styles.arGuideButtonText}>Open AR camera guide</Text>
+        </PressScale>
+      )}
+
       <View style={styles.controls}>
-        <Pressable style={styles.secondaryButton} onPress={handleSkipPrevious}>
-          <Text style={styles.secondaryButtonText}>Back</Text>
-        </Pressable>
+        <PressScale style={styles.secondaryButton} scaleTo={0.9} onPress={handleSkipPrevious}>
+          <Text style={styles.secondaryButtonText}>{t("activeTour.back")}</Text>
+        </PressScale>
 
-        <Pressable style={styles.playButton} onPress={handleTogglePlay}>
+        <PressScale style={styles.playButton} scaleTo={0.92} onPress={handleTogglePlay}>
           <Text style={styles.playButtonText}>{isPlaying ? "II" : "▶"}</Text>
-        </Pressable>
+        </PressScale>
 
-        <Pressable style={styles.secondaryButton} onPress={handleSkipNext}>
-          <Text style={styles.secondaryButtonText}>Skip</Text>
-        </Pressable>
+        <PressScale style={styles.secondaryButton} scaleTo={0.9} onPress={handleSkipNext}>
+          <Text style={styles.secondaryButtonText}>{t("activeTour.skip")}</Text>
+        </PressScale>
       </View>
 
       <Pressable style={styles.replayLink} onPress={handleReplay}>
-        <Text style={styles.replayLinkText}>Replay this segment</Text>
+        <Text style={styles.replayLinkText}>{t("activeTour.replayLink")}</Text>
       </Pressable>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0F1115", justifyContent: "space-between" },
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background, justifyContent: "space-between" },
   progressTrack: {
     height: 4,
-    backgroundColor: "#2A2E37",
+    backgroundColor: colors.border,
     marginHorizontal: 20,
     marginTop: 12,
     borderRadius: 2,
   },
-  progressFill: { height: 4, backgroundColor: "#4F8CFF", borderRadius: 2 },
+  progressFill: { height: 4, backgroundColor: colors.primary, borderRadius: 2 },
+  scanRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    marginTop: 12,
+  },
+  exitButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  arGuideButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    alignSelf: "center",
+    backgroundColor: colors.primary,
+    borderRadius: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  arGuideButtonText: { color: colors.onPrimary, fontSize: 14, fontWeight: "700" },
+  scanButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: colors.primary,
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  scanButtonText: { color: colors.onPrimary, fontSize: 13, fontWeight: "700" },
   offRouteBanner: {
     marginHorizontal: 20,
     marginTop: 16,
-    backgroundColor: "#3A2A1A",
+    backgroundColor: colors.warnBg,
     borderRadius: 12,
     padding: 12,
   },
-  offRouteText: { color: "#FFB877", fontSize: 13 },
-  centered: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24 },
-  stopLabel: { color: "#7B8798", fontSize: 14, marginBottom: 8 },
-  waypointName: { color: "#fff", fontSize: 32, fontWeight: "700", textAlign: "center" },
+  offRouteText: { color: colors.warnText, fontSize: 13 },
+  centered: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24, gap: 16 },
+  stopLabel: { color: colors.textDim, fontSize: 14 },
+  waypointName: { color: colors.text, fontSize: 32, fontWeight: "700", textAlign: "center" },
   controls: {
     flexDirection: "row",
     alignItems: "center",
@@ -241,26 +349,27 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 18,
   },
-  secondaryButtonText: { color: "#9AA1AC", fontSize: 15, fontWeight: "600" },
+  secondaryButtonText: { color: colors.textMid, fontSize: 15, fontWeight: "600" },
   playButton: {
     width: 84,
     height: 84,
     borderRadius: 42,
-    backgroundColor: "#4F8CFF",
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
-  playButtonText: { color: "#fff", fontSize: 30, fontWeight: "700" },
+  playButtonText: { color: colors.onPrimary, fontSize: 30, fontWeight: "700" },
   replayLink: { alignItems: "center", paddingBottom: 24, paddingTop: 4 },
-  replayLinkText: { color: "#7B8798", fontSize: 13, textDecorationLine: "underline" },
-  completeTitle: { color: "#fff", fontSize: 28, fontWeight: "700" },
-  completeSubtitle: { color: "#9AA1AC", fontSize: 15, marginTop: 8, textAlign: "center" },
+  replayLinkText: { color: colors.textDim, fontSize: 13, textDecorationLine: "underline" },
+  completeTitle: { color: colors.text, fontSize: 28, fontWeight: "700" },
+  completeSubtitle: { color: colors.textMid, fontSize: 15, marginTop: 8, textAlign: "center" },
   cta: {
     marginTop: 24,
-    backgroundColor: "#4F8CFF",
+    backgroundColor: colors.primary,
     borderRadius: 14,
     paddingVertical: 16,
     paddingHorizontal: 32,
   },
-  ctaText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-});
+  ctaText: { color: colors.onPrimary, fontSize: 16, fontWeight: "600" },
+  });
+}

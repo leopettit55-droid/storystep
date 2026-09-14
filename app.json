@@ -21,10 +21,13 @@
     "android": {
       "package": "com.storystep.app",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#D85A30",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCl-WB-CTiMpJAy5Oj3KQ7LImln4RSWMnY"
+        }
       },
       "permissions": [
         "ACCESS_COARSE_LOCATION",
@@ -62,9 +65,17 @@
           "enableBackgroundPlayback": true
         }
       ],
-      "expo-asset"
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "StoryStep uses your camera to identify landmarks you point it at during the tour."
+        }
+      ],
+      "expo-asset",
+      "expo-font"
     ],
     "extra": {
+      "googleVisionApiKey": "AIzaSyCl-WB-CTiMpJAy5Oj3KQ7LImln4RSWMnY",
       "eas": {
         "projectId": "c9a06407-7893-427d-a819-46c00ac2c7df"
       }

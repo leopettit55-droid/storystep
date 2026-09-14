@@ -1,4 +1,5 @@
 import * as Location from "expo-location";
+import { Platform } from "react-native";
 import type { Coordinates, Waypoint } from "../content";
 
 const EARTH_RADIUS_M = 6371000;
@@ -60,6 +61,7 @@ interface ProximityCallbacks {
  */
 export class ProximityTracker {
   private subscription: Location.LocationSubscription | null = null;
+  private webWatchId: number | null = null;
   private triggeredIds = new Set<string>();
 
   constructor(
@@ -68,6 +70,30 @@ export class ProximityTracker {
   ) {}
 
   async start(): Promise<void> {
+    // expo-location's web shim has a watch-id mismatch bug: its
+    // watchPositionImplAsync reassigns the id it emits update events under
+    // to the browser's own native watchPosition id, while the callback
+    // registry it's matched against is keyed by Expo's own separate id
+    // counter. The two only coincide by chance for the very first watch
+    // created anywhere on the page; every watch after that (e.g. this one,
+    // started after GetToStartScreen already created its own) gets its
+    // updates silently misrouted and the watch auto-torn-down on the very
+    // first position event. Bypassing the wrapper and using the browser's
+    // geolocation API directly sidesteps it entirely. Native platforms use
+    // the real expo-location module, which doesn't have this bug.
+    if (Platform.OS === "web") {
+      this.webWatchId = navigator.geolocation.watchPosition(
+        (position) =>
+          this.handleUpdate({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          }),
+        (err) => console.warn("[ProximityTracker] web geolocation error:", err.message),
+        { enableHighAccuracy: true, maximumAge: 1000, timeout: 15000 }
+      );
+      return;
+    }
+
     this.subscription = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.BestForNavigation,
@@ -85,6 +111,10 @@ export class ProximityTracker {
   stop(): void {
     this.subscription?.remove();
     this.subscription = null;
+    if (this.webWatchId != null) {
+      navigator.geolocation.clearWatch(this.webWatchId);
+      this.webWatchId = null;
+    }
   }
 
   /** Call after a manual replay so the same waypoint can re-trigger if the user backtracks into it. */

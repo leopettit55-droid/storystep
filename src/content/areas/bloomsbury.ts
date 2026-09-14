@@ -4,6 +4,7 @@ import type { Area } from "../schema";
 export const bloomsbury: Area = {
   id: "bloomsbury",
   name: "Bloomsbury",
+  city: "London",
   description: "Coming soon: the British Museum, the Bloomsbury Group, and London's university quarter.",
   estimatedDurationMin: 0,
   estimatedDistanceKm: 0,
@@ -11,4 +12,6 @@ export const bloomsbury: Area = {
   isContentComplete: false,
   startingPoint: { lat: 51.523, lng: -0.1244, label: "Russell Square Underground Station" },
   route: [],
+  image: null,
+  price: { singleTour: 4.99 },
 };

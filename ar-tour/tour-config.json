@@ -1,0 +1,80 @@
+{
+  "tourName": "StoryStep AR — Mayfair",
+  "tourSubtitle": "Follow your guide down the street — point your camera up and around.",
+
+  "model": {
+    "url": "./assets/models/penguin.glb",
+    "scale": 0.28,
+    "standOffMeters": 2.5,
+    "modelYawOffsetDeg": 180,
+    "clipNames": { "idle": "Idle", "walk": "Walk", "talk": "Talk" },
+    "note": "This is your real penguin — but it has no rig or animation clips (checked: 0 animations, 0 skins), which is normal for an AI-generated mesh export. The engine detects that automatically and plays a procedural waddle/bob instead of a skeletal clip, so it still moves. `clipNames` is left in place in case you later swap in a rigged version — the engine will pick up real Idle/Walk/Talk clips automatically if they exist, no other change needed. `scale` 0.28 brings its raw ~1.9m height down to about 0.53m. `standOffMeters` is how far ahead of the camera it stands — 2.5m currently. `modelYawOffsetDeg` 180 corrects this specific model's face being authored toward local +Z instead of the standard -Z 'forward' — if you swap in a different model and it faces the wrong way, tweak this (0 or 180 are the two you'll likely need) rather than editing app.js."
+  },
+
+  "waypoints": [
+    {
+      "id": "shepherd-market",
+      "name": "Shepherd Market",
+      "lat": 51.5074,
+      "lng": -0.1469,
+      "radiusMeters": 40,
+      "audioFile": "../assets/audio/mayfair/01-shepherd-market.mp3"
+    },
+    {
+      "id": "curzon-street",
+      "name": "Curzon Street",
+      "lat": 51.5081,
+      "lng": -0.1489,
+      "radiusMeters": 35,
+      "audioFile": "../assets/audio/mayfair/02-curzon-street.mp3"
+    },
+    {
+      "id": "berkeley-square",
+      "name": "Berkeley Square",
+      "lat": 51.509,
+      "lng": -0.1467,
+      "radiusMeters": 45,
+      "audioFile": "../assets/audio/mayfair/03-berkeley-square.mp3"
+    },
+    {
+      "id": "mount-street",
+      "name": "Mount Street",
+      "lat": 51.5087,
+      "lng": -0.1503,
+      "radiusMeters": 35,
+      "audioFile": "../assets/audio/mayfair/04-mount-street.mp3"
+    },
+    {
+      "id": "grosvenor-square",
+      "name": "Grosvenor Square",
+      "lat": 51.5107,
+      "lng": -0.152,
+      "radiusMeters": 50,
+      "audioFile": "../assets/audio/mayfair/05-grosvenor-square.mp3"
+    },
+    {
+      "id": "brook-street",
+      "name": "Handel & Hendrix House, Brook Street",
+      "lat": 51.5127,
+      "lng": -0.1466,
+      "radiusMeters": 30,
+      "audioFile": "../assets/audio/mayfair/06-brook-street.mp3"
+    },
+    {
+      "id": "savile-row",
+      "name": "Savile Row",
+      "lat": 51.5112,
+      "lng": -0.1409,
+      "radiusMeters": 35,
+      "audioFile": "../assets/audio/mayfair/07-savile-row.mp3"
+    },
+    {
+      "id": "burlington-arcade",
+      "name": "Burlington Arcade",
+      "lat": 51.509,
+      "lng": -0.1421,
+      "radiusMeters": 30,
+      "audioFile": "../assets/audio/mayfair/08-burlington-arcade.mp3"
+    }
+  ]
+}

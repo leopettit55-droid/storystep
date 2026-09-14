@@ -1,5 +1,6 @@
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
+import { Platform } from "react-native";
 import type { Waypoint } from "../content";
 
 /**
@@ -53,7 +54,16 @@ export async function requestLocationPermissions(): Promise<{
   return { foreground: true, background: bg.status === "granted" };
 }
 
+/**
+ * OS-level geofencing (and the TaskManager it depends on) has no web
+ * implementation — expo-location's web shim throws rather than no-oping.
+ * Skipping it on web still leaves narration working via the foreground
+ * ProximityTracker polling in ActiveTourScreen; only the "keeps triggering
+ * with the app backgrounded" behavior is native-only.
+ */
 export async function startWaypointGeofencing(waypoints: Waypoint[]): Promise<void> {
+  if (Platform.OS === "web") return;
+
   const regions: Location.LocationRegion[] = waypoints.map((waypoint) => ({
     identifier: waypoint.id,
     latitude: waypoint.coordinates.lat,
@@ -68,6 +78,8 @@ export async function startWaypointGeofencing(waypoints: Waypoint[]): Promise<vo
 }
 
 export async function stopWaypointGeofencing(): Promise<void> {
+  if (Platform.OS === "web") return;
+
   const isRegistered = await TaskManager.isTaskRegisteredAsync(GEOFENCE_TASK_NAME);
   if (isRegistered) {
     await Location.stopGeofencingAsync(GEOFENCE_TASK_NAME);
