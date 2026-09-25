@@ -39,7 +39,6 @@ export default function HomeScreen() {
   const featured = areas.filter((a) => a.isContentComplete);
   const cityCount = new Set(featured.map((a) => a.city)).size;
   const paidTours = featured.filter((a) => !a.scannerOnly);
-  const fromPrice = Math.min(...paidTours.map((a) => a.price.singleTour));
 
   const FEATURES = [
     { title: t("home.featureGpsTitle"), body: t("home.featureGpsBody"), icon: "📍" },
@@ -70,11 +69,6 @@ export default function HomeScreen() {
                   <View style={styles.stat}>
                     <Text style={styles.statNumber}>{cityCount}</Text>
                     <Text style={styles.statLabel}>{t("home.statsCities")}</Text>
-                  </View>
-                  <View style={styles.statDivider} />
-                  <View style={styles.stat}>
-                    <Text style={styles.statNumber}>£{fromPrice.toFixed(2)}</Text>
-                    <Text style={styles.statLabel}>{t("home.statsFrom")}</Text>
                   </View>
                 </View>
 
@@ -191,30 +185,6 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          <View style={[styles.band, styles.bandWhite]}>
-            <View style={[styles.page, isDesktop && styles.pageDesktop]}>
-              <Text style={styles.sectionLabel}>{t("home.pricingTitle")}</Text>
-              <View style={[styles.pricingGrid, isDesktop && styles.pricingGridDesktop]}>
-                <View style={styles.priceCard}>
-                  <Text style={styles.priceCardTitle}>{t("home.singleTourTitle")}</Text>
-                  <Text style={styles.priceCardAmount}>£4.99</Text>
-                  <Text style={styles.priceCardBody}>{t("home.singleTourBody")}</Text>
-                </View>
-                <View style={[styles.priceCard, styles.priceCardHighlighted]}>
-                  <Text style={styles.priceCardBadge}>{t("home.weeklyBadge")}</Text>
-                  <Text style={styles.priceCardTitle}>{t("home.weeklyTitle")}</Text>
-                  <Text style={styles.priceCardAmount}>£14.99</Text>
-                  <Text style={styles.priceCardBody}>{t("home.weeklyBody")}</Text>
-                </View>
-                <View style={styles.priceCard}>
-                  <Text style={styles.priceCardTitle}>{t("home.monthlyTitle")}</Text>
-                  <Text style={styles.priceCardAmount}>£19.99</Text>
-                  <Text style={styles.priceCardBody}>{t("home.monthlyBody")}</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-
           <View style={styles.ctaBand}>
             <Text style={styles.ctaTitle}>{t("home.ctaTitle")}</Text>
             <Text style={styles.ctaBody}>{t("home.ctaBody")}</Text>
@@ -278,7 +248,7 @@ function FeaturedCard({
               <Text style={styles.featuredMeta}>
                 {area.scannerOnly
                   ? t("tourPreview.useScanner")
-                  : `${area.estimatedDurationMin} ${t("common.min")} · ${t("common.from")} £${area.price.singleTour.toFixed(2)}`}
+                  : `${area.estimatedDurationMin} ${t("common.min")} · ${t("common.free")}`}
               </Text>
             </View>
           </ImageBackground>

@@ -127,7 +127,7 @@ export default function TourPreviewScreen() {
       <View style={styles.sheet}>
         <View style={styles.titleRow}>
           <Text style={styles.title}>{text.name}</Text>
-          {!scannerOnly && <Text style={styles.price}>£{area.price.singleTour.toFixed(2)}</Text>}
+          {!scannerOnly && <Text style={styles.price}>{t("common.free")}</Text>}
         </View>
         {!scannerOnly && (
           <>

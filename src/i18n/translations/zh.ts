@@ -4,6 +4,7 @@ const zh: TranslationDict = {
   nav: { home: "首页", map: "3D 地图", tours: "行程", account: "账户", help: "帮助" },
 
   common: {
+    free: "免费",
     min: "分钟",
     km: "公里",
     stops: "个站点",

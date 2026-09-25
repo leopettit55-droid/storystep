@@ -2,6 +2,7 @@ const en = {
   nav: { home: "Home", map: "Explore Map", tours: "Tours", account: "Account", help: "Help" },
 
   common: {
+    free: "Free",
     min: "min",
     km: "km",
     stops: "stops",

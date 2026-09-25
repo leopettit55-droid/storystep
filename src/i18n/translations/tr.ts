@@ -4,6 +4,7 @@ const tr: TranslationDict = {
   nav: { home: "Ana Sayfa", map: "3D Harita", tours: "Turlar", account: "Hesap", help: "Yardım" },
 
   common: {
+    free: "Ücretsiz",
     min: "dk",
     km: "km",
     stops: "durak",

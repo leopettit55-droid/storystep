@@ -4,6 +4,7 @@ const id: TranslationDict = {
   nav: { home: "Beranda", map: "Peta 3D", tours: "Tur", account: "Akun", help: "Bantuan" },
 
   common: {
+    free: "Gratis",
     min: "mnt",
     km: "km",
     stops: "perhentian",

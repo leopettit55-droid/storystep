@@ -4,6 +4,7 @@ const vi: TranslationDict = {
   nav: { home: "Trang chủ", map: "Bản đồ 3D", tours: "Tour", account: "Tài khoản", help: "Trợ giúp" },
 
   common: {
+    free: "Miễn phí",
     min: "phút",
     km: "km",
     stops: "điểm dừng",

@@ -4,6 +4,7 @@ const ar: TranslationDict = {
   nav: { home: "الرئيسية", map: "خريطة ثلاثية الأبعاد", tours: "الجولات", account: "الحساب", help: "المساعدة" },
 
   common: {
+    free: "مجاني",
     min: "دقيقة",
     km: "كم",
     stops: "محطات",

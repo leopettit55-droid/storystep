@@ -4,6 +4,7 @@ const fr: TranslationDict = {
   nav: { home: "Accueil", map: "Carte 3D", tours: "Parcours", account: "Compte", help: "Aide" },
 
   common: {
+    free: "Gratuit",
     min: "min",
     km: "km",
     stops: "étapes",

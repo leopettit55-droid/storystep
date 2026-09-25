@@ -4,6 +4,7 @@ const ko: TranslationDict = {
   nav: { home: "홈", map: "3D 지도", tours: "투어", account: "계정", help: "도움말" },
 
   common: {
+    free: "무료",
     min: "분",
     km: "km",
     stops: "개 정류장",

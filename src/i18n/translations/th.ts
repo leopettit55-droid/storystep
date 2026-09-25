@@ -4,6 +4,7 @@ const th: TranslationDict = {
   nav: { home: "หน้าแรก", map: "แผนที่ 3 มิติ", tours: "ทัวร์", account: "บัญชี", help: "ช่วยเหลือ" },
 
   common: {
+    free: "ฟรี",
     min: "นาที",
     km: "กม.",
     stops: "จุดแวะ",

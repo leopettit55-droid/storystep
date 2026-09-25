@@ -21,7 +21,7 @@ import type { ThemeColors } from "../theme";
 
 type Nav = TabScreenNav<"Tours">;
 
-const CITIES: Area["city"][] = ["London", "Paris", "Oxford"];
+const CITIES: Area["city"][] = ["Oxford", "London", "Paris"];
 
 const DIFFICULTY_KEYS: Record<Area["difficulty"], string> = {
   easy: "common.easy",
@@ -91,7 +91,7 @@ export default function AreaSelectScreen() {
                     {t("common.km")} · {t(DIFFICULTY_KEYS[item.difficulty])}
                   </Text>
                   <Text style={styles.cardPrice}>
-                    {t("common.from")} £{item.price.singleTour.toFixed(2)}
+                    {t("common.free")}
                   </Text>
                 </>
               )}

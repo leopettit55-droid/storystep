@@ -4,6 +4,7 @@ const hi: TranslationDict = {
   nav: { home: "होम", map: "3D मैप", tours: "टूर", account: "खाता", help: "सहायता" },
 
   common: {
+    free: "मुफ़्त",
     min: "मिनट",
     km: "किमी",
     stops: "पड़ाव",
