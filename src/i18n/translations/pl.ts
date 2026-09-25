@@ -111,6 +111,8 @@ const pl: TranslationDict = {
   },
 
   tourPreview: {
+    useScanner: "Użyj naszego skanera zabytków",
+    scannerFree: "Za darmo — bez kupowania wycieczki",
     getMeToStart: "Zaprowadź mnie na start",
     buyTour: "Kup wycieczkę — {{price}}",
     startsAt: "Start: {{label}}",

@@ -5,11 +5,15 @@ import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import LandmarkResultCard from "../components/LandmarkResultCard";
 import PressScale from "../components/PressScale";
+import { type Coordinates } from "../content";
 import { bearingDegrees, distanceMeters } from "../geofencing/proximityTracker";
-import { computeRouteGuidance } from "../geofencing/routeGuide";
+import { RouteProgress } from "../geofencing/routeGuide";
 import { notifyError, notifySuccess } from "../haptics";
-import { identifyLandmark, type LandmarkResult } from "../landmark/identifyLandmark";
+import { primeLandmarkAudio, stopLandmarkSpeech, useLandmarkSpeech } from "../landmark/landmarkSpeech";
+import { describeMatch, scanLandmark, speakMatch, type ScanOutcome } from "../landmark/scan";
+import type { LandmarkMatch } from "../landmark/recognize";
 import type { RootStackParamList } from "../navigation/types";
 import { selectCurrentWaypoint, useTourStore } from "../state/tourStore";
 import { useTheme } from "../ThemeContext";
@@ -89,28 +93,38 @@ interface HudInfo {
 type Nav = NativeStackNavigationProp<RootStackParamList, "ARCamera">;
 type RouteProp = { params: RootStackParamList["ARCamera"] };
 
-/** Full-screen AR walking guide: the real camera feed with a 3D penguin
- * standing ~2.5m ahead (back to the user, like someone leading you) and a
- * ground guide-line ribbon pointing toward the current waypoint. Purely a
- * visual layer — it reads live position from the same useTourStore +
- * ProximityTracker that ActiveTourScreen already uses (which keeps running
- * underneath, unaffected, since react-navigation keeps it mounted while this
- * screen sits on top), and never touches narration playback. */
+/** Full-screen camera view with two modes.
+ *
+ * "tour": the live camera with a 3D penguin ~3m ahead (back to the user, like
+ * someone leading you) and a ground ribbon along the tour's real path, plus
+ * turn prompts. A purely visual layer over the tour ActiveTourScreen keeps
+ * running underneath (react-navigation keeps it mounted).
+ *
+ * "scanner": just the camera, position and compass — for the free landmark
+ * scanner, which needs no tour and no purchase.
+ *
+ * In both, "Scan landmark" reads the picture together with GPS position and
+ * compass heading, pauses any tour narration, speaks what it found, and
+ * resumes the tour afterwards. */
 export default function ARCameraScreen() {
   const navigation = useNavigation<Nav>();
   const { params } = useRoute() as unknown as RouteProp;
+  const mode = params?.mode ?? "tour";
   const { colors } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const userRef = useRef<Coordinates | null>(null);
+  const headingRef = useRef<{ deg: number; absolute: boolean }>({ deg: 0, absolute: false });
   const [hud, setHud] = useState<HudInfo>({ distanceText: null, turnText: null, turnAngle: 0 });
   const [errorText, setErrorText] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [scanning, setScanning] = useState(false);
-  const [scanResults, setScanResults] = useState<LandmarkResult[] | null>(null);
+  const [outcome, setOutcome] = useState<ScanOutcome | null>(null);
   const [scanError, setScanError] = useState<string | null>(null);
   const [capturing, setCapturing] = useState(false);
   const [photoMessage, setPhotoMessage] = useState<string | null>(null);
   const photoMessageTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const speaking = useLandmarkSpeech((s) => s.speaking);
 
   const showPhotoMessage = (text: string) => {
     setPhotoMessage(text);
@@ -173,27 +187,34 @@ export default function ARCameraScreen() {
     }
   };
 
-  // Captures the current camera frame straight off the live <video> feed
-  // already driving the AR view — no separate camera session needed, so
-  // scanning works without interrupting the penguin/ribbon guide at all.
+  // Reads the picture off the live <video> feed already driving this view —
+  // no separate camera session, so scanning never interrupts the guide.
   const handleScan = async () => {
+    // Must run synchronously inside the tap so the browser lets audio and
+    // speech start once the network calls below have finished.
+    primeLandmarkAudio();
     const video = videoRef.current;
     if (!video || scanning) return;
     setScanning(true);
     setScanError(null);
-    setScanResults(null);
+    setOutcome(null);
     try {
       const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      // Vision doesn't need full resolution; smaller uploads answer faster on mobile data.
+      const scale = Math.min(1, 1024 / Math.max(video.videoWidth, video.videoHeight));
+      canvas.width = Math.round(video.videoWidth * scale);
+      canvas.height = Math.round(video.videoHeight * scale);
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Couldn't capture the camera frame.");
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.6);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
       const base64 = dataUrl.slice(dataUrl.indexOf(",") + 1);
-      const results = await identifyLandmark(base64);
-      setScanResults(results);
-      if (results.length > 0) notifySuccess();
+
+      const user = useTourStore.getState().lastKnownLocation ?? userRef.current;
+      const heading = headingRef.current.absolute ? headingRef.current.deg : null;
+      const result = await scanLandmark({ base64, areaId: params?.areaId, user, headingDeg: heading });
+      setOutcome(result);
+      if (result.shown) notifySuccess();
       else notifyError();
     } catch (e) {
       notifyError();
@@ -203,9 +224,25 @@ export default function ARCameraScreen() {
     }
   };
 
+  const handlePickAlternative = (id: string) => {
+    if (!outcome) return;
+    const { best, alternatives } = outcome.recognition;
+    const picked: LandmarkMatch | undefined = alternatives.find((a) => a.landmark.id === id);
+    if (!picked) return;
+    const rest = alternatives.filter((a) => a.landmark.id !== id);
+    setOutcome({
+      ...outcome,
+      recognition: { ...outcome.recognition, best: picked, alternatives: best ? [best, ...rest] : rest },
+      shown: describeMatch(picked),
+    });
+    void speakMatch(picked);
+  };
+
   useEffect(() => {
     return () => {
       if (photoMessageTimer.current) clearTimeout(photoMessageTimer.current);
+      // Never leave the tour paused if the visitor leaves mid-narration.
+      stopLandmarkSpeech();
     };
   }, []);
 
@@ -245,28 +282,18 @@ export default function ARCameraScreen() {
         });
         await video.play();
 
-        const canvas = document.createElement("canvas");
-        Object.assign(canvas.style, { position: "absolute", inset: "0", width: "100%", height: "100%" });
-        containerRef.current?.appendChild(canvas);
-        cleanupFns.push(() => canvas.remove());
-
         // --- device orientation (compass) ---
         // Permission (iOS) was already requested and granted from the launch
-        // button on ActiveTourScreen, directly in that tap — requesting it
-        // again here would fail (no longer inside a fresh user gesture). We
-        // just wire up the listeners; they'll simply stay quiet if consent
-        // wasn't actually granted (params.orientationGranted === false).
-        // `heading` must update on every single orientation event no matter
-        // what — freezing it, even briefly, makes the whole guide look dead
-        // ("stuck no matter which way you turn"). But a plain "deviceorientation"
-        // event's alpha is relative to wherever the phone happened to be
-        // pointed when tracking started, not true north, so raw alpha alone
-        // isn't a compass reading. The fix: always derive heading live from
-        // alpha, and maintain a calibration offset that snaps to true north
-        // whenever a real compass reading is available (iOS webkitCompassHeading
-        // on every event; Android via the separate "deviceorientationabsolute"
-        // event, which can fire far less often than plain "deviceorientation") —
-        // so it's live-updating AND accurate, instead of one or the other.
+        // button, directly in that tap — requesting it again here would fail
+        // (no longer inside a fresh user gesture). We just wire up the
+        // listeners; they'll simply stay quiet if consent wasn't granted.
+        // `heading` must update on every single orientation event — freezing
+        // it makes the whole guide look dead. But a plain "deviceorientation"
+        // event's alpha is relative to wherever the phone was pointed when
+        // tracking started, not true north, so we derive heading live from
+        // alpha and keep a calibration offset that snaps to true north
+        // whenever a real compass reading arrives (iOS webkitCompassHeading
+        // on every event; Android via the sparser "deviceorientationabsolute").
         const orientation = { heading: 0, quaternion: new THREE.Quaternion(), headingOffset: 0 };
         let screenAngle = (screen.orientation && screen.orientation.angle) || (window as any).orientation || 0;
         const handleOrientationChange = () => {
@@ -284,8 +311,10 @@ export default function ARCameraScreen() {
             if (isAbsolute) {
               const trueHeading = typeof webkitHeading === "number" ? webkitHeading : rawHeading;
               orientation.headingOffset = trueHeading - rawHeading;
+              headingRef.current.absolute = true;
             }
             orientation.heading = (rawHeading + orientation.headingOffset + 360) % 360;
+            headingRef.current.deg = orientation.heading;
           }
 
           const alpha = toRad(event.alpha || 0);
@@ -299,6 +328,27 @@ export default function ARCameraScreen() {
           window.removeEventListener("deviceorientationabsolute", handleOrientation as EventListener, true);
           window.removeEventListener("deviceorientation", handleOrientation as EventListener, true);
         });
+
+        if (mode === "scanner") {
+          // No tour is running, so nothing else is tracking position — watch it
+          // here, straight through the browser (expo-location's web watcher
+          // drops updates; see ProximityTracker).
+          const watchId = navigator.geolocation?.watchPosition(
+            (pos) => {
+              userRef.current = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            },
+            (err) => console.warn("[ARCameraScreen] geolocation error:", err.message),
+            { enableHighAccuracy: true, maximumAge: 1000, timeout: 15000 }
+          );
+          if (watchId != null) cleanupFns.push(() => navigator.geolocation.clearWatch(watchId));
+          if (!cancelled) setReady(true);
+          return;
+        }
+
+        const canvas = document.createElement("canvas");
+        Object.assign(canvas.style, { position: "absolute", inset: "0", width: "100%", height: "100%" });
+        containerRef.current?.appendChild(canvas);
+        cleanupFns.push(() => canvas.remove());
 
         // --- three.js scene ---
         const scene = new THREE.Scene();
@@ -373,11 +423,10 @@ export default function ARCameraScreen() {
         if (cancelled) return;
         setReady(true);
 
-        // Route guidance (nearest-point projection + turn scan over a
-        // 100-300 point path) is recomputed at the same cadence as the HUD
-        // below, not every animation frame — the render loop just reads
-        // this cached value each frame, since it doesn't meaningfully
-        // change within 400ms of walking.
+        // Route guidance (path projection + turn scan) is recomputed at the
+        // HUD's cadence, not every animation frame — the render loop just
+        // reads this cached bearing, which doesn't change meaningfully
+        // within 400ms of walking.
         let cachedWalkBearing: number | null = null;
 
         const clock = new THREE.Clock();
@@ -426,16 +475,19 @@ export default function ARCameraScreen() {
         tick();
         cleanupFns.push(() => cancelAnimationFrame(rafId));
 
-        // HUD + route-guidance recompute at a human-readable cadence rather
-        // than every frame — no need to re-render React 60x/sec, and the
-        // path projection is too expensive to redo every animation frame.
+        const tourArea = useTourStore.getState().area;
+        const routeProgress =
+          tourArea?.path && tourArea.path.length > 1 ? new RouteProgress(tourArea.path, tourArea.route) : null;
+
+        // HUD + route guidance recompute at a human-readable cadence rather
+        // than every frame.
         const hudInterval = setInterval(() => {
           const state = useTourStore.getState();
-          const waypoint = selectCurrentWaypoint(state);
+          const area = state.area;
+          const current = selectCurrentWaypoint(state);
           const userCoords = state.lastKnownLocation;
-          const path = state.area?.path;
 
-          if (!waypoint) {
+          if (!area || !current) {
             cachedWalkBearing = null;
             setHud({ distanceText: null, turnText: null, turnAngle: 0 });
             return;
@@ -446,26 +498,34 @@ export default function ARCameraScreen() {
             return;
           }
 
-          // Prefer the real street-following path (routed from a mapping
-          // service, same polyline the map uses) for both "which way to
-          // walk right now" and distance — a straight line to the next
-          // waypoint can cut straight through a building. Falls back to the
-          // direct bearing/distance for the handful of tours with no path
-          // data yet.
-          const guidance = path && path.length > 1 ? computeRouteGuidance(path, userCoords) : null;
-          const walkBearing = guidance?.walkBearing ?? bearingDegrees(userCoords, waypoint.coordinates);
-          const d = guidance?.pathDistanceTo(waypoint.coordinates) ?? distanceMeters(userCoords, waypoint.coordinates);
+          // Aim at the stop the walker is actually heading to — by progress
+          // along the real path, not the tour store's "current stop", which is
+          // simply the last one whose narration started (the one just left).
+          let target = current;
+          let walkBearing: number;
+          let distance: number;
+          let turn: { distanceMeters: number; turnAngleDeg: number } | null = null;
+          if (routeProgress) {
+            const g = routeProgress.update(userCoords, state.visitedWaypointIds);
+            target = area.route[g.targetIndex] ?? current;
+            walkBearing = g.walkBearing;
+            distance = g.distanceToTarget;
+            turn = g.upcomingTurn;
+          } else {
+            if (state.visitedWaypointIds.includes(current.id)) {
+              target = area.route[state.currentWaypointIndex + 1] ?? current;
+            }
+            walkBearing = bearingDegrees(userCoords, target.coordinates);
+            distance = distanceMeters(userCoords, target.coordinates);
+          }
           cachedWalkBearing = walkBearing;
 
           const rel = normalizeAngle(walkBearing - orientation.heading);
           const abs = Math.abs(rel);
 
           // An upcoming sharp bend in the path takes priority over the
-          // general "which way am I facing" correction — that's the actual
-          // "turn left/right as part of the route" instruction, called out
-          // as it approaches rather than only once you're already on top
-          // of it.
-          const turn = guidance?.upcomingTurn;
+          // general "which way am I facing" correction — called out as it
+          // approaches rather than once you're already on top of it.
           let turnText: string;
           let turnAngle: number;
           if (turn && turn.distanceMeters <= 15) {
@@ -478,14 +538,14 @@ export default function ARCameraScreen() {
           }
 
           setHud({
-            distanceText: `${Math.round(d)}m to ${waypoint.name}`,
+            distanceText: `${Math.round(distance)}m to ${target.name}`,
             turnText,
             turnAngle,
           });
         }, 400);
         cleanupFns.push(() => clearInterval(hudInterval));
       } catch (err) {
-        console.warn("[ARCameraScreen] failed to start AR view:", err);
+        console.warn("[ARCameraScreen] failed to start camera view:", err);
         const message = err instanceof Error ? err.message : String(err);
         const denied = message.includes("denied") || (err as any)?.name === "NotAllowedError";
         setErrorText(
@@ -503,6 +563,17 @@ export default function ARCameraScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const rec = outcome?.recognition;
+  const hint = outcome
+    ? outcome.visionError
+      ? "Couldn't read the picture, so this is based on where you're standing."
+      : !rec?.usedPosition
+        ? "No GPS fix yet — with location on, this gets more accurate."
+        : rec?.best && rec.best.score < 0.45
+          ? "Best guess — try standing a little closer and centring it."
+          : undefined
+    : undefined;
+
   return (
     <View style={styles.container}>
       {/* eslint-disable-next-line react/no-unknown-property */}
@@ -513,14 +584,21 @@ export default function ARCameraScreen() {
           <Pressable style={styles.closeButton} onPress={() => navigation.goBack()} hitSlop={8}>
             <Ionicons name="close" size={22} color="#fff" />
           </Pressable>
+          {mode === "scanner" && (
+            <View style={styles.modePill}>
+              <Text style={styles.modePillText}>Landmark scanner · free</Text>
+            </View>
+          )}
           {!params?.orientationGranted && ready && (
             <View style={styles.compassWarning}>
-              <Text style={styles.compassWarningText}>Compass unavailable — guide may not track turns</Text>
+              <Text style={styles.compassWarningText}>
+                Compass unavailable — {mode === "scanner" ? "identifying by picture and location only" : "guide may not track turns"}
+              </Text>
             </View>
           )}
         </View>
 
-        {hud.turnText && (
+        {mode === "tour" && hud.turnText && (
           <View style={styles.turnPrompt}>
             <Text style={[styles.turnArrow, { transform: [{ rotate: `${hud.turnAngle}deg` }] }]}>↑</Text>
             <Text style={styles.turnText}>{hud.turnText}</Text>
@@ -528,34 +606,37 @@ export default function ARCameraScreen() {
         )}
 
         <View style={styles.bottomGroup} pointerEvents="box-none">
-          {scanResults && scanResults.length > 0 && (
-            <View style={styles.resultCard}>
-              <Text style={styles.resultName}>{scanResults[0].name}</Text>
-              <Text style={styles.resultScore}>{Math.round(scanResults[0].score * 100)}% match</Text>
-              {scanResults[0].ourScript && (
-                <Text style={styles.resultBody} numberOfLines={4}>
-                  {scanResults[0].ourScript}
-                </Text>
-              )}
-            </View>
+          {outcome?.shown && (
+            <LandmarkResultCard
+              title={outcome.shown.title}
+              body={outcome.shown.body}
+              note={outcome.shown.note}
+              speaking={speaking}
+              onStop={stopLandmarkSpeech}
+              alternatives={(rec?.alternatives ?? []).map((a) => ({ id: a.landmark.id, name: a.landmark.name }))}
+              onPickAlternative={handlePickAlternative}
+              hint={hint}
+            />
           )}
-          {scanResults && scanResults.length === 0 && !scanError && (
-            <View style={styles.resultCard}>
-              <Text style={styles.resultHint}>Couldn't identify a landmark — try centering it in view.</Text>
+          {outcome && !outcome.shown && (
+            <View style={styles.simpleCard}>
+              <Text style={styles.simpleCardText}>
+                Couldn't identify that. Try a building, tree or feature, stand a little closer, and keep it in the middle of the picture.
+              </Text>
             </View>
           )}
           {scanError && (
-            <View style={styles.resultCard}>
-              <Text style={styles.resultHint}>{scanError}</Text>
+            <View style={styles.simpleCard}>
+              <Text style={styles.simpleCardText}>{scanError}</Text>
             </View>
           )}
           {photoMessage && (
-            <View style={styles.resultCard}>
-              <Text style={styles.resultHint}>{photoMessage}</Text>
+            <View style={styles.simpleCard}>
+              <Text style={styles.simpleCardText}>{photoMessage}</Text>
             </View>
           )}
 
-          {hud.distanceText && (
+          {mode === "tour" && hud.distanceText && (
             <View style={styles.distancePill}>
               <Text style={styles.distanceText}>{hud.distanceText}</Text>
             </View>
@@ -589,7 +670,7 @@ export default function ARCameraScreen() {
         <View style={styles.errorOverlay}>
           <Text style={styles.errorTitle}>{errorText}</Text>
           <Pressable style={styles.errorBackButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.errorBackButtonText}>Back to tour</Text>
+            <Text style={styles.errorBackButtonText}>Back</Text>
           </Pressable>
         </View>
       )}
@@ -618,6 +699,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "rgba(0,0,0,0.45)",
   },
+  modePill: {
+    backgroundColor: "rgba(0,0,0,0.45)",
+    borderRadius: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  modePillText: { color: "#fff", fontSize: 12, fontWeight: "700" },
   compassWarning: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.45)",
@@ -645,17 +733,13 @@ const styles = StyleSheet.create({
   },
   distanceText: { color: "#d9dfdc", fontSize: 13 },
   bottomGroup: { alignItems: "center", gap: 10 },
-  resultCard: {
+  simpleCard: {
     alignSelf: "stretch",
     backgroundColor: "rgba(10,10,10,0.75)",
     borderRadius: 16,
     padding: 14,
-    gap: 4,
   },
-  resultName: { color: "#fff", fontSize: 17, fontWeight: "700" },
-  resultScore: { color: "rgba(255,255,255,0.6)", fontSize: 12 },
-  resultBody: { color: "rgba(255,255,255,0.85)", fontSize: 13, lineHeight: 18, marginTop: 4 },
-  resultHint: { color: "rgba(255,255,255,0.8)", fontSize: 13, textAlign: "center" },
+  simpleCardText: { color: "rgba(255,255,255,0.85)", fontSize: 13, textAlign: "center", lineHeight: 18 },
   actionRow: { flexDirection: "row", alignItems: "center", gap: 16 },
   scanButton: {
     flexDirection: "row",

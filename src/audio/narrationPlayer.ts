@@ -5,6 +5,27 @@ import { resolveAudioSource } from "./audioCache";
 let player: AudioPlayer | null = null;
 let endedHandler: (() => void) | null = null;
 
+// While the landmark scanner is speaking, tour narration must not start over
+// it. A waypoint that fires meanwhile is parked here and played when released.
+let held = false;
+let pendingWaypoint: Waypoint | null = null;
+
+export function holdWaypointNarration(): void {
+  held = true;
+}
+
+/** Ends the hold; returns a waypoint that fired during it, if any (not yet played). */
+export function releaseWaypointNarration(): Waypoint | null {
+  held = false;
+  const parked = pendingWaypoint;
+  pendingWaypoint = null;
+  return parked;
+}
+
+export function isNarrationPlaying(): boolean {
+  return !!player?.playing;
+}
+
 export async function setupAudioPlayback(): Promise<void> {
   await setAudioModeAsync({
     playsInSilentMode: true,
@@ -20,6 +41,10 @@ export function setNarrationEndedHandler(handler: (() => void) | null): void {
 
 /** Resolves the waypoint's narration (bundled or cached-remote) and starts playback. */
 export async function playWaypointNarration(waypoint: Waypoint): Promise<void> {
+  if (held) {
+    pendingWaypoint = waypoint;
+    return;
+  }
   const source = await resolveAudioSource(
     waypoint.id,
     waypoint.narration.audioSource

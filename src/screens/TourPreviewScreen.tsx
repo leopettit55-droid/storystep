@@ -1,12 +1,14 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useCallback, useMemo, useState } from "react";
-import { Alert, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Alert, Platform, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import BackButton from "../components/BackButton";
 import PressScale from "../components/PressScale";
 import RouteMap from "../components/RouteMap";
 import Skeleton from "../components/Skeleton";
 import { getAreaById } from "../content";
+import { requestOrientationPermission } from "../landmark/orientationPermission";
 import { localizedAreaText } from "../i18n/areaTranslations";
 import { useLanguage } from "../i18n/LanguageContext";
 import type { RootStackParamList } from "../navigation/types";
@@ -57,6 +59,18 @@ export default function TourPreviewScreen() {
   const handleGetToStart = () => {
     selectArea(area.id);
     navigation.navigate("GetToStart", { areaId: area.id });
+  };
+
+  // Free for everyone, no purchase needed. On the web it opens the camera
+  // scanner (asking for compass access first, straight from this tap); on
+  // native it opens the standard landmark camera.
+  const handleOpenScanner = async () => {
+    if (Platform.OS === 'web') {
+      const orientationGranted = await requestOrientationPermission();
+      navigation.navigate('ARCamera', { areaId: area.id, orientationGranted, mode: 'scanner' });
+    } else {
+      navigation.navigate('CameraTour', { areaId: area.id });
+    }
   };
 
   const handleBuy = async () => {
@@ -112,6 +126,8 @@ export default function TourPreviewScreen() {
           {t("tourPreview.startsAt", { label: area.startingPoint.label })}
         </Text>
 
+        {area.accessNote && <Text style={styles.accessNote}>{area.accessNote}</Text>}
+
         {owned === null ? (
           <Skeleton style={[styles.cta, styles.ctaSkeleton]} borderRadius={14} />
         ) : owned ? (
@@ -123,6 +139,16 @@ export default function TourPreviewScreen() {
             <Text style={styles.ctaText}>
               {t("tourPreview.buyTour", { price: `£${area.price.singleTour.toFixed(2)}` })}
             </Text>
+          </PressScale>
+        )}
+
+        {area.freeLandmarkScanner && (
+          <PressScale style={styles.scannerButton} scaleTo={0.96} onPress={handleOpenScanner}>
+            <Ionicons name="scan" size={18} color={colors.primary} />
+            <View>
+              <Text style={styles.scannerButtonText}>{t('tourPreview.useScanner')}</Text>
+              <Text style={styles.scannerButtonSub}>{t('tourPreview.scannerFree')}</Text>
+            </View>
           </PressScale>
         )}
       </View>
@@ -161,5 +187,27 @@ function createStyles(colors: ThemeColors) {
   },
   ctaText: { color: colors.onPrimary, fontSize: 16, fontWeight: "600" },
   ctaSkeleton: { height: 52 },
+  accessNote: {
+    fontSize: 12,
+    lineHeight: 17,
+    color: colors.textMid,
+    marginTop: 12,
+    backgroundColor: colors.warnBg,
+    borderRadius: 10,
+    padding: 10,
+  },
+  scannerButton: {
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    borderRadius: 14,
+    paddingVertical: 12,
+  },
+  scannerButtonText: { color: colors.primary, fontSize: 15, fontWeight: '700' },
+  scannerButtonSub: { color: colors.textDim, fontSize: 11, marginTop: 1 },
   });
 }

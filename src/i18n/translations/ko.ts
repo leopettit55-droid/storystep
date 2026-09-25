@@ -111,6 +111,8 @@ const ko: TranslationDict = {
   },
 
   tourPreview: {
+    useScanner: "랜드마크 스캐너 사용하기",
+    scannerFree: "무료 — 투어 구매 불필요",
     getMeToStart: "출발 지점으로 안내",
     buyTour: "투어 구매 — {{price}}",
     startsAt: "출발지: {{label}}",

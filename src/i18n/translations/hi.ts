@@ -111,6 +111,8 @@ const hi: TranslationDict = {
   },
 
   tourPreview: {
+    useScanner: "हमारा लैंडमार्क स्कैनर इस्तेमाल करें",
+    scannerFree: "मुफ़्त — टूर खरीदने की ज़रूरत नहीं",
     getMeToStart: "मुझे शुरुआत तक ले चलें",
     buyTour: "टूर खरीदें — {{price}}",
     startsAt: "यहाँ से शुरू: {{label}}",

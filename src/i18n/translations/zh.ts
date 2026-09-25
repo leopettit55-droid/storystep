@@ -111,6 +111,8 @@ const zh: TranslationDict = {
   },
 
   tourPreview: {
+    useScanner: "使用我们的地标扫描器",
+    scannerFree: "免费 — 无需购买导览",
     getMeToStart: "带我去起点",
     buyTour: "购买行程 — {{price}}",
     startsAt: "起点：{{label}}",

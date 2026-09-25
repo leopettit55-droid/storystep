@@ -15,8 +15,8 @@ export type RootStackParamList = {
   TourPreview: { areaId: string };
   GetToStart: { areaId: string };
   ActiveTour: { areaId: string };
-  CameraTour: undefined;
-  ARCamera: { areaId: string; orientationGranted: boolean };
+  CameraTour: { areaId?: string } | undefined;
+  ARCamera: { areaId: string; orientationGranted: boolean; mode?: "tour" | "scanner" };
   PrivacyPolicy: undefined;
   TermsOfService: undefined;
   ComingSoon: { cityName: string };

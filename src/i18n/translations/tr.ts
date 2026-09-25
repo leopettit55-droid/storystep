@@ -111,6 +111,8 @@ const tr: TranslationDict = {
   },
 
   tourPreview: {
+    useScanner: "Yapı tarayıcımızı kullan",
+    scannerFree: "Ücretsiz — tur satın almak gerekmez",
     getMeToStart: "Beni başlangıca götür",
     buyTour: "Turu satın al — {{price}}",
     startsAt: "Başlangıç: {{label}}",

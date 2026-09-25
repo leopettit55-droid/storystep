@@ -111,6 +111,8 @@ const vi: TranslationDict = {
   },
 
   tourPreview: {
+    useScanner: "Dùng trình quét địa danh của chúng tôi",
+    scannerFree: "Miễn phí — không cần mua tour",
     getMeToStart: "Đưa tôi đến điểm bắt đầu",
     buyTour: "Mua tour — {{price}}",
     startsAt: "Bắt đầu tại {{label}}",

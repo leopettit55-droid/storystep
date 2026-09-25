@@ -111,6 +111,8 @@ const ja: TranslationDict = {
   },
 
   tourPreview: {
+    useScanner: "ランドマークスキャナーを使う",
+    scannerFree: "無料 — ツアーの購入は不要",
     getMeToStart: "出発地点まで案内する",
     buyTour: "ツアーを購入 — {{price}}",
     startsAt: "出発地点：{{label}}",

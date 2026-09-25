@@ -111,6 +111,8 @@ const id: TranslationDict = {
   },
 
   tourPreview: {
+    useScanner: "Gunakan pemindai landmark kami",
+    scannerFree: "Gratis — tanpa perlu membeli tur",
     getMeToStart: "Antar aku ke titik awal",
     buyTour: "Beli tur — {{price}}",
     startsAt: "Mulai di {{label}}",

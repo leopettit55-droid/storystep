@@ -111,6 +111,8 @@ const ar: TranslationDict = {
   },
 
   tourPreview: {
+    useScanner: "استخدم ماسح المعالم لدينا",
+    scannerFree: "مجاني — لا حاجة لشراء الجولة",
     getMeToStart: "خذني إلى نقطة البداية",
     buyTour: "شراء الجولة — {{price}}",
     startsAt: "تبدأ من {{label}}",

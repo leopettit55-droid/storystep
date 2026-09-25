@@ -6,6 +6,7 @@ import { Platform, Pressable, SafeAreaView, StyleSheet, Text, View } from "react
 import PressScale from "../components/PressScale";
 import { notifySuccess } from "../haptics";
 import {
+  isNarrationPlaying,
   pauseNarration,
   playWaypointNarration,
   replayCurrentNarration,
@@ -21,6 +22,7 @@ import {
   stopWaypointGeofencing,
 } from "../geofencing/geofenceManager";
 import { ProximityTracker } from "../geofencing/proximityTracker";
+import { requestOrientationPermission } from "../landmark/orientationPermission";
 import { localizedAreaText } from "../i18n/areaTranslations";
 import { useLanguage } from "../i18n/LanguageContext";
 import type { RootStackParamList } from "../navigation/types";
@@ -61,22 +63,56 @@ export default function ActiveTourScreen() {
 
   const trackerRef = useRef<ProximityTracker | null>(null);
   const visitedRef = useRef(new Set<string>());
+  /** A stop that fired while the previous narration was still playing (sequential tours only). */
+  const queuedRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!area) return;
 
     let cancelled = false;
 
+    // The stop the walker should reach next: the one after the last stop whose
+    // narration started (or the first stop, before anything has played).
+    const expectedIndex = () => {
+      const s = useTourStore.getState();
+      const cur = s.area?.route[s.currentWaypointIndex];
+      return cur && s.visitedWaypointIds.includes(cur.id) ? s.currentWaypointIndex + 1 : Math.max(0, s.currentWaypointIndex);
+    };
+
     const handleWaypointEnter = (waypointId: string) => {
       if (visitedRef.current.has(waypointId)) return;
-      visitedRef.current.add(waypointId);
       const waypoint = area.route.find((w) => w.id === waypointId);
       if (!waypoint) return;
+
+      // Compact routes (a college's courtyards sit closer together than GPS
+      // can separate) fire stops strictly in order and never talk over the
+      // narration still playing. A stop that arrives early is parked and
+      // played as soon as the current one finishes; the tracker is re-armed
+      // so a stop that fired too soon or out of order can fire again later.
+      if (area.sequentialStops) {
+        const idx = area.route.indexOf(waypoint);
+        if (idx !== expectedIndex()) {
+          trackerRef.current?.resetTriggeredWaypoint(waypointId);
+          return;
+        }
+        if (isNarrationPlaying()) {
+          queuedRef.current = waypointId;
+          trackerRef.current?.resetTriggeredWaypoint(waypointId);
+          return;
+        }
+      }
+
+      queuedRef.current = null;
+      visitedRef.current.add(waypointId);
       enterWaypoint(waypointId);
       void playWaypointNarration(waypoint);
     };
 
     const handleNarrationEnded = () => {
+      if (queuedRef.current) {
+        handleWaypointEnter(queuedRef.current);
+        return;
+      }
       const current = selectCurrentWaypoint(useTourStore.getState());
       if (!current) return;
       const isLast = current.id === area.route[area.route.length - 1]?.id;
@@ -200,17 +236,8 @@ export default function ActiveTourScreen() {
   // camera screen — the narration keeps playing underneath either way, since
   // this screen stays mounted while ARCamera sits on top of it.
   const handleOpenARGuide = async () => {
-    let orientationGranted = true;
-    try {
-      const DOEvent = (window as any).DeviceOrientationEvent;
-      if (DOEvent && typeof DOEvent.requestPermission === "function") {
-        const result = await DOEvent.requestPermission();
-        orientationGranted = result === "granted";
-      }
-    } catch (e) {
-      orientationGranted = false;
-    }
-    navigation.navigate("ARCamera", { areaId: area.id, orientationGranted });
+    const orientationGranted = await requestOrientationPermission();
+    navigation.navigate("ARCamera", { areaId: area.id, orientationGranted, mode: "tour" });
   };
 
   return (
@@ -223,7 +250,7 @@ export default function ActiveTourScreen() {
         <PressScale style={styles.exitButton} scaleTo={0.9} onPress={() => navigation.goBack()} hitSlop={8}>
           <Ionicons name="close" size={20} color={colors.textMid} />
         </PressScale>
-        <PressScale style={styles.scanButton} scaleTo={0.94} onPress={() => navigation.navigate("CameraTour")}>
+        <PressScale style={styles.scanButton} scaleTo={0.94} onPress={() => navigation.navigate("CameraTour", { areaId: area.id })}>
           <Ionicons name="camera" size={16} color={colors.onPrimary} />
           <Text style={styles.scanButtonText}>{t("activeTour.scanLandmarks")}</Text>
         </PressScale>

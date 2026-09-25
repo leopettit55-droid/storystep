@@ -109,6 +109,8 @@ const en = {
   },
 
   tourPreview: {
+    useScanner: "Use our landmark scanner",
+    scannerFree: "Free — no tour purchase needed",
     getMeToStart: "Get me to the start",
     buyTour: "Buy tour — {{price}}",
     startsAt: "Starts at {{label}}",

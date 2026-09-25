@@ -111,6 +111,8 @@ const nl: TranslationDict = {
   },
 
   tourPreview: {
+    useScanner: "Gebruik onze monumentenscanner",
+    scannerFree: "Gratis — geen tour kopen nodig",
     getMeToStart: "Breng me naar de start",
     buyTour: "Tour kopen — {{price}}",
     startsAt: "Start bij {{label}}",

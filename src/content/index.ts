@@ -16,6 +16,7 @@ import { oxfordHarryPotter } from "./areas/oxford-harry-potter";
 import { oxfordBodleian } from "./areas/oxford-bodleian";
 import { oxfordCastleMarket } from "./areas/oxford-castle-market";
 import { oxfordInklings } from "./areas/oxford-inklings";
+import { oxfordMagdalen } from "./areas/oxford-magdalen";
 import type { Area } from "./schema";
 
 export const areas: Area[] = [
@@ -37,6 +38,7 @@ export const areas: Area[] = [
   oxfordBodleian,
   oxfordCastleMarket,
   oxfordInklings,
+  oxfordMagdalen,
 ];
 
 export function getAreaById(id: string): Area | undefined {

@@ -1,7 +1,8 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { useRef, useState } from "react";
+import * as Location from "expo-location";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -10,30 +11,61 @@ import {
   Text,
   View,
 } from "react-native";
+import LandmarkResultCard from "../components/LandmarkResultCard";
 import PressScale from "../components/PressScale";
+import type { Coordinates } from "../content";
 import { notifyError, notifySuccess } from "../haptics";
 import { useLanguage } from "../i18n/LanguageContext";
-import { GOOGLE_VISION_API_KEY, identifyLandmark, type LandmarkResult } from "../landmark/identifyLandmark";
+import { primeLandmarkAudio, stopLandmarkSpeech, useLandmarkSpeech } from "../landmark/landmarkSpeech";
+import { GOOGLE_VISION_API_KEY } from "../landmark/recognize";
+import { describeMatch, scanLandmark, speakMatch, type ScanOutcome } from "../landmark/scan";
 import type { RootStackParamList } from "../navigation/types";
+import { useTourStore } from "../state/tourStore";
 import { colors } from "../theme";
 
 type Nav = NativeStackNavigationProp<RootStackParamList, "CameraTour">;
 
+/** Position for the scan: the running tour's latest fix, else a one-off reading. */
+async function currentPosition(): Promise<Coordinates | null> {
+  const fromTour = useTourStore.getState().lastKnownLocation;
+  if (fromTour) return fromTour;
+  try {
+    const perm = await Location.getForegroundPermissionsAsync();
+    if (!perm.granted) return null;
+    const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+    return { lat: loc.coords.latitude, lng: loc.coords.longitude };
+  } catch {
+    return null;
+  }
+}
+
+/** The camera scanner for native devices (the web build uses the richer
+ * ARCamera screen, which also knows the compass heading). Same recognise →
+ * pause the tour → speak → resume flow. */
 export default function CameraTourScreen() {
   const navigation = useNavigation<Nav>();
+  const route = useRoute();
+  const areaId = (route.params as { areaId?: string } | undefined)?.areaId;
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView>(null);
   const { t } = useLanguage();
+  const speaking = useLandmarkSpeech((s) => s.speaking);
 
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [results, setResults] = useState<LandmarkResult[] | null>(null);
+  const [outcome, setOutcome] = useState<ScanOutcome | null>(null);
+
+  useEffect(() => {
+    // Never leave the tour paused if the visitor leaves mid-narration.
+    return () => stopLandmarkSpeech();
+  }, []);
 
   const handleScan = async () => {
+    primeLandmarkAudio();
     if (!cameraRef.current || scanning) return;
     setScanning(true);
     setError(null);
-    setResults(null);
+    setOutcome(null);
     try {
       const photo = await cameraRef.current.takePictureAsync({
         base64: true,
@@ -45,19 +77,35 @@ export default function CameraTourScreen() {
       const rawBase64 = photo.base64.includes(",")
         ? photo.base64.slice(photo.base64.indexOf(",") + 1)
         : photo.base64;
-      const landmarks = await identifyLandmark(rawBase64);
-      setResults(landmarks);
-      if (landmarks.length > 0) {
-        notifySuccess();
-      } else {
-        notifyError();
-      }
+      const result = await scanLandmark({
+        base64: rawBase64,
+        areaId,
+        user: await currentPosition(),
+        headingDeg: null,
+      });
+      setOutcome(result);
+      if (result.shown) notifySuccess();
+      else notifyError();
     } catch (e) {
       notifyError();
       setError(e instanceof Error ? e.message : t("camera.errorGeneric"));
     } finally {
       setScanning(false);
     }
+  };
+
+  const handlePickAlternative = (id: string) => {
+    if (!outcome) return;
+    const { best, alternatives } = outcome.recognition;
+    const picked = alternatives.find((a) => a.landmark.id === id);
+    if (!picked) return;
+    const rest = alternatives.filter((a) => a.landmark.id !== id);
+    setOutcome({
+      ...outcome,
+      recognition: { ...outcome.recognition, best: picked, alternatives: best ? [best, ...rest] : rest },
+      shown: describeMatch(picked),
+    });
+    void speakMatch(picked);
   };
 
   if (!permission) {
@@ -81,6 +129,13 @@ export default function CameraTourScreen() {
     );
   }
 
+  const rec = outcome?.recognition;
+  const hint = outcome?.visionError
+    ? "Couldn't read the picture, so this is based on where you're standing."
+    : outcome && !rec?.usedPosition
+      ? "No GPS fix — with location on, this gets more accurate."
+      : undefined;
+
   return (
     <View style={styles.container}>
       <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing="back" />
@@ -95,21 +150,19 @@ export default function CameraTourScreen() {
 
           {error && <Text style={styles.error}>{error}</Text>}
 
-          {results && results.length === 0 && !error && (
-            <Text style={styles.hint}>{t("camera.hint")}</Text>
+          {outcome?.shown && (
+            <LandmarkResultCard
+              title={outcome.shown.title}
+              body={outcome.shown.body}
+              note={outcome.shown.note}
+              speaking={speaking}
+              onStop={stopLandmarkSpeech}
+              alternatives={(rec?.alternatives ?? []).map((a) => ({ id: a.landmark.id, name: a.landmark.name }))}
+              onPickAlternative={handlePickAlternative}
+              hint={hint}
+            />
           )}
-
-          {results && results.length > 0 && (
-            <View style={styles.resultCard}>
-              <Text style={styles.resultName}>{results[0].name}</Text>
-              <Text style={styles.resultScore}>
-                {t("camera.matchPercent", { percent: Math.round(results[0].score * 100) })}
-              </Text>
-              <Text style={styles.resultBody} numberOfLines={6}>
-                {results[0].ourScript ?? t("camera.noScriptFallback")}
-              </Text>
-            </View>
-          )}
+          {outcome && !outcome.shown && !error && <Text style={styles.hint}>{t("camera.hint")}</Text>}
 
           <PressScale
             style={[styles.scanButton, scanning && styles.scanButtonDisabled]}
@@ -153,16 +206,6 @@ const styles = StyleSheet.create({
   },
   hint: { color: colors.textMid, fontSize: 14, textAlign: "center" },
   error: { color: colors.warnText, fontSize: 13, textAlign: "center" },
-  resultCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  resultName: { fontSize: 20, fontWeight: "700", color: colors.text },
-  resultScore: { fontSize: 12, color: colors.textDim, marginTop: 2 },
-  resultBody: { fontSize: 14, color: colors.textMid, marginTop: 8, lineHeight: 20 },
   scanButton: {
     backgroundColor: colors.primary,
     borderRadius: 14,

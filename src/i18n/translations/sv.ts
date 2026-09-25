@@ -111,6 +111,8 @@ const sv: TranslationDict = {
   },
 
   tourPreview: {
+    useScanner: "Använd vår sevärdhetsskanner",
+    scannerFree: "Gratis – ingen turköp krävs",
     getMeToStart: "Ta mig till starten",
     buyTour: "Köp tur — {{price}}",
     startsAt: "Start vid {{label}}",
