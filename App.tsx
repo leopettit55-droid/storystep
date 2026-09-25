@@ -6,7 +6,7 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ErrorBoundary from "./src/components/ErrorBoundary";
 import { LanguageProvider, useLanguage } from "./src/i18n/LanguageContext";
@@ -67,6 +67,23 @@ function AppInner() {
       <StatusBar style={isDark ? "light" : "dark"} />
       <NavigationContainer
         ref={navigationRef}
+        linking={{
+          // Real web addresses, so a printed QR code can open a specific page:
+          //   /tours                    -> the Tours tab (Oxford is listed first)
+          //   /tour/oxford-magdalen     -> straight to a tour's page
+          // Anything unrecognised falls back to the home page as before.
+          enabled: Platform.OS === "web",
+          prefixes: [],
+          config: {
+            screens: {
+              MainTabs: {
+                path: "",
+                screens: { Home: "", Map: "map", Tours: "tours", Account: "account", Help: "help" },
+              },
+              TourPreview: "tour/:areaId",
+            },
+          },
+        }}
         onReady={() => handlePurchaseReturn(t)}
         theme={{
           ...navTheme,
