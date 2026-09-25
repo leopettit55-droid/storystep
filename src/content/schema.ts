@@ -69,6 +69,8 @@ export interface Area {
   landmarks?: Landmark[];
   /** When true the landmark scanner is offered on the tour page without buying the tour. */
   freeLandmarkScanner?: boolean;
+  /** The place offers only the free landmark scanner: no purchase, price, or tour start. */
+  scannerOnly?: boolean;
   /** Shown on the tour page — e.g. a separate entry ticket the visitor needs. */
   accessNote?: string;
   /** Stops only trigger in order, and never cut off narration that's still playing.

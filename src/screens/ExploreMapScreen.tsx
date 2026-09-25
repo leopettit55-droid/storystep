@@ -40,7 +40,9 @@ export default function ExploreMapScreen() {
                   <Text style={styles.city}>{localizedCityName(area.city, language)}</Text>
                   <Text style={styles.name}>{text.name}</Text>
                   <Text style={styles.meta}>
-                    {t("common.from")} £{area.price.singleTour.toFixed(2)}
+                    {area.scannerOnly
+                      ? t("tourPreview.useScanner")
+                      : `${t("common.from")} £${area.price.singleTour.toFixed(2)}`}
                   </Text>
                 </View>
               </Pressable>

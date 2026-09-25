@@ -38,7 +38,8 @@ export default function HomeScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const featured = areas.filter((a) => a.isContentComplete);
   const cityCount = new Set(featured.map((a) => a.city)).size;
-  const fromPrice = Math.min(...featured.map((a) => a.price.singleTour));
+  const paidTours = featured.filter((a) => !a.scannerOnly);
+  const fromPrice = Math.min(...paidTours.map((a) => a.price.singleTour));
 
   const FEATURES = [
     { title: t("home.featureGpsTitle"), body: t("home.featureGpsBody"), icon: "📍" },
@@ -62,7 +63,7 @@ export default function HomeScreen() {
 
                 <View style={styles.statRow}>
                   <View style={styles.stat}>
-                    <Text style={styles.statNumber}>{featured.length}</Text>
+                    <Text style={styles.statNumber}>{paidTours.length}</Text>
                     <Text style={styles.statLabel}>{t("home.statsTours")}</Text>
                   </View>
                   <View style={styles.statDivider} />
@@ -275,8 +276,9 @@ function FeaturedCard({
               <Text style={styles.featuredCity}>{localizedCityName(area.city, language)}</Text>
               <Text style={styles.featuredTitle}>{text.name}</Text>
               <Text style={styles.featuredMeta}>
-                {area.estimatedDurationMin} {t("common.min")} · {t("common.from")} £
-                {area.price.singleTour.toFixed(2)}
+                {area.scannerOnly
+                  ? t("tourPreview.useScanner")
+                  : `${area.estimatedDurationMin} ${t("common.min")} · ${t("common.from")} £${area.price.singleTour.toFixed(2)}`}
               </Text>
             </View>
           </ImageBackground>

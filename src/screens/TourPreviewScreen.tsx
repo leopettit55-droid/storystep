@@ -55,6 +55,7 @@ export default function TourPreviewScreen() {
   }
 
   const text = localizedAreaText(area.id, language, area);
+  const scannerOnly = !!area.scannerOnly;
 
   const handleGetToStart = () => {
     selectArea(area.id);
@@ -100,54 +101,69 @@ export default function TourPreviewScreen() {
             color: colors.primary,
             title: t("common.start"),
           },
-          ...area.route.map((w) => ({
-            id: w.id,
-            lat: w.coordinates.lat,
-            lng: w.coordinates.lng,
-            color: colors.mapPinNeutral,
-            title: `${w.order}. ${w.name}`,
-          })),
+          ...(scannerOnly
+            ? (area.landmarks ?? []).map((l) => ({
+                id: l.id,
+                lat: l.coordinates.lat,
+                lng: l.coordinates.lng,
+                color: colors.mapPinNeutral,
+                title: l.name,
+              }))
+            : area.route.map((w) => ({
+                id: w.id,
+                lat: w.coordinates.lat,
+                lng: w.coordinates.lng,
+                color: colors.mapPinNeutral,
+                title: `${w.order}. ${w.name}`,
+              }))),
         ]}
         polyline={
-          area.path ?? area.route.map((w) => ({ lat: w.coordinates.lat, lng: w.coordinates.lng }))
+          scannerOnly
+            ? undefined
+            : area.path ?? area.route.map((w) => ({ lat: w.coordinates.lat, lng: w.coordinates.lng }))
         }
       />
 
       <View style={styles.sheet}>
         <View style={styles.titleRow}>
           <Text style={styles.title}>{text.name}</Text>
-          <Text style={styles.price}>£{area.price.singleTour.toFixed(2)}</Text>
+          {!scannerOnly && <Text style={styles.price}>£{area.price.singleTour.toFixed(2)}</Text>}
         </View>
-        <Text style={styles.meta}>
-          {area.estimatedDurationMin} {t("common.min")} · {area.estimatedDistanceKm} {t("common.km")} ·{" "}
-          {area.route.length} {t("common.stops")}
-        </Text>
-        <Text style={styles.startLabel}>
-          {t("tourPreview.startsAt", { label: area.startingPoint.label })}
-        </Text>
+        {!scannerOnly && (
+          <>
+            <Text style={styles.meta}>
+              {area.estimatedDurationMin} {t("common.min")} · {area.estimatedDistanceKm} {t("common.km")} ·{" "}
+              {area.route.length} {t("common.stops")}
+            </Text>
+            <Text style={styles.startLabel}>
+              {t("tourPreview.startsAt", { label: area.startingPoint.label })}
+            </Text>
+          </>
+        )}
 
         {area.accessNote && <Text style={styles.accessNote}>{area.accessNote}</Text>}
 
-        {owned === null ? (
-          <Skeleton style={[styles.cta, styles.ctaSkeleton]} borderRadius={14} />
-        ) : owned ? (
-          <PressScale style={styles.cta} scaleTo={0.96} onPress={handleGetToStart}>
-            <Text style={styles.ctaText}>{t("tourPreview.getMeToStart")}</Text>
-          </PressScale>
-        ) : (
-          <PressScale style={styles.cta} scaleTo={0.96} onPress={handleBuy}>
-            <Text style={styles.ctaText}>
-              {t("tourPreview.buyTour", { price: `£${area.price.singleTour.toFixed(2)}` })}
-            </Text>
-          </PressScale>
-        )}
+        {!scannerOnly &&
+          (owned === null ? (
+            <Skeleton style={[styles.cta, styles.ctaSkeleton]} borderRadius={14} />
+          ) : owned ? (
+            <PressScale style={styles.cta} scaleTo={0.96} onPress={handleGetToStart}>
+              <Text style={styles.ctaText}>{t("tourPreview.getMeToStart")}</Text>
+            </PressScale>
+          ) : (
+            <PressScale style={styles.cta} scaleTo={0.96} onPress={handleBuy}>
+              <Text style={styles.ctaText}>
+                {t("tourPreview.buyTour", { price: `£${area.price.singleTour.toFixed(2)}` })}
+              </Text>
+            </PressScale>
+          ))}
 
         {area.freeLandmarkScanner && (
           <PressScale style={styles.scannerButton} scaleTo={0.96} onPress={handleOpenScanner}>
             <Ionicons name="scan" size={18} color={colors.primary} />
             <View>
               <Text style={styles.scannerButtonText}>{t('tourPreview.useScanner')}</Text>
-              <Text style={styles.scannerButtonSub}>{t('tourPreview.scannerFree')}</Text>
+              {!scannerOnly && <Text style={styles.scannerButtonSub}>{t('tourPreview.scannerFree')}</Text>}
             </View>
           </PressScale>
         )}

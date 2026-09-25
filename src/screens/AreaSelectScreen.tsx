@@ -82,13 +82,19 @@ export default function AreaSelectScreen() {
           </Text>
           {!disabled && (
             <View style={styles.metaRow}>
-              <Text style={styles.cardMeta}>
-                {item.estimatedDurationMin} {t("common.min")} · {item.estimatedDistanceKm}{" "}
-                {t("common.km")} · {t(DIFFICULTY_KEYS[item.difficulty])}
-              </Text>
-              <Text style={styles.cardPrice}>
-                {t("common.from")} £{item.price.singleTour.toFixed(2)}
-              </Text>
+              {item.scannerOnly ? (
+                <Text style={styles.cardPrice}>{t("tourPreview.useScanner")}</Text>
+              ) : (
+                <>
+                  <Text style={styles.cardMeta}>
+                    {item.estimatedDurationMin} {t("common.min")} · {item.estimatedDistanceKm}{" "}
+                    {t("common.km")} · {t(DIFFICULTY_KEYS[item.difficulty])}
+                  </Text>
+                  <Text style={styles.cardPrice}>
+                    {t("common.from")} £{item.price.singleTour.toFixed(2)}
+                  </Text>
+                </>
+              )}
             </View>
           )}
         </View>

@@ -350,7 +350,9 @@ export default function ExploreMapScreen() {
               {localizedAreaText(hoveredArea.id, language, hoveredArea).name}
             </Text>
             <Text style={styles.hoverCardMeta}>
-              {t("common.from")} £{hoveredArea.price.singleTour.toFixed(2)}
+              {hoveredArea.scannerOnly
+                ? t("tourPreview.useScanner")
+                : `${t("common.from")} £${hoveredArea.price.singleTour.toFixed(2)}`}
             </Text>
           </View>
         )}
