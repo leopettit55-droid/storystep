@@ -1,0 +1,85 @@
+{
+  "expo": {
+    "name": "StoryStep",
+    "slug": "storystep",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.storystep.app",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "location",
+          "audio"
+        ],
+        "NSLocationWhenInUseUsageDescription": "StoryStep uses your location to guide you to the tour start point and to trigger narration as you walk.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "StoryStep uses your location in the background to keep playing the right narration as you walk with your phone locked."
+      }
+    },
+    "android": {
+      "package": "com.storystep.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#D85A30",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCl-WB-CTiMpJAy5Oj3KQ7LImln4RSWMnY"
+        }
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ],
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "StoryStep uses your location in the background to trigger tour narration as you walk, even when your phone is locked.",
+          "locationWhenInUsePermission": "StoryStep uses your location to guide you to the tour start and trigger narration as you walk.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": true
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "StoryStep uses your camera to identify landmarks you point it at during the tour."
+        }
+      ],
+      "expo-asset",
+      "expo-font"
+    ],
+    "extra": {
+      "googleVisionApiKey": "AIzaSyCl-WB-CTiMpJAy5Oj3KQ7LImln4RSWMnY",
+      "eas": {
+        "projectId": "c9a06407-7893-427d-a819-46c00ac2c7df"
+      }
+    },
+    "owner": "leopettit20"
+  }
+}

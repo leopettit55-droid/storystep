@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "storystep-web",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["expo", "start", "--web"],
+      "port": 8081
+    },
+    {
+      "name": "storystep-web-tunnel",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["expo", "start", "--web", "--tunnel"],
+      "port": 8081
+    },
+    {
+      "name": "ar-tour",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "5050", "."],
+      "port": 5050
+    }
+  ]
+}
