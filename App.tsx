@@ -9,6 +9,7 @@ import { StatusBar } from "expo-status-bar";
 import { Alert, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ErrorBoundary from "./src/components/ErrorBoundary";
+import LanguageGate from "./src/components/LanguageGate";
 import { LanguageProvider, useLanguage } from "./src/i18n/LanguageContext";
 import { ThemeProvider, useTheme } from "./src/ThemeContext";
 import MainTabNavigator from "./src/navigation/MainTabNavigator";
@@ -114,6 +115,7 @@ function AppInner() {
           <Stack.Screen name="ContactUs" component={ContactUsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
+      <LanguageGate />
     </GestureHandlerRootView>
   );
 }
