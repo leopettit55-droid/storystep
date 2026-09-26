@@ -86,11 +86,15 @@ function createStyles(colors: ThemeColors) {
     link: { paddingVertical: 4 },
     linkText: { fontSize: 14, fontWeight: "600", color: colors.textDim },
     linkTextActive: { color: colors.primary },
+    // Overlaid, so the active link doesn't sit higher than the others.
     linkUnderline: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      bottom: -6,
       height: 2,
       borderRadius: 1,
       backgroundColor: colors.primary,
-      marginTop: 6,
     },
   });
 }

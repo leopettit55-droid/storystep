@@ -40,12 +40,19 @@ export default function MainTabNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
+        // Desktop shows its navbar across the top, like a website.
+        tabBarPosition: isDesktop ? "top" : "bottom",
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textFaint,
         tabBarStyle: {
           backgroundColor: colors.background,
           borderTopColor: colors.border,
+          // Room for the labels so they don't sit clipped against the screen edge.
+          height: 64,
+          paddingTop: 4,
+          paddingBottom: 6,
         },
+        tabBarLabelStyle: { fontSize: 11, lineHeight: 14, fontWeight: "600" },
         tabBarLabel: t(LABEL_KEYS[route.name as keyof MainTabParamList]),
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons

@@ -19,7 +19,7 @@ import { useLanguage } from "../i18n/LanguageContext";
 import { getSubscription, type SubscriptionPlan } from "../purchases/entitlements";
 import { openCustomerPortal, openSubscriptionCheckout, stripeIsConfigured } from "../purchases/stripeConfig";
 import { useTheme } from "../ThemeContext";
-import type { ThemeColors } from "../theme";
+import { CONTENT_MAX_WIDTH, type ThemeColors } from "../theme";
 
 const STORAGE_KEY = "storystep.localAccount";
 
@@ -134,6 +134,8 @@ export default function AccountScreen() {
               onValueChange={handleToggleTheme}
               trackColor={{ false: colors.border, true: colors.primary }}
               thumbColor="#FFFFFF"
+              // The web Switch ignores thumbColor when on and draws a teal knob.
+              {...({ activeThumbColor: "#FFFFFF" } as object)}
             />
           </View>
         </View>
@@ -207,7 +209,7 @@ export default function AccountScreen() {
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
-    scroll: { padding: 20, paddingTop: 24, gap: 16 },
+    scroll: { padding: 20, paddingTop: 24, gap: 16, width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
     skeletonTitle: { width: 140, height: 34, borderRadius: 8 },
     skeletonRowTitle: { width: "50%", height: 16, borderRadius: 6, marginBottom: 10 },
     skeletonLine: { width: "90%", height: 12, borderRadius: 6, marginTop: 6 },

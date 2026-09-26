@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
 import {
@@ -41,17 +42,23 @@ export default function HomeScreen() {
   const paidTours = featured.filter((a) => !a.scannerOnly);
 
   const FEATURES = [
-    { title: t("home.featureGpsTitle"), body: t("home.featureGpsBody"), icon: "📍" },
-    { title: t("home.featureNarratorTitle"), body: t("home.featureNarratorBody"), icon: "🎙️" },
-    { title: t("home.featureScanTitle"), body: t("home.featureScanBody"), icon: "🔍" },
-    { title: t("home.featureOfflineTitle"), body: t("home.featureOfflineBody"), icon: "📶" },
+    { title: t("home.featureGpsTitle"), body: t("home.featureGpsBody"), icon: "location" as const },
+    { title: t("home.featureNarratorTitle"), body: t("home.featureNarratorBody"), icon: "mic" as const },
+    // Scanning has its own card just below, so it isn't repeated here.
+    { title: t("home.featureOfflineTitle"), body: t("home.featureOfflineBody"), icon: "cellular" as const },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.stage}>
         <ScrollView contentContainerStyle={styles.scroll}>
-          <ImageBackground source={HERO_IMAGE} style={styles.hero} resizeMode="cover">
+          <ImageBackground
+            source={HERO_IMAGE}
+            style={styles.hero}
+            // Fill the full width on wide screens instead of the photo's natural 1024px.
+            imageStyle={styles.heroImage}
+            resizeMode="cover"
+          >
             <View style={styles.heroScrim} />
             <View style={[styles.heroInner, isDesktop && styles.heroInnerDesktop]}>
               <View style={styles.heroTextCol}>
@@ -87,7 +94,8 @@ export default function HomeScreen() {
                   >
                     <Text style={styles.heroSecondaryButtonText}>{t("home.exploreIn3D")}</Text>
                   </PressScale>
-                  <LanguagePicker tone="light" />
+                  {/* Desktop already has the language picker in the top bar. */}
+                  {!isDesktop && <LanguagePicker tone="light" />}
                 </View>
               </View>
               {isDesktop && (
@@ -148,7 +156,7 @@ export default function HomeScreen() {
                     key={f.title}
                     style={[styles.featureCard, isDesktop && styles.featureCardDesktop]}
                   >
-                    <Text style={styles.featureIcon}>{f.icon}</Text>
+                    <Ionicons name={f.icon} size={22} color={colors.primary} />
                     <Text style={styles.featureTitle}>{f.title}</Text>
                     <Text style={styles.featureBody}>{f.body}</Text>
                   </HoverLift>
@@ -265,6 +273,7 @@ function createStyles(colors: ThemeColors) {
   scroll: { paddingBottom: 0 },
 
   hero: { minHeight: 420, justifyContent: "flex-end" },
+  heroImage: { width: "100%", height: "100%" },
   heroScrim: {
     position: "absolute",
     top: 0,
@@ -295,7 +304,7 @@ function createStyles(colors: ThemeColors) {
   statNumber: { fontSize: 22, fontWeight: "800", color: "#FFFFFF" },
   statLabel: { fontSize: 11, color: "#F3E6DE", marginTop: 2, textTransform: "uppercase", letterSpacing: 0.5 },
   statDivider: { width: 1, height: 26, backgroundColor: "rgba(255,255,255,0.3)" },
-  heroActions: { flexDirection: "row", gap: 12, marginTop: 24 },
+  heroActions: { flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 24 },
   heroPrimaryButton: {
     backgroundColor: colors.primary,
     borderRadius: 12,
@@ -334,7 +343,6 @@ function createStyles(colors: ThemeColors) {
     borderColor: colors.border,
   },
   featureCardDesktop: { width: "23.5%", marginRight: "2%" },
-  featureIcon: { fontSize: 22 },
   featureTitle: { fontSize: 14, fontWeight: "700", color: colors.text, marginTop: 8 },
   featureBody: { fontSize: 12, color: colors.textMid, marginTop: 4, lineHeight: 17 },
 

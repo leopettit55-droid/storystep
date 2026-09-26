@@ -67,3 +67,7 @@ export const colors = lightColors;
 /** Viewport width at which the tab layout switches from mobile bottom-tabs
  * to the desktop top navbar. */
 export const DESKTOP_BREAKPOINT = 900;
+
+/** Reading width for list and text pages on wide screens, so lines and cards
+ * don't stretch across the whole desktop window. */
+export const CONTENT_MAX_WIDTH = 760;

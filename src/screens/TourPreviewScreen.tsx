@@ -16,7 +16,7 @@ import { hasTourAccess } from "../purchases/entitlements";
 import { openTourCheckout, stripeIsConfigured } from "../purchases/stripeConfig";
 import { useTourStore } from "../state/tourStore";
 import { useTheme } from "../ThemeContext";
-import type { ThemeColors } from "../theme";
+import { CONTENT_MAX_WIDTH, type ThemeColors } from "../theme";
 
 type Nav = NativeStackNavigationProp<RootStackParamList, "TourPreview">;
 type RouteProp = { params: { areaId: string } };
@@ -125,6 +125,7 @@ export default function TourPreviewScreen() {
       />
 
       <View style={styles.sheet}>
+        <View style={styles.sheetInner}>
         <View style={styles.titleRow}>
           <Text style={styles.title}>{text.name}</Text>
           {!scannerOnly && <Text style={styles.price}>{t("common.free")}</Text>}
@@ -167,6 +168,7 @@ export default function TourPreviewScreen() {
             </View>
           </PressScale>
         )}
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -185,6 +187,8 @@ function createStyles(colors: ThemeColors) {
     borderTopWidth: 1,
     borderColor: colors.border,
   },
+  // Keeps the details and buttons at a readable width on desktop.
+  sheetInner: { width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
   titleRow: {
     flexDirection: "row",
     justifyContent: "space-between",

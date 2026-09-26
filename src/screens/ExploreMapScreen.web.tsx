@@ -13,7 +13,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Skeleton from "../components/Skeleton";
 import { areas } from "../content";
-import { COMING_SOON_CITIES } from "../content/comingSoonCities";
 import type { Area } from "../content/schema";
 import { localizedAreaText } from "../i18n/areaTranslations";
 import { localizedCityName } from "../i18n/cityNames";
@@ -107,7 +106,7 @@ export default function ExploreMapScreen() {
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef<Record<string, Marker>>({});
   const markerDotsRef = useRef<Record<string, HTMLDivElement>>({});
-  const [city, setCity] = useState<City>("London");
+  const [city, setCity] = useState<City>("Oxford");
   const [hoveredArea, setHoveredArea] = useState<Area | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapLoadIssue, setMapLoadIssue] = useState(false);
@@ -202,8 +201,8 @@ export default function ExploreMapScreen() {
         container: containerRef.current,
         style,
         bounds: boundsForAreas(
-          complete.filter((a) => a.city === "London"),
-          "London"
+          complete.filter((a) => a.city === "Oxford"),
+          "Oxford"
         ),
         fitBoundsOptions: { ...FIT_OPTIONS, duration: 0 },
         attributionControl: false,
@@ -302,7 +301,7 @@ export default function ExploreMapScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.cityToggle}
         >
-          {(["London", "Paris", "Oxford"] as City[]).map((c) => (
+          {(["Oxford", "London", "Paris"] as City[]).map((c) => (
             <Pressable
               key={c}
               style={[styles.cityButton, city === c && styles.cityButtonActive]}
@@ -311,15 +310,6 @@ export default function ExploreMapScreen() {
               <Text style={[styles.cityButtonText, city === c && styles.cityButtonTextActive]}>
                 {localizedCityName(c, language)}
               </Text>
-            </Pressable>
-          ))}
-          {COMING_SOON_CITIES.map((c) => (
-            <Pressable
-              key={c.id}
-              style={[styles.cityButton, styles.cityButtonSoon]}
-              onPress={() => navigation.navigate("ComingSoon", { cityName: c.name })}
-            >
-              <Text style={styles.cityButtonSoonText}>{localizedCityName(c.name, language)}</Text>
             </Pressable>
           ))}
         </ScrollView>
@@ -415,8 +405,6 @@ function createStyles(colors: ThemeColors) {
   cityButtonActive: { backgroundColor: colors.primary, borderColor: colors.primary },
   cityButtonText: { fontSize: 13, fontWeight: "700", color: colors.textMid },
   cityButtonTextActive: { color: colors.onPrimary },
-  cityButtonSoon: { backgroundColor: "transparent", borderStyle: "dashed", borderColor: colors.textFaint },
-  cityButtonSoonText: { fontSize: 13, fontWeight: "600", color: colors.textFaint },
   hoverCard: {
     // Always a dark scrim regardless of theme — this floats over map
     // imagery, not app chrome, so it needs consistent contrast with its

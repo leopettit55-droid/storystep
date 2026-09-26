@@ -17,7 +17,7 @@ import { localizedCityName } from "../i18n/cityNames";
 import { useLanguage } from "../i18n/LanguageContext";
 import type { TabScreenNav } from "../navigation/types";
 import { useTheme } from "../ThemeContext";
-import type { ThemeColors } from "../theme";
+import { CONTENT_MAX_WIDTH, type ThemeColors } from "../theme";
 
 type Nav = TabScreenNav<"Tours">;
 
@@ -145,10 +145,10 @@ export default function AreaSelectScreen() {
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
-    header: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 4 },
+    header: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 4, width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
     title: { fontSize: 32, fontWeight: "700", color: colors.primary },
     subtitle: { fontSize: 14, color: colors.textMid, marginTop: 4 },
-    list: { padding: 16, paddingBottom: 32, gap: 12 },
+    list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32, width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
     sectionHeader: {
       fontSize: 13,
       fontWeight: "700",

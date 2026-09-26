@@ -19,8 +19,13 @@ import { oxfordInklings } from "./areas/oxford-inklings";
 import { oxfordMagdalen } from "./areas/oxford-magdalen";
 import type { Area } from "./schema";
 
+// Oxford first (Magdalen College leading), then London, then Paris.
 export const areas: Area[] = [
   oxfordMagdalen,
+  oxfordHarryPotter,
+  oxfordBodleian,
+  oxfordCastleMarket,
+  oxfordInklings,
   mayfair,
   soho,
   coventGarden,
@@ -35,10 +40,6 @@ export const areas: Area[] = [
   parisMontmartre,
   parisIleDeLaCite,
   parisEiffel,
-  oxfordHarryPotter,
-  oxfordBodleian,
-  oxfordCastleMarket,
-  oxfordInklings,
 ];
 
 export function getAreaById(id: string): Area | undefined {

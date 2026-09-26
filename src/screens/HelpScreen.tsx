@@ -6,7 +6,7 @@ import PressScale from "../components/PressScale";
 import { useLanguage } from "../i18n/LanguageContext";
 import type { TabScreenNav } from "../navigation/types";
 import { useTheme } from "../ThemeContext";
-import type { ThemeColors } from "../theme";
+import { CONTENT_MAX_WIDTH, type ThemeColors } from "../theme";
 
 export default function HelpScreen() {
   const navigation = useNavigation<TabScreenNav<"Help">>();
@@ -56,7 +56,7 @@ export default function HelpScreen() {
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  scroll: { padding: 20, paddingTop: 24, gap: 12 },
+  scroll: { padding: 20, paddingTop: 24, gap: 12, width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
   title: { fontSize: 32, fontWeight: "700", color: colors.primary },
   subtitle: { fontSize: 14, color: colors.textMid, marginTop: -6, marginBottom: 6 },
   card: {

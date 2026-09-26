@@ -64,5 +64,6 @@ export default function CharacterGuide({ isTalking, size = 96 }: CharacterGuideP
 }
 
 const styles = StyleSheet.create({
-  image: {},
+  // The artwork has a white background; a circle makes it read as a badge.
+  image: { borderRadius: 9999 },
 });
