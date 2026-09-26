@@ -352,7 +352,7 @@ export default function ExploreMapScreen() {
             <Text style={styles.hoverCardMeta}>
               {hoveredArea.scannerOnly
                 ? t("tourPreview.useScanner")
-                : `${t("common.from")} £${hoveredArea.price.singleTour.toFixed(2)}`}
+                : t("common.free")}
             </Text>
           </View>
         )}

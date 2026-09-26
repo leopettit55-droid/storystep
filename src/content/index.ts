@@ -20,6 +20,7 @@ import { oxfordMagdalen } from "./areas/oxford-magdalen";
 import type { Area } from "./schema";
 
 export const areas: Area[] = [
+  oxfordMagdalen,
   mayfair,
   soho,
   coventGarden,
@@ -38,7 +39,6 @@ export const areas: Area[] = [
   oxfordBodleian,
   oxfordCastleMarket,
   oxfordInklings,
-  oxfordMagdalen,
 ];
 
 export function getAreaById(id: string): Area | undefined {

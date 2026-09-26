@@ -138,41 +138,6 @@ export default function AccountScreen() {
           </View>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.rowTitle}>{t("account.unlimitedTours")}</Text>
-          {subscription ? (
-            <>
-              <Text style={styles.body}>
-                {t("account.planActive", {
-                  plan: t(subscription.plan === "weekly" ? "account.planWeekly" : "account.planMonthly"),
-                  date: new Date(subscription.expiresAt).toLocaleDateString(),
-                })}
-              </Text>
-              {stripeIsConfigured.customerPortal ? (
-                <PressScale style={styles.manageButton} scaleTo={0.96} onPress={openCustomerPortal}>
-                  <Text style={styles.manageButtonText}>{t("account.manageOrCancel")}</Text>
-                </PressScale>
-              ) : (
-                <Text style={styles.manageFallback}>{t("account.cancelFallback")}</Text>
-              )}
-            </>
-          ) : (
-            <>
-              <Text style={styles.body}>{t("account.skipPaying")}</Text>
-              <View style={styles.planRow}>
-                <PressScale style={styles.planButton} scaleTo={0.95} onPress={() => handleSubscribe("weekly")}>
-                  <Text style={styles.planButtonLabel}>{t("account.weekly")}</Text>
-                  <Text style={styles.planButtonPrice}>£14.99</Text>
-                </PressScale>
-                <PressScale style={styles.planButton} scaleTo={0.95} onPress={() => handleSubscribe("monthly")}>
-                  <Text style={styles.planButtonLabel}>{t("account.monthly")}</Text>
-                  <Text style={styles.planButtonPrice}>£19.99</Text>
-                </PressScale>
-              </View>
-            </>
-          )}
-        </View>
-
         {account ? (
           <>
             <View style={styles.card}>

@@ -4,6 +4,7 @@ const ru: TranslationDict = {
   nav: { home: "Главная", map: "3D-карта", tours: "Туры", account: "Аккаунт", help: "Помощь" },
 
   common: {
+    free: "Бесплатно",
     min: "мин",
     km: "км",
     stops: "остановок",

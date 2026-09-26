@@ -4,6 +4,7 @@ const ja: TranslationDict = {
   nav: { home: "ホーム", map: "3Dマップ", tours: "ツアー", account: "アカウント", help: "ヘルプ" },
 
   common: {
+    free: "無料",
     min: "分",
     km: "km",
     stops: "ストップ",
