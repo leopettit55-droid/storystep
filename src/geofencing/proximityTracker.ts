@@ -1,6 +1,7 @@
 import * as Location from "expo-location";
 import { Platform } from "react-native";
 import type { Coordinates, Waypoint } from "../content";
+import { DemoWalker, isDemoWalk } from "../demo/demoWalk";
 
 const EARTH_RADIUS_M = 6371000;
 
@@ -130,13 +131,24 @@ export class ProximityTracker {
   private webWatchId: number | null = null;
   private triggeredIds = new Set<string>();
   private smoother = new LocationSmoother();
+  private demoWalker: DemoWalker | null = null;
 
   constructor(
     private route: Waypoint[],
-    private callbacks: ProximityCallbacks
+    private callbacks: ProximityCallbacks,
+    /** The tour's walking path — used only by the `?demo=walk` simulated walker. */
+    private path?: Coordinates[]
   ) {}
 
   async start(): Promise<void> {
+    if (isDemoWalk() && this.path && this.path.length > 1) {
+      this.demoWalker = new DemoWalker(this.path, (coords, accuracy, timestamp) =>
+        this.handleRawFix(coords, accuracy, timestamp)
+      );
+      this.demoWalker.start();
+      return;
+    }
+
     // expo-location's web shim has a watch-id mismatch bug: its
     // watchPositionImplAsync reassigns the id it emits update events under
     // to the browser's own native watchPosition id, while the callback
@@ -178,6 +190,8 @@ export class ProximityTracker {
   }
 
   stop(): void {
+    this.demoWalker?.stop();
+    this.demoWalker = null;
     this.subscription?.remove();
     this.subscription = null;
     if (this.webWatchId != null) {

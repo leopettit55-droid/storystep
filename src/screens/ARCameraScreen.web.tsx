@@ -9,6 +9,7 @@ import LandmarkResultCard from "../components/LandmarkResultCard";
 import PressScale from "../components/PressScale";
 import { type Coordinates } from "../content";
 import { bearingDegrees, distanceMeters } from "../geofencing/proximityTracker";
+import { isDemoWalk } from "../demo/demoWalk";
 import { RouteProgress, type LocalOffset } from "../geofencing/routeGuide";
 import { notifyError, notifySuccess } from "../haptics";
 import { primeLandmarkAudio, stopLandmarkSpeech, useLandmarkSpeech } from "../landmark/landmarkSpeech";
@@ -32,6 +33,8 @@ const RIBBON_MAX_POINTS = 64;
 /** Per-second rate at which the drawn ribbon/penguin glide to a new GPS fix,
  * instead of jumping every time guidance is recomputed. */
 const GUIDE_EASE_PER_S = 4;
+/** How quickly the demo walk's "you" turns to follow the route's bends. */
+const DEMO_TURN_EASE_PER_S = 1.5;
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 
@@ -321,7 +324,10 @@ export default function ARCameraScreen() {
         // alpha and keep a calibration offset that snaps to true north
         // whenever a real compass reading arrives (iOS webkitCompassHeading
         // on every event; Android via the sparser "deviceorientationabsolute").
-        const orientation = { heading: 0, quaternion: new THREE.Quaternion(), headingOffset: 0 };
+        const demo = mode === "tour" && isDemoWalk();
+        // deviceHeading: where the phone really points. heading: where it points in
+        // the tour's world — the same, except in a demo walk (see tick).
+        const orientation = { heading: 0, deviceHeading: 0, quaternion: new THREE.Quaternion(), headingOffset: 0 };
         let screenAngle = (screen.orientation && screen.orientation.angle) || (window as any).orientation || 0;
         const handleOrientationChange = () => {
           screenAngle = (screen.orientation && screen.orientation.angle) || (window as any).orientation || 0;
@@ -340,8 +346,9 @@ export default function ARCameraScreen() {
               orientation.headingOffset = trueHeading - rawHeading;
               headingRef.current.absolute = true;
             }
-            orientation.heading = (rawHeading + orientation.headingOffset + 360) % 360;
-            headingRef.current.deg = orientation.heading;
+            orientation.deviceHeading = (rawHeading + orientation.headingOffset + 360) % 360;
+            if (!demo) orientation.heading = orientation.deviceHeading;
+            headingRef.current.deg = orientation.deviceHeading;
           }
 
           const alpha = toRad(event.alpha || 0);
@@ -491,10 +498,25 @@ export default function ARCameraScreen() {
 
         const clock = new THREE.Clock();
         let rafId = 0;
+        // Demo walk: the direction the phone faced when guidance started counts
+        // as the simulated walker's direction of travel, so the route appears
+        // ahead of you wherever you are; turning the phone still looks around.
+        let demoBase: number | null = null;
+        let demoDevice0 = 0;
+
         const tick = () => {
           const dt = clock.getDelta();
           if (mixer) mixer.update(dt);
           camera.quaternion.copy(orientation.quaternion);
+          if (demo && cachedWalkBearing != null) {
+            if (demoBase == null) {
+              demoBase = cachedWalkBearing;
+              demoDevice0 = orientation.deviceHeading;
+            } else {
+              demoBase += normalizeAngle(cachedWalkBearing - demoBase) * (1 - Math.exp(-DEMO_TURN_EASE_PER_S * dt));
+            }
+            orientation.heading = (demoBase + orientation.deviceHeading - demoDevice0 + 720) % 360;
+          }
 
           const state = useTourStore.getState();
           const walking = state.status === "touring";
@@ -707,6 +729,11 @@ export default function ARCameraScreen() {
           <Pressable style={styles.closeButton} onPress={() => navigation.goBack()} hitSlop={8}>
             <Ionicons name="close" size={22} color="#fff" />
           </Pressable>
+          {mode === "tour" && isDemoWalk() && (
+            <View style={styles.modePill}>
+              <Text style={styles.modePillText}>Demo walk · simulated GPS</Text>
+            </View>
+          )}
           {mode === "scanner" && (
             <View style={styles.modePill}>
               <Text style={styles.modePillText}>Landmark scanner · free</Text>

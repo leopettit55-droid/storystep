@@ -22,6 +22,7 @@ import {
   stopWaypointGeofencing,
 } from "../geofencing/geofenceManager";
 import { ProximityTracker } from "../geofencing/proximityTracker";
+import { demoSpeed, isDemoWalk } from "../demo/demoWalk";
 import { requestOrientationPermission } from "../landmark/orientationPermission";
 import { localizedAreaText } from "../i18n/areaTranslations";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -139,11 +140,15 @@ export default function ActiveTourScreen() {
       }
 
       try {
-        trackerRef.current = new ProximityTracker(area.route, {
-          onNearWaypoint: (waypoint) => handleWaypointEnter(waypoint.id),
-          onOffRoute: setOffRoute,
-          onLocationUpdate: setLastKnownLocation,
-        });
+        trackerRef.current = new ProximityTracker(
+          area.route,
+          {
+            onNearWaypoint: (waypoint) => handleWaypointEnter(waypoint.id),
+            onOffRoute: setOffRoute,
+            onLocationUpdate: setLastKnownLocation,
+          },
+          area.path
+        );
         await trackerRef.current.start();
       } catch (e) {
         console.warn("[ActiveTourScreen] location tracking unavailable:", e);
@@ -256,6 +261,14 @@ export default function ActiveTourScreen() {
         </PressScale>
       </View>
 
+      {isDemoWalk() && (
+        <View style={styles.demoBanner}>
+          <Text style={styles.demoText}>
+            Demo walk: a simulated walker is following the route{demoSpeed() !== 1 ? ` at ${demoSpeed()}× speed` : ""}. It waits at each stop until the narration ends. Tap “Open AR camera guide” to watch the penguin lead.
+          </Text>
+        </View>
+      )}
+
       {isOffRoute && (
         <View style={styles.offRouteBanner}>
           <Text style={styles.offRouteText}>
@@ -362,6 +375,16 @@ function createStyles(colors: ThemeColors) {
     padding: 12,
   },
   offRouteText: { color: colors.warnText, fontSize: 13 },
+  demoBanner: {
+    marginHorizontal: 20,
+    marginTop: 16,
+    backgroundColor: colors.surface,
+    borderColor: colors.primary,
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+  },
+  demoText: { color: colors.text, fontSize: 13, lineHeight: 18 },
   centered: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24, gap: 16 },
   stopLabel: { color: colors.textDim, fontSize: 14 },
   waypointName: { color: colors.text, fontSize: 32, fontWeight: "700", textAlign: "center" },
