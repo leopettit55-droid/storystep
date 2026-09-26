@@ -42,7 +42,7 @@ When you're ready, we'll walk around to the Cour Carrée, the Louvre's original 
       order: 2,
       name: "Cour Carrée",
       coordinates: { lat: 48.8608, lng: 2.3396 },
-      triggerRadiusMeters: 40,
+      triggerRadiusMeters: 48,
       narration: {
         durationSec: 52,
         audioSource: require("../../../assets/audio/paris-louvre/02-cour-carree.mp3"),

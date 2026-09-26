@@ -9,7 +9,7 @@ import LandmarkResultCard from "../components/LandmarkResultCard";
 import PressScale from "../components/PressScale";
 import { type Coordinates } from "../content";
 import { bearingDegrees, distanceMeters } from "../geofencing/proximityTracker";
-import { RouteProgress } from "../geofencing/routeGuide";
+import { RouteProgress, type LocalOffset } from "../geofencing/routeGuide";
 import { notifyError, notifySuccess } from "../haptics";
 import { primeLandmarkAudio, stopLandmarkSpeech, useLandmarkSpeech } from "../landmark/landmarkSpeech";
 import { describeMatch, scanLandmark, speakMatch, type ScanOutcome } from "../landmark/scan";
@@ -24,9 +24,36 @@ const MODEL_URL = "/models/penguin.glb";
 const MODEL_SCALE = 0.28;
 const STAND_OFF_M = 3.0;
 const MODEL_YAW_OFFSET_DEG = 180;
-const GUIDE_LINE_DISTANCE_M = 2.1;
+/** The ribbon starts just ahead of the walker's feet and follows the path. */
+const RIBBON_START_M = 0.8;
+const RIBBON_HALF_WIDTH_M = 0.16;
+const RIBBON_Y = -0.95;
+const RIBBON_MAX_POINTS = 64;
+/** Per-second rate at which the drawn ribbon/penguin glide to a new GPS fix,
+ * instead of jumping every time guidance is recomputed. */
+const GUIDE_EASE_PER_S = 4;
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;
+
+/** The point and unit direction `at` metres along a polyline (clamped to its end). */
+function walkPolyline(points: LocalOffset[], at: number): { point: LocalOffset; dir: LocalOffset } | null {
+  let travelled = 0;
+  for (let i = 0; i < points.length - 1; i++) {
+    const a = points[i];
+    const b = points[i + 1];
+    const len = Math.hypot(b.east - a.east, b.north - a.north);
+    if (len <= 0) continue;
+    if (travelled + len >= at || i === points.length - 2) {
+      const t = Math.min(1, (at - travelled) / len);
+      return {
+        point: { east: a.east + (b.east - a.east) * t, north: a.north + (b.north - a.north) * t },
+        dir: { east: (b.east - a.east) / len, north: (b.north - a.north) / len },
+      };
+    }
+    travelled += len;
+  }
+  return null;
+}
 
 function normalizeAngle(deg: number): number {
   let d = deg % 360;
@@ -371,8 +398,20 @@ export default function ARCameraScreen() {
         window.addEventListener("resize", handleResize);
         cleanupFns.push(() => window.removeEventListener("resize", handleResize));
 
+        // The ribbon is a flat strip laid along the real path ahead (rebuilt
+        // every frame from the latest guidance), so it bends round corners
+        // and through gateways exactly where the path does.
+        const ribbonGeometry = new THREE.BufferGeometry();
+        const ribbonPositions = new Float32Array(RIBBON_MAX_POINTS * 2 * 3);
+        ribbonGeometry.setAttribute("position", new THREE.BufferAttribute(ribbonPositions, 3));
+        const ribbonIndex: number[] = [];
+        for (let i = 0; i < RIBBON_MAX_POINTS - 1; i++) {
+          const a = i * 2;
+          ribbonIndex.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+        }
+        ribbonGeometry.setIndex(ribbonIndex);
         const guideLine = new THREE.Mesh(
-          new THREE.PlaneGeometry(0.28, 3.2),
+          ribbonGeometry,
           new THREE.MeshBasicMaterial({
             color: new THREE.Color(colors.primary),
             transparent: true,
@@ -381,8 +420,9 @@ export default function ARCameraScreen() {
             depthWrite: false,
           })
         );
-        guideLine.rotation.x = -Math.PI / 2;
+        guideLine.frustumCulled = false;
         scene.add(guideLine);
+        cleanupFns.push(() => ribbonGeometry.dispose());
 
         let penguin: THREE.Object3D;
         let mixer: THREE.AnimationMixer | null = null;
@@ -428,6 +468,26 @@ export default function ARCameraScreen() {
         // reads this cached bearing, which doesn't change meaningfully
         // within 400ms of walking.
         let cachedWalkBearing: number | null = null;
+        /** The path ahead from the latest guidance (east/north metres from the walker). */
+        let targetAhead: LocalOffset[] | null = null;
+        /** What's actually drawn — eased towards targetAhead so the ribbon and
+         * penguin glide on each GPS update instead of jumping. */
+        let shownAhead: LocalOffset[] | null = null;
+
+        // Converts a walker-relative east/north offset into the scene, using
+        // the camera's own horizontal forward vector plus the compass heading —
+        // the same frame the penguin has always been placed in.
+        const up = new THREE.Vector3(0, 1, 0);
+        const forward = new THREE.Vector3();
+        const right = new THREE.Vector3();
+        const toScene = (o: LocalOffset, out: THREE.Vector3) => {
+          const h = toRad(orientation.heading);
+          const ahead = o.north * Math.cos(h) + o.east * Math.sin(h);
+          const side = o.east * Math.cos(h) - o.north * Math.sin(h);
+          return out.copy(forward).multiplyScalar(ahead).addScaledVector(right, side);
+        };
+        const tmpA = new THREE.Vector3();
+        const tmpB = new THREE.Vector3();
 
         const clock = new THREE.Clock();
         let rafId = 0;
@@ -438,35 +498,86 @@ export default function ARCameraScreen() {
 
           const state = useTourStore.getState();
           const walking = state.status === "touring";
-          const relativeBearing =
-            cachedWalkBearing != null ? normalizeAngle(cachedWalkBearing - orientation.heading) : 0;
 
           // Deriving placement from the camera's OWN current forward vector
           // (rather than an independent absolute-compass calculation) is
-          // what guarantees the penguin always ends up exactly STAND_OFF_M
-          // in front of wherever the camera is actually looking, regardless
-          // of how device-orientation angles map to its quaternion.
-          const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+          // what keeps the penguin and ribbon anchored to wherever the camera
+          // is actually looking, regardless of how device-orientation angles
+          // map to its quaternion.
+          forward.set(0, 0, -1).applyQuaternion(camera.quaternion);
           forward.y = 0;
           if (forward.lengthSq() < 1e-6) forward.set(0, 0, -1);
           forward.normalize();
-          const targetDir = forward.applyAxisAngle(new THREE.Vector3(0, 1, 0), -toRad(relativeBearing));
-          const rad = Math.atan2(targetDir.x, -targetDir.z);
+          right.copy(forward).applyAxisAngle(up, -Math.PI / 2);
 
+          // Ease the drawn path towards the latest guidance.
+          if (targetAhead) {
+            if (!shownAhead || shownAhead.length !== targetAhead.length) {
+              shownAhead = targetAhead.map((o) => ({ ...o }));
+            } else {
+              const f = 1 - Math.exp(-GUIDE_EASE_PER_S * dt);
+              for (let i = 0; i < shownAhead.length; i++) {
+                shownAhead[i].east += (targetAhead[i].east - shownAhead[i].east) * f;
+                shownAhead[i].north += (targetAhead[i].north - shownAhead[i].north) * f;
+              }
+            }
+          }
+
+          // Penguin: stands on the path STAND_OFF_M ahead, facing along it —
+          // so round a corner it's round the corner, not in the wall.
           const groundY = -0.9 + groundOffset;
-          penguin.position.set(targetDir.x * STAND_OFF_M, groundY, targetDir.z * STAND_OFF_M);
-          penguin.rotation.y = -rad + toRad(MODEL_YAW_OFFSET_DEG);
+          const stand = shownAhead ? walkPolyline(shownAhead, STAND_OFF_M) : null;
+          if (stand) {
+            toScene(stand.point, tmpA);
+            toScene(stand.dir, tmpB);
+            penguin.position.set(tmpA.x, groundY, tmpA.z);
+            penguin.rotation.y = -Math.atan2(tmpB.x, -tmpB.z) + toRad(MODEL_YAW_OFFSET_DEG);
+          }
 
           playAnim(walking ? "walk" : "idle");
           if (!mixer) applyProceduralMotion(penguin, walking, dt);
 
-          guideLine.position.set(targetDir.x * GUIDE_LINE_DISTANCE_M, -0.95, targetDir.z * GUIDE_LINE_DISTANCE_M);
-          guideLine.rotation.z = -rad;
-          // Until there's an actual GPS-derived bearing to guide toward,
-          // showing the penguin/ribbon planted in front of the camera reads
-          // as a real direction when it isn't one yet — hide both instead.
-          const hasGuidance = cachedWalkBearing != null;
-          guideLine.visible = hasGuidance && state.status !== "complete";
+          // Ribbon: a strip laid along the path ahead, skipping the first bit
+          // under the walker's feet.
+          let count = 0;
+          if (shownAhead) {
+            let travelled = 0;
+            for (let i = 0; i < shownAhead.length && count < RIBBON_MAX_POINTS; i++) {
+              if (i > 0) {
+                travelled += Math.hypot(
+                  shownAhead[i].east - shownAhead[i - 1].east,
+                  shownAhead[i].north - shownAhead[i - 1].north
+                );
+              }
+              if (travelled < RIBBON_START_M) continue;
+              const prev = shownAhead[Math.max(0, i - 1)];
+              const next = shownAhead[Math.min(shownAhead.length - 1, i + 1)];
+              toScene(shownAhead[i], tmpA);
+              toScene({ east: next.east - prev.east, north: next.north - prev.north }, tmpB);
+              tmpB.y = 0;
+              if (tmpB.lengthSq() < 1e-9) continue;
+              tmpB.normalize();
+              // Perpendicular on the ground plane.
+              const nx = -tmpB.z * RIBBON_HALF_WIDTH_M;
+              const nz = tmpB.x * RIBBON_HALF_WIDTH_M;
+              const o = count * 6;
+              ribbonPositions[o] = tmpA.x + nx;
+              ribbonPositions[o + 1] = RIBBON_Y;
+              ribbonPositions[o + 2] = tmpA.z + nz;
+              ribbonPositions[o + 3] = tmpA.x - nx;
+              ribbonPositions[o + 4] = RIBBON_Y;
+              ribbonPositions[o + 5] = tmpA.z - nz;
+              count++;
+            }
+          }
+          ribbonGeometry.attributes.position.needsUpdate = true;
+          ribbonGeometry.setDrawRange(0, Math.max(0, count - 1) * 6);
+
+          // Until there's an actual GPS-derived path to guide along, showing
+          // the penguin/ribbon planted in front of the camera reads as a real
+          // direction when it isn't one yet — hide both instead.
+          const hasGuidance = cachedWalkBearing != null && !!stand;
+          guideLine.visible = hasGuidance && count > 1 && state.status !== "complete";
           penguin.visible = hasGuidance;
 
           renderer.render(scene, camera);
@@ -489,11 +600,13 @@ export default function ARCameraScreen() {
 
           if (!area || !current) {
             cachedWalkBearing = null;
+            targetAhead = null;
             setHud({ distanceText: null, turnText: null, turnAngle: 0 });
             return;
           }
           if (!userCoords) {
             cachedWalkBearing = null;
+            targetAhead = null;
             setHud({ distanceText: "Getting your location…", turnText: null, turnAngle: 0 });
             return;
           }
@@ -505,18 +618,23 @@ export default function ARCameraScreen() {
           let walkBearing: number;
           let distance: number;
           let turn: { distanceMeters: number; turnAngleDeg: number } | null = null;
+          let offPath = false;
           if (routeProgress) {
             const g = routeProgress.update(userCoords, state.visitedWaypointIds);
             target = area.route[g.targetIndex] ?? current;
             walkBearing = g.walkBearing;
             distance = g.distanceToTarget;
             turn = g.upcomingTurn;
+            offPath = g.offPath;
+            targetAhead = g.pathAhead;
           } else {
             if (state.visitedWaypointIds.includes(current.id)) {
               target = area.route[state.currentWaypointIndex + 1] ?? current;
             }
             walkBearing = bearingDegrees(userCoords, target.coordinates);
             distance = distanceMeters(userCoords, target.coordinates);
+            const b = toRad(walkBearing);
+            targetAhead = [0, 4, 8].map((d) => ({ east: Math.sin(b) * d, north: Math.cos(b) * d }));
           }
           cachedWalkBearing = walkBearing;
 
@@ -528,7 +646,12 @@ export default function ARCameraScreen() {
           // approaches rather than once you're already on top of it.
           let turnText: string;
           let turnAngle: number;
-          if (turn && turn.distanceMeters <= 15) {
+          if (offPath) {
+            // Further from the route than GPS error explains: lead them back
+            // to it first, rather than calling turns on a path they're not on.
+            turnText = abs < 18 ? "Back to the route" : rel > 0 ? "Turn right to rejoin" : "Turn left to rejoin";
+            turnAngle = abs < 18 ? 0 : Math.min(abs, 90) * Math.sign(rel);
+          } else if (turn && turn.distanceMeters <= 15) {
             const dir = turn.turnAngleDeg > 0 ? "right" : "left";
             turnText = turn.distanceMeters <= 4 ? `Turn ${dir} now` : `Turn ${dir} in ${Math.round(turn.distanceMeters)}m`;
             turnAngle = Math.sign(turn.turnAngleDeg) * 60;

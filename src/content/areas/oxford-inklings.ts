@@ -43,7 +43,7 @@ Ahead, a bookshop built for exactly the kind of people who'd start a group like 
       order: 2,
       name: "Blackwell's Bookshop",
       coordinates: { lat: 51.7541, lng: -1.2559 },
-      triggerRadiusMeters: 30,
+      triggerRadiusMeters: 41,
       narration: {
         durationSec: 66,
         audioSource: require("../../../assets/audio/oxford-inklings/02-blackwells-bookshop.mp3"),

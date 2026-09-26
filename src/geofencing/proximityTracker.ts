@@ -40,6 +40,72 @@ export function compassLabel(bearing: number): string {
   return COMPASS_LABELS[index];
 }
 
+/** Fixes vaguer than this (Wi-Fi / cell-tower positions, often 50-150m out)
+ * are ignored once a better fix has been seen — they're what makes the guide
+ * suddenly swing towards a wall. */
+const MAX_ACCEPTED_ACCURACY_M = 35;
+/** Assumed walking-pace uncertainty growth for the smoother (m/s). */
+const WALKER_SPEED_NOISE_MS = 2.5;
+/** A fix implying faster than this since the last one is a GPS jump, not walking. */
+const MAX_PLAUSIBLE_SPEED_MS = 8;
+/** After this many rejected fixes in a row, accept anyway — the walker may
+ * really have moved (e.g. left the tour and came back), and the guide should
+ * recover rather than stay frozen on a stale position. */
+const MAX_CONSECUTIVE_REJECTS = 4;
+
+/**
+ * Smooths raw GPS fixes into a steadier walking position: a 1-D Kalman
+ * filter per axis, weighted by each fix's reported accuracy, with poor-accuracy
+ * fixes and impossible jumps thrown away. Between tall college walls a phone's
+ * raw fixes wander 5-20m side to side; smoothing them is what keeps the
+ * penguin and ribbon on the path instead of zig-zagging into buildings.
+ */
+export class LocationSmoother {
+  private lat = 0;
+  private lng = 0;
+  /** Position variance in m². Negative = no fix yet. */
+  private variance = -1;
+  private lastTime = 0;
+  private rejects = 0;
+
+  /** Returns the smoothed position, or null if this fix was rejected. */
+  add(coords: Coordinates, accuracyM: number | null | undefined, timeMs: number): Coordinates | null {
+    const acc = Math.max(3, accuracyM ?? 20);
+    if (this.variance < 0) {
+      this.lat = coords.lat;
+      this.lng = coords.lng;
+      this.variance = acc * acc;
+      this.lastTime = timeMs;
+      return { lat: this.lat, lng: this.lng };
+    }
+
+    const dt = Math.max(0, (timeMs - this.lastTime) / 1000);
+    const current = { lat: this.lat, lng: this.lng };
+    const jump = distanceMeters(current, coords);
+    const tooVague = acc > MAX_ACCEPTED_ACCURACY_M && acc * acc > this.variance;
+    const tooFast = jump - acc > MAX_PLAUSIBLE_SPEED_MS * Math.max(dt, 1);
+    if ((tooVague || tooFast) && this.rejects < MAX_CONSECUTIVE_REJECTS) {
+      this.rejects += 1;
+      return null;
+    }
+    if (this.rejects >= MAX_CONSECUTIVE_REJECTS) {
+      // Forced acceptance after a run of rejects: start afresh from this fix.
+      this.rejects = 0;
+      this.variance = -1;
+      return this.add(coords, accuracyM, timeMs);
+    }
+    this.rejects = 0;
+
+    this.variance += dt * WALKER_SPEED_NOISE_MS * WALKER_SPEED_NOISE_MS;
+    const k = this.variance / (this.variance + acc * acc);
+    this.lat += k * (coords.lat - this.lat);
+    this.lng += k * (coords.lng - this.lng);
+    this.variance = (1 - k) * this.variance;
+    this.lastTime = timeMs;
+    return { lat: this.lat, lng: this.lng };
+  }
+}
+
 /** Beyond this distance from the nearest waypoint, treat the walker as off-route. */
 const OFF_ROUTE_THRESHOLD_M = 120;
 const POLL_INTERVAL_MS = 3000;
@@ -63,6 +129,7 @@ export class ProximityTracker {
   private subscription: Location.LocationSubscription | null = null;
   private webWatchId: number | null = null;
   private triggeredIds = new Set<string>();
+  private smoother = new LocationSmoother();
 
   constructor(
     private route: Waypoint[],
@@ -84,10 +151,11 @@ export class ProximityTracker {
     if (Platform.OS === "web") {
       this.webWatchId = navigator.geolocation.watchPosition(
         (position) =>
-          this.handleUpdate({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          }),
+          this.handleRawFix(
+            { lat: position.coords.latitude, lng: position.coords.longitude },
+            position.coords.accuracy,
+            position.timestamp
+          ),
         (err) => console.warn("[ProximityTracker] web geolocation error:", err.message),
         { enableHighAccuracy: true, maximumAge: 1000, timeout: 15000 }
       );
@@ -101,10 +169,11 @@ export class ProximityTracker {
         distanceInterval: MIN_DISTANCE_INTERVAL_M,
       },
       (location) =>
-        this.handleUpdate({
-          lat: location.coords.latitude,
-          lng: location.coords.longitude,
-        })
+        this.handleRawFix(
+          { lat: location.coords.latitude, lng: location.coords.longitude },
+          location.coords.accuracy,
+          location.timestamp
+        )
     );
   }
 
@@ -120,6 +189,11 @@ export class ProximityTracker {
   /** Call after a manual replay so the same waypoint can re-trigger if the user backtracks into it. */
   resetTriggeredWaypoint(waypointId: string): void {
     this.triggeredIds.delete(waypointId);
+  }
+
+  private handleRawFix(coords: Coordinates, accuracy: number | null, timestamp: number): void {
+    const smoothed = this.smoother.add(coords, accuracy, timestamp || Date.now());
+    if (smoothed) this.handleUpdate(smoothed);
   }
 
   private handleUpdate(coords: Coordinates): void {

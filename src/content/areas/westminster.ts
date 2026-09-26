@@ -42,7 +42,7 @@ When you're ready, continue toward Parliament Square.`,
       order: 2,
       name: "Houses of Parliament & Parliament Square",
       coordinates: { lat: 51.4995, lng: -0.1248 },
-      triggerRadiusMeters: 45,
+      triggerRadiusMeters: 85,
       narration: {
         durationSec: 61,
         audioSource: require("../../../assets/audio/westminster/02-parliament-square.mp3"),

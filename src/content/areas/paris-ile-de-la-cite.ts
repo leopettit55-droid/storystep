@@ -24,7 +24,7 @@ export const parisIleDeLaCite: Area = {
       order: 1,
       name: "Notre-Dame Cathedral",
       coordinates: { lat: 48.853, lng: 2.3499 },
-      triggerRadiusMeters: 45,
+      triggerRadiusMeters: 54,
       narration: {
         durationSec: 62,
         audioSource: require("../../../assets/audio/paris-ile-de-la-cite/01-notre-dame.mp3"),
@@ -42,7 +42,7 @@ Ahead, we're heading to Sainte-Chapelle, a much smaller building with, arguably,
       order: 2,
       name: "Sainte-Chapelle",
       coordinates: { lat: 48.8554, lng: 2.345 },
-      triggerRadiusMeters: 30,
+      triggerRadiusMeters: 65,
       narration: {
         durationSec: 59,
         audioSource: require("../../../assets/audio/paris-ile-de-la-cite/02-sainte-chapelle.mp3"),
