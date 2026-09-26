@@ -177,11 +177,11 @@ const sv: TranslationDict = {
       },
       {
         q: "Fungerar det med låst telefon?",
-        a: "Ja — bakgrundsljudet fortsätter spela och positionsuppdateringar fortsätter utlösa avsnitt även med skärmen av, så länge du gett platsåtkomst \"Alltid\".",
+        a: "Håll skärmen tänd medan du går. Webbläsare pausar platsen när telefonen är låst, så nästa stopp startar inte förrän du låser upp den.",
       },
       {
         q: "Behöver jag signal under hela promenaden?",
-        a: "Nej. Berättelsens ljud laddas ner i förväg, så det fortsätter spela vid svag anslutning — bara GPS behövs under promenaden.",
+        a: "Ja, du behöver mobildata. Berättelsen för varje stopp laddas när du kommer fram (ungefär 1 MB per stopp), så med svag täckning kan ett stopp starta några sekunder senare.",
       },
       {
         q: "Varför behöver \"Skanna ett landmärke\" behörighet?",

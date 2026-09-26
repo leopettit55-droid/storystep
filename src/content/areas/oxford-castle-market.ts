@@ -9,7 +9,7 @@ export const oxfordCastleMarket: Area = {
   description:
     "Oxford's working, everyday side, on foot: the crossroads that gives the city its centre, a Victorian market still trading after two centuries, and a Norman mound that's older than any college in town.",
   estimatedDurationMin: 35,
-  estimatedDistanceKm: 0.9,
+  estimatedDistanceKm: 0.8,
   difficulty: "easy",
   isContentComplete: true,
   image: require("../../../assets/tours/oxford-castle.jpg"),

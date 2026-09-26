@@ -3,7 +3,7 @@ export interface PolicySection {
   body: string;
 }
 
-export const PRIVACY_POLICY_EFFECTIVE_DATE = "19 August 2026";
+export const PRIVACY_POLICY_EFFECTIVE_DATE = "26 September 2026";
 
 export const PRIVACY_POLICY_INTRO =
   "This policy explains what information StoryStep collects, why, and what control you have over it. " +
@@ -13,8 +13,8 @@ export const PRIVACY_POLICY_SECTIONS: PolicySection[] = [
   {
     heading: "Who this policy covers",
     body:
-      "StoryStep is operated by [YOUR LEGAL NAME OR COMPANY NAME — e.g. \"Jane Doe, trading as StoryStep\" " +
-      "or \"StoryStep Ltd, company number 00000000\"], based in [YOUR COUNTRY — e.g. the United Kingdom]. " +
+      // TODO: add the registered company name, number and country once confirmed.
+      "StoryStep is a walking-tour service operated from the United Kingdom. " +
       "You can reach us via the Contact form in the app's Help section with any question about this policy or your data.",
   },
   {

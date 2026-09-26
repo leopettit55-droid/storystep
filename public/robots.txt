@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://storystep.expo.app/sitemap.xml
+Sitemap: https://storystep.site/sitemap.xml

@@ -136,7 +136,7 @@ export const oxfordMagdalen: Area = {
   description:
     "Inside one of Oxford's most beautiful colleges, on foot: a medieval cloister with carved beasts, a chapel and a tower with a dawn choir, a deer park, the ancient trees, the riverside walk where C. S. Lewis talked with Tolkien, and the fritillary meadow.",
   estimatedDurationMin: 60,
-  estimatedDistanceKm: 1.9,
+  estimatedDistanceKm: 2.1,
   difficulty: "easy",
   isContentComplete: true,
   image: require("../../../assets/tours/oxford-magdalen.jpg"),

@@ -177,11 +177,11 @@ const id: TranslationDict = {
       },
       {
         q: "Apakah berfungsi saat ponsel terkunci?",
-        a: "Ya — audio latar terus diputar dan pembaruan lokasi terus memicu bagian-bagian narasi bahkan saat layar mati, selama kamu memberikan izin lokasi \"Selalu\".",
+        a: "Biarkan layar tetap menyala saat berjalan. Browser menjeda pembaruan lokasi saat ponsel terkunci, jadi perhentian berikutnya tidak akan dimulai sampai Anda membukanya.",
       },
       {
         q: "Apakah aku butuh sinyal sepanjang perjalanan?",
-        a: "Tidak. Audio narasi diunduh terlebih dahulu, jadi tetap diputar meski koneksi lemah — hanya GPS yang dibutuhkan selama berjalan.",
+        a: "Ya, Anda memerlukan data seluler. Narasi setiap perhentian dimuat saat Anda tiba di sana (sekitar 1 MB per perhentian), jadi dengan sinyal lemah sebuah perhentian bisa mulai beberapa detik lebih lambat.",
       },
       {
         q: "Mengapa \"Pindai landmark\" memerlukan izin?",

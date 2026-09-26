@@ -1,0 +1,15 @@
+# Build settings for storystep.site. Once the site is linked to this GitHub
+# repo in Netlify, every push to main builds and publishes automatically.
+[build]
+  command = "npx expo export -p web"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# Single-page app: every address loads the app, which then shows the right
+# screen (public/_redirects does the same for manual deploys).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -177,11 +177,11 @@ const pl: TranslationDict = {
       },
       {
         q: "Czy działa przy zablokowanym telefonie?",
-        a: "Tak — dźwięk w tle nadal gra, a aktualizacje lokalizacji nadal uruchamiają fragmenty nawet przy wyłączonym ekranie, o ile udzieliłeś dostępu do lokalizacji \"Zawsze\".",
+        a: "Nie wyłączaj ekranu podczas spaceru. Przeglądarki wstrzymują lokalizację, gdy telefon jest zablokowany, więc kolejny przystanek nie włączy się, dopóki go nie odblokujesz.",
       },
       {
         q: "Czy potrzebuję zasięgu przez cały spacer?",
-        a: "Nie. Dźwięk narracji jest pobierany z wyprzedzeniem, więc działa nawet przy słabym połączeniu — podczas spaceru potrzebny jest tylko GPS.",
+        a: "Tak, potrzebujesz danych komórkowych. Narracja każdego przystanku wczytuje się, gdy do niego dotrzesz (około 1 MB na przystanek), więc przy słabym zasięgu przystanek może zacząć się kilka sekund później.",
       },
       {
         q: "Dlaczego \"Zeskanuj zabytek\" wymaga uprawnień?",

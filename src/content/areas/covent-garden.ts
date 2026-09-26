@@ -8,7 +8,7 @@ export const coventGarden: Area = {
   description:
     "The old fruit and veg market turned street-performance stage, on foot: opera, actors' history, a hidden courtyard, and the maze of Seven Dials.",
   estimatedDurationMin: 45,
-  estimatedDistanceKm: 2.0,
+  estimatedDistanceKm: 1.8,
   difficulty: "easy",
   isContentComplete: true,
   image: require("../../../assets/tours/covent-garden.jpg"),

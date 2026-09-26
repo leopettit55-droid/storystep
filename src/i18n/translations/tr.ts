@@ -177,11 +177,11 @@ const tr: TranslationDict = {
       },
       {
         q: "Telefon kilitliyken çalışır mı?",
-        a: "Evet — \"Her Zaman\" konum izni verdiyseniz, ekran kapalıyken de arka plan sesi çalmaya ve konum güncellemeleri bölümleri tetiklemeye devam eder.",
+        a: "Yürürken ekranınızı açık tutun. Telefon kilitliyken tarayıcılar konum güncellemelerini duraklatır, bu yüzden bir sonraki durak siz kilidi açana kadar başlamaz.",
       },
       {
         q: "Yürüyüş boyunca sinyale ihtiyacım var mı?",
-        a: "Hayır. Anlatım sesi önceden indirilir, bu yüzden zayıf bağlantıda da çalmaya devam eder — yürüyüş sırasında yalnızca GPS gerekir.",
+        a: "Evet, mobil veriye ihtiyacınız olacak. Her durağın anlatımı oraya vardığınızda yüklenir (durak başına yaklaşık 1 MB), bu yüzden zayıf sinyalde bir durak birkaç saniye geç başlayabilir.",
       },
       {
         q: "\"Bir yapıyı tara\" neden izin istiyor?",

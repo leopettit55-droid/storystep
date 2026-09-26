@@ -177,11 +177,11 @@ const es: TranslationDict = {
       },
       {
         q: "¿Funciona con el teléfono bloqueado?",
-        a: "Sí — el audio en segundo plano sigue sonando y las actualizaciones de ubicación siguen activando segmentos aunque la pantalla esté apagada, siempre que hayas concedido el acceso a la ubicación \"Siempre\".",
+        a: "Mantén la pantalla encendida mientras caminas. Los navegadores pausan la ubicación cuando el teléfono está bloqueado, así que la siguiente parada no empezará hasta que lo desbloquees.",
       },
       {
         q: "¿Necesito señal durante todo el paseo?",
-        a: "No. El audio de la narración se descarga por adelantado, así que sigue funcionando con conexión débil — solo se necesita el GPS durante el paseo.",
+        a: "Sí, necesitarás datos móviles. La narración de cada parada se carga al llegar a ella (alrededor de 1 MB por parada), así que con poca cobertura una parada puede tardar unos segundos en empezar.",
       },
       {
         q: "¿Para qué necesita permiso \"Escanear un monumento\"?",

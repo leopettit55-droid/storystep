@@ -175,11 +175,11 @@ const en = {
       },
       {
         q: "Does it work with my phone locked?",
-        a: "Yes — background audio keeps playing and location updates keep triggering segments even with the screen off, as long as you granted \"Always\" location access.",
+        a: "Keep your screen on while you walk. Web browsers pause location updates while the phone is locked, so the next stop won't start until you unlock it.",
       },
       {
         q: "Do I need signal for the whole walk?",
-        a: "No. Narration audio is downloaded in advance, so it keeps playing over a spotty connection — only GPS is needed mid-walk.",
+        a: "Yes, you'll need mobile data. Each stop's narration loads when you reach it (about 1 MB per stop), so a weak signal can delay a stop by a few seconds.",
       },
       {
         q: "What does \"Scan a landmark\" need permission for?",

@@ -177,11 +177,11 @@ const it: TranslationDict = {
       },
       {
         q: "Funziona con il telefono bloccato?",
-        a: "Sì — l'audio in background continua a riprodursi e gli aggiornamenti di posizione continuano ad attivare i segmenti anche a schermo spento, purché tu abbia concesso l'accesso alla posizione \"Sempre\".",
+        a: "Tieni lo schermo acceso mentre cammini. I browser mettono in pausa la posizione quando il telefono è bloccato, quindi la tappa successiva non partirà finché non lo sblocchi.",
       },
       {
         q: "Serve il segnale per tutta la passeggiata?",
-        a: "No. L'audio della narrazione viene scaricato in anticipo, quindi continua a funzionare con una connessione debole — durante la camminata serve solo il GPS.",
+        a: "Sì, ti servono i dati mobili. La narrazione di ogni tappa si carica quando la raggiungi (circa 1 MB per tappa), quindi con segnale debole una tappa può partire con qualche secondo di ritardo.",
       },
       {
         q: "Perché \"Scansiona un monumento\" richiede un'autorizzazione?",

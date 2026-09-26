@@ -177,11 +177,11 @@ const fr: TranslationDict = {
       },
       {
         q: "Est-ce que ça marche téléphone verrouillé ?",
-        a: "Oui — l'audio continue en arrière-plan et les mises à jour de position continuent de déclencher les segments même écran éteint, à condition d'avoir autorisé la localisation « Toujours ».",
+        a: "Gardez l'écran allumé pendant la marche. Les navigateurs suspendent la localisation lorsque le téléphone est verrouillé, donc l'étape suivante ne démarrera qu'après le déverrouillage.",
       },
       {
         q: "Ai-je besoin de réseau pendant toute la marche ?",
-        a: "Non. L'audio de narration est téléchargé à l'avance, il continue donc de fonctionner avec une connexion instable — seul le GPS est nécessaire pendant la marche.",
+        a: "Oui, il vous faut des données mobiles. La narration de chaque étape se charge quand vous y arrivez (environ 1 Mo par étape) : avec un signal faible, une étape peut démarrer avec quelques secondes de retard.",
       },
       {
         q: "Pourquoi « Scanner un monument » demande-t-il une autorisation ?",

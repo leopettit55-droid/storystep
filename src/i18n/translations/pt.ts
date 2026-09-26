@@ -177,11 +177,11 @@ const pt: TranslationDict = {
       },
       {
         q: "Funciona com o telemóvel bloqueado?",
-        a: "Sim — o áudio em segundo plano continua a tocar e as atualizações de localização continuam a ativar segmentos mesmo com o ecrã desligado, desde que tenha concedido acesso de localização \"Sempre\".",
+        a: "Mantenha o ecrã ligado enquanto caminha. Os navegadores suspendem a localização quando o telemóvel está bloqueado, por isso a paragem seguinte só começa quando o desbloquear.",
       },
       {
         q: "Preciso de rede durante todo o passeio?",
-        a: "Não. O áudio da narração é descarregado antecipadamente, por isso continua a funcionar com ligação fraca — durante o passeio só é necessário o GPS.",
+        a: "Sim, vai precisar de dados móveis. A narração de cada paragem é carregada quando lá chega (cerca de 1 MB por paragem), por isso com rede fraca uma paragem pode começar alguns segundos mais tarde.",
       },
       {
         q: "Para que precisa de permissão \"Digitalizar um monumento\"?",

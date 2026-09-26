@@ -1,6 +1,6 @@
 import type { PolicySection } from "./privacyPolicy";
 
-export const TERMS_EFFECTIVE_DATE = "3 September 2026";
+export const TERMS_EFFECTIVE_DATE = "26 September 2026";
 
 export const TERMS_INTRO =
   "These terms govern your use of the StoryStep app and website. By creating an account, buying a tour, " +
@@ -10,8 +10,8 @@ export const TERMS_SECTIONS: PolicySection[] = [
   {
     heading: "Who you're agreeing with",
     body:
-      "StoryStep is operated by [YOUR LEGAL NAME OR COMPANY NAME — e.g. \"Jane Doe, trading as StoryStep\" " +
-      "or \"StoryStep Ltd, company number 00000000\"], based in [YOUR COUNTRY — e.g. the United Kingdom]. " +
+      // TODO: add the registered company name, number and country once confirmed.
+      "StoryStep is a walking-tour service operated from the United Kingdom. " +
       "Contact: use the Contact form in the Help section of the app.",
   },
   {
@@ -40,35 +40,20 @@ export const TERMS_SECTIONS: PolicySection[] = [
       "your local account at any time from Account → Sign out.",
   },
   {
-    heading: "Purchases, pricing, and access",
+    heading: "Pricing and access",
     body:
-      "Single tours are a one-time purchase that unlocks that tour permanently on the device where you bought " +
-      "it. Weekly and monthly plans are recurring subscriptions billed automatically by Stripe until you cancel " +
-      "— see \"Subscriptions and cancellation\" below. Prices are shown in GBP and may change; a price change " +
-      "doesn't affect a tour you've already bought. All payments are processed by Stripe; StoryStep never " +
-      "receives or stores your card details.",
-  },
-  {
-    heading: "Subscriptions and cancellation",
-    body:
-      "Weekly (£14.99) and monthly (£19.99) plans renew automatically until cancelled. You can cancel any time " +
-      "— cancelling stops future renewals but doesn't refund the current billing period. [ADD YOUR STRIPE " +
-      "CUSTOMER PORTAL / MANAGE-SUBSCRIPTION LINK HERE once configured].",
-  },
-  {
-    heading: "Refunds",
-    body:
-      "Single-tour purchases: if a tour's narration or route is broken or clearly not as described, contact " +
-      "us via the Help section within 14 days for a refund. We don't offer refunds simply because you changed " +
-      "your mind after completing a tour. Subscriptions: cancel before the next renewal date to avoid being " +
-      "charged again; we don't refund partial billing periods except where required by law.",
+      "All StoryStep tours are currently free, with no account, purchase or subscription needed. Some tours " +
+      "visit places that charge their own entry fee (for example, Magdalen College's visitor ticket); that fee " +
+      "is paid to the venue, not to StoryStep. If we introduce paid tours or plans in future, the price will be " +
+      "shown before you pay, payments will be handled by Stripe (StoryStep never sees your card details), and " +
+      "we'll update these terms first.",
   },
   {
     heading: "Acceptable use",
     body:
       "Don't reverse-engineer, scrape, or redistribute StoryStep's narration audio, route data, or app code. " +
       "Don't use the camera-scan or map features to harass, surveil, or endanger others. Don't attempt to " +
-      "circumvent purchase checks. We may suspend access for accounts that abuse the service.",
+      "interfere with the service. We may suspend access for accounts that abuse the service.",
   },
   {
     heading: "Intellectual property",
@@ -115,7 +100,7 @@ export const TERMS_SECTIONS: PolicySection[] = [
   {
     heading: "Governing law",
     body:
-      "These terms are governed by the laws of [YOUR COUNTRY/JURISDICTION], without regard to conflict-of-law " +
+      "These terms are governed by the laws of England and Wales, without regard to conflict-of-law " +
       "rules.",
   },
   {

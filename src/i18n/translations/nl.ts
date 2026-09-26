@@ -177,11 +177,11 @@ const nl: TranslationDict = {
       },
       {
         q: "Werkt het met een vergrendelde telefoon?",
-        a: "Ja — de audio blijft op de achtergrond spelen en locatie-updates blijven delen starten, ook met het scherm uit, zolang je \"Altijd\" locatietoegang hebt gegeven.",
+        a: "Houd je scherm aan tijdens het lopen. Browsers pauzeren de locatie wanneer de telefoon vergrendeld is, dus de volgende stop begint pas als je hem ontgrendelt.",
       },
       {
         q: "Heb ik de hele wandeling bereik nodig?",
-        a: "Nee. De audio van het verhaal wordt van tevoren gedownload, dus blijft werken bij een zwakke verbinding — onderweg is alleen gps nodig.",
+        a: "Ja, je hebt mobiele data nodig. Het verhaal van elke stop wordt geladen zodra je daar aankomt (ongeveer 1 MB per stop), dus bij zwak bereik kan een stop een paar seconden later beginnen.",
       },
       {
         q: "Waarom heeft \"Scan een bezienswaardigheid\" toestemming nodig?",

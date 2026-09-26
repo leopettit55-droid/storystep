@@ -177,11 +177,11 @@ const vi: TranslationDict = {
       },
       {
         q: "Có hoạt động khi điện thoại bị khóa không?",
-        a: "Có — âm thanh nền vẫn tiếp tục phát và các cập nhật vị trí vẫn kích hoạt các đoạn ngay cả khi tắt màn hình, miễn là bạn đã cấp quyền vị trí \"Luôn cho phép\".",
+        a: "Hãy giữ màn hình luôn bật khi đi bộ. Trình duyệt sẽ tạm dừng cập nhật vị trí khi điện thoại bị khóa, vì vậy điểm dừng tiếp theo sẽ không bắt đầu cho đến khi bạn mở khóa.",
       },
       {
         q: "Tôi có cần sóng suốt cả chuyến đi bộ không?",
-        a: "Không. Âm thanh thuyết minh được tải trước, nên vẫn phát khi kết nối yếu — trong lúc đi bộ chỉ cần GPS.",
+        a: "Có, bạn sẽ cần dữ liệu di động. Phần thuyết minh của mỗi điểm dừng được tải khi bạn đến nơi (khoảng 1 MB mỗi điểm), nên khi sóng yếu, điểm dừng có thể bắt đầu chậm vài giây.",
       },
       {
         q: "Vì sao \"Quét một địa danh\" cần quyền truy cập?",

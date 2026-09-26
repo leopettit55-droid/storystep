@@ -177,11 +177,11 @@ const de: TranslationDict = {
       },
       {
         q: "Funktioniert es bei gesperrtem Handy?",
-        a: "Ja — die Audiowiedergabe läuft im Hintergrund weiter, und Standortaktualisierungen lösen Abschnitte auch bei ausgeschaltetem Display aus, solange du „Immer“ als Standortzugriff erlaubt hast.",
+        a: "Lassen Sie den Bildschirm beim Gehen eingeschaltet. Browser pausieren die Standortbestimmung, wenn das Handy gesperrt ist, daher startet die nächste Station erst, wenn Sie es entsperren.",
       },
       {
         q: "Brauche ich während des ganzen Spaziergangs Netz?",
-        a: "Nein. Die Erzählung wird vorab heruntergeladen und läuft daher auch bei schlechter Verbindung weiter — unterwegs wird nur GPS benötigt.",
+        a: "Ja, Sie brauchen mobile Daten. Die Erzählung jeder Station wird geladen, wenn Sie sie erreichen (etwa 1 MB pro Station) – bei schwachem Empfang kann eine Station ein paar Sekunden später starten.",
       },
       {
         q: "Wofür braucht „Sehenswürdigkeit scannen“ eine Berechtigung?",
