@@ -48,8 +48,10 @@ function removeMeta(html: string, attr: "name" | "property", key: string): strin
   return html.replace(new RegExp(`\\s*<meta ${attr}="${key}" content="[^"]*"\\s*/?>`), "");
 }
 
+/** With the trailing slash: Netlify serves dist/tour/<id>/index.html there and
+ * redirects /tour/<id> to it, so this is the address search engines should index. */
 function tourUrl(area: Area): string {
-  return `${SITE}/tour/${area.id}`;
+  return `${SITE}/tour/${area.id}/`;
 }
 
 /** Copies the tour's photo to a stable address for link previews. */

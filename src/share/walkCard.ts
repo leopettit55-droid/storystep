@@ -23,9 +23,10 @@ export const BRAND = {
   nearBlack: "#1B1A17",
 };
 
-/** The page a share links to. utm_source lets visits from shares be counted later. */
+/** The page a share links to. utm_source lets visits from shares be counted later.
+ * The trailing slash is the tour page's real address (no redirect on the way). */
 export function tourShareUrl(areaId: string): string {
-  return `https://storystep.site/tour/${areaId}?utm_source=share`;
+  return `https://storystep.site/tour/${areaId}/?utm_source=share`;
 }
 
 /** The same link as printed on the card: short, no tracking parameter. */
