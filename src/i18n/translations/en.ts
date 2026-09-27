@@ -194,6 +194,25 @@ const en = {
     privacyPolicy: "Privacy Policy",
   },
 
+  pageTitle: {
+    home: "StoryStep: AI-narrated walking tours of London, Paris & Oxford",
+    tour: "{{tour}}: free audio walking tour of {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  share: {
+    button: "Share your walk",
+    iWalked: "I walked",
+    stops: "{{count}} stops",
+    distance: "{{km}} km",
+    tagline: "Free audio walking tours",
+    shareText: "I walked {{tour}} in {{city}} with StoryStep, a free audio walking tour.",
+    downloadedCopied: "Image saved, and the link is copied.",
+    downloaded: "Image saved.",
+    copied: "Link copied.",
+    failed: "Couldn't share that. Please try again.",
+  },
+
   errorBoundary: {
     title: "Something went wrong",
     body: "Sorry about that — this screen hit an unexpected error. Try again, and if it keeps happening, let us know.",

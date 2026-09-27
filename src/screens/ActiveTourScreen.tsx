@@ -37,6 +37,7 @@ import {
 import { useTheme } from "../ThemeContext";
 import type { ThemeColors } from "../theme";
 import CharacterGuide from "../components/CharacterGuide";
+import ShareWalkButton from "../components/ShareWalkButton";
 
 type Nav = NativeStackNavigationProp<RootStackParamList, "ActiveTour">;
 type RouteProp = { params: RootStackParamList["ActiveTour"] };
@@ -214,6 +215,7 @@ export default function ActiveTourScreen() {
           <Text style={styles.completeSubtitle}>
             {t("activeTour.tourCompleteBody", { area: areaText.name })}
           </Text>
+          <ShareWalkButton area={area} />
           <Pressable
             style={styles.cta}
             role="button"
