@@ -19,6 +19,8 @@ interface TourState {
   selectArea: (areaId: string) => void;
   beginNavigationToStart: () => void;
   arrivedAtStart: () => void;
+  /** Jump straight into a tour at a saved stop (see tourProgress). */
+  resumeAt: (currentIndex: number, visitedIds: string[]) => void;
   enterWaypoint: (waypointId: string) => void;
   pause: () => void;
   resume: () => void;
@@ -55,6 +57,19 @@ export const useTourStore = create<TourState>((set, get) => ({
   arrivedAtStart: () => {
     if (!get().area) return;
     set({ status: "touring", currentWaypointIndex: 0 });
+  },
+
+  resumeAt: (currentIndex, visitedIds) => {
+    const { area } = get();
+    if (!area) return;
+    const index = Math.max(0, Math.min(currentIndex, area.route.length - 1));
+    const known = new Set(area.route.map((w) => w.id));
+    set({
+      status: "touring",
+      currentWaypointIndex: index,
+      visitedWaypointIds: visitedIds.filter((id) => known.has(id)),
+      isOffRoute: false,
+    });
   },
 
   enterWaypoint: (waypointId) => {

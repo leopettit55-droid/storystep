@@ -1,6 +1,6 @@
-import type { TranslationDict } from "./en";
+import type { PartialTranslationDict } from "./en";
 
-const id: TranslationDict = {
+const id: PartialTranslationDict = {
   nav: { home: "Beranda", map: "Peta 3D", tours: "Tur", account: "Akun", help: "Bantuan" },
 
   common: {

@@ -24,6 +24,8 @@ import ComingSoonScreen from "./src/screens/ComingSoonScreen";
 import ContactUsScreen from "./src/screens/ContactUsScreen";
 import type { RootStackParamList } from "./src/navigation/types";
 import { getAreaById } from "./src/content";
+import { localizedAreaText } from "./src/i18n/areaTranslations";
+import { localizedCityName } from "./src/i18n/cityNames";
 import { notifySuccess } from "./src/haptics";
 import { consumePendingPurchase, grantSubscription, grantTourPurchase } from "./src/purchases/entitlements";
 import { consumePurchaseReturnParam } from "./src/purchases/stripeConfig";
@@ -59,8 +61,35 @@ async function handlePurchaseReturn(t: (key: string, vars?: Record<string, strin
   );
 }
 
+type Translate = ReturnType<typeof useLanguage>["t"];
+
+const SECTION_TITLE_KEYS: Record<string, string> = {
+  Map: "nav.map",
+  Tours: "nav.tours",
+  Account: "nav.account",
+  Help: "nav.help",
+  PrivacyPolicy: "home.footerPrivacy",
+  TermsOfService: "home.footerTerms",
+  ContactUs: "help.contactUs",
+};
+
+/** The browser tab title for a screen (web only). Tour screens match the
+ * static tour pages written by scripts/build-tour-pages.ts. */
+function pageTitle(routeName: string | undefined, params: unknown, t: Translate, language: string): string {
+  const areaId = (params as { areaId?: string } | undefined)?.areaId;
+  const area = areaId ? getAreaById(areaId) : undefined;
+  if (area) {
+    return t("pageTitle.tour", {
+      tour: localizedAreaText(area.id, language, area).name,
+      city: localizedCityName(area.city, language),
+    });
+  }
+  const key = routeName ? SECTION_TITLE_KEYS[routeName] : undefined;
+  return key ? t("pageTitle.section", { section: t(key) }) : t("pageTitle.home");
+}
+
 function AppInner() {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const { colors, isDark } = useTheme();
   const navTheme = isDark ? NavDarkTheme : NavDefaultTheme;
   return (
@@ -68,6 +97,10 @@ function AppInner() {
       <StatusBar style={isDark ? "light" : "dark"} />
       <NavigationContainer
         ref={navigationRef}
+        documentTitle={{
+          enabled: Platform.OS === "web",
+          formatter: (_options, route) => pageTitle(route?.name, route?.params, t, language),
+        }}
         linking={{
           // Real web addresses, so a printed QR code can open a specific page:
           //   /tours                    -> the Tours tab (Oxford is listed first)

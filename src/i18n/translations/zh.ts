@@ -1,6 +1,6 @@
-import type { TranslationDict } from "./en";
+import type { PartialTranslationDict } from "./en";
 
-const zh: TranslationDict = {
+const zh: PartialTranslationDict = {
   nav: { home: "首页", map: "3D 地图", tours: "行程", account: "账户", help: "帮助" },
 
   common: {

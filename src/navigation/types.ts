@@ -14,7 +14,8 @@ export type RootStackParamList = {
   MainTabs: undefined;
   TourPreview: { areaId: string };
   GetToStart: { areaId: string };
-  ActiveTour: { areaId: string };
+  /** resume: continue from progress already loaded into the tour store. */
+  ActiveTour: { areaId: string; resume?: boolean };
   CameraTour: { areaId?: string } | undefined;
   ARCamera: { areaId: string; orientationGranted: boolean; mode?: "tour" | "scanner" };
   PrivacyPolicy: undefined;

@@ -1,6 +1,6 @@
-import type { TranslationDict } from "./en";
+import type { PartialTranslationDict } from "./en";
 
-const th: TranslationDict = {
+const th: PartialTranslationDict = {
   nav: { home: "หน้าแรก", map: "แผนที่ 3 มิติ", tours: "ทัวร์", account: "บัญชี", help: "ช่วยเหลือ" },
 
   common: {

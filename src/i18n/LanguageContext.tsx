@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { DEFAULT_LANGUAGE } from "./languages";
-import en, { type TranslationDict } from "./translations/en";
+import en, { type PartialTranslationDict } from "./translations/en";
 import es from "./translations/es";
 import fr from "./translations/fr";
 import zh from "./translations/zh";
@@ -23,7 +23,7 @@ import id from "./translations/id";
 
 const STORAGE_KEY = "storystep.language";
 
-const DICTS: Record<string, TranslationDict> = {
+const DICTS: Record<string, PartialTranslationDict> = {
   en, zh, es, fr, de, it, pt, ja, ko, ar, ru, hi, nl, tr, pl, sv, vi, th, id,
 };
 
@@ -52,7 +52,7 @@ interface LanguageContextValue {
    * interpolating {{vars}}. Falls back to English, then to the key itself,
    * so a missing translation never crashes the app or renders "undefined". */
   t: (key: string, vars?: Record<string, Primitive>) => string;
-  dict: TranslationDict;
+  dict: PartialTranslationDict;
 }
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);

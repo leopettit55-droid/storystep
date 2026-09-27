@@ -27,6 +27,7 @@ import { requestOrientationPermission } from "../landmark/orientationPermission"
 import { localizedAreaText } from "../i18n/areaTranslations";
 import { useLanguage } from "../i18n/LanguageContext";
 import type { RootStackParamList } from "../navigation/types";
+import { clearTourProgress, saveTourProgress } from "../state/tourProgress";
 import {
   selectCurrentWaypoint,
   selectNextWaypoint,
@@ -36,14 +37,23 @@ import {
 import { useTheme } from "../ThemeContext";
 import type { ThemeColors } from "../theme";
 import CharacterGuide from "../components/CharacterGuide";
+import ShareWalkButton from "../components/ShareWalkButton";
 
 type Nav = NativeStackNavigationProp<RootStackParamList, "ActiveTour">;
-type RouteProp = { params: { areaId: string } };
+type RouteProp = { params: RootStackParamList["ActiveTour"] };
+
+/** Remember where the walker is, so the tour page can offer "Continue from stop N". */
+function persistProgress() {
+  const s = useTourStore.getState();
+  if (!s.area || s.status === "complete") return;
+  void saveTourProgress(s.area.id, s.currentWaypointIndex, s.visitedWaypointIds);
+}
 
 export default function ActiveTourScreen() {
   const navigation = useNavigation<Nav>();
   const { params } = useRoute() as unknown as RouteProp;
   const area = getAreaById(params.areaId);
+  const resuming = params.resume === true;
   const { language, t } = useLanguage();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -67,10 +77,20 @@ export default function ActiveTourScreen() {
   /** A stop that fired while the previous narration was still playing (sequential tours only). */
   const queuedRef = useRef<string | null>(null);
 
+  // A finished tour has nothing to continue.
+  useEffect(() => {
+    if (area && status === "complete") void clearTourProgress(area.id);
+  }, [area, status]);
+
   useEffect(() => {
     if (!area) return;
 
     let cancelled = false;
+
+    // Continuing a saved tour: stops already heard count as done, so they
+    // neither replay nor block a sequential tour's next stop.
+    const resumedVisited = resuming ? useTourStore.getState().visitedWaypointIds : [];
+    for (const id of resumedVisited) visitedRef.current.add(id);
 
     // The stop the walker should reach next: the one after the last stop whose
     // narration started (or the first stop, before anything has played).
@@ -106,6 +126,7 @@ export default function ActiveTourScreen() {
       queuedRef.current = null;
       visitedRef.current.add(waypointId);
       enterWaypoint(waypointId);
+      persistProgress();
       void playWaypointNarration(waypoint);
     };
 
@@ -149,14 +170,20 @@ export default function ActiveTourScreen() {
           },
           area.path
         );
+        if (resuming) {
+          trackerRef.current.markTriggered(resumedVisited);
+          const current = selectCurrentWaypoint(useTourStore.getState());
+          if (current) trackerRef.current.setDemoStart(current.coordinates);
+        }
         await trackerRef.current.start();
       } catch (e) {
         console.warn("[ActiveTourScreen] location tracking unavailable:", e);
       }
 
       // First waypoint is usually right at the starting point — trigger it
-      // immediately rather than waiting for the next GPS fix.
-      if (area.route[0]) handleWaypointEnter(area.route[0].id);
+      // immediately rather than waiting for the next GPS fix. Not when
+      // continuing: the walker is mid-tour, and stop 1 was heard already.
+      if (!resuming && area.route[0]) handleWaypointEnter(area.route[0].id);
     })();
 
     return () => {
@@ -188,8 +215,10 @@ export default function ActiveTourScreen() {
           <Text style={styles.completeSubtitle}>
             {t("activeTour.tourCompleteBody", { area: areaText.name })}
           </Text>
+          <ShareWalkButton area={area} />
           <Pressable
             style={styles.cta}
+            role="button"
             onPress={() => navigation.popToTop()}
           >
             <Text style={styles.ctaText}>{t("activeTour.backToAreas")}</Text>
@@ -219,11 +248,13 @@ export default function ActiveTourScreen() {
     if (!nextWaypoint) return;
     visitedRef.current.delete(nextWaypoint.id);
     skipToNext();
+    persistProgress();
     void playWaypointNarration(nextWaypoint);
   };
 
   const handleSkipPrevious = () => {
     skipToPrevious();
+    persistProgress();
     const wp = useTourStore.getState().area
       ? selectCurrentWaypoint(useTourStore.getState())
       : null;
@@ -252,7 +283,13 @@ export default function ActiveTourScreen() {
       </View>
 
       <View style={styles.scanRow}>
-        <PressScale style={styles.exitButton} scaleTo={0.9} onPress={() => navigation.goBack()} hitSlop={8}>
+        <PressScale
+          style={styles.exitButton}
+          scaleTo={0.9}
+          onPress={() => navigation.goBack()}
+          hitSlop={8}
+          aria-label={t("camera.close")}
+        >
           <Ionicons name="close" size={20} color={colors.textMid} />
         </PressScale>
         <PressScale style={styles.scanButton} scaleTo={0.94} onPress={() => navigation.navigate("CameraTour", { areaId: area.id })}>
@@ -301,8 +338,19 @@ export default function ActiveTourScreen() {
           <Text style={styles.secondaryButtonText}>{t("activeTour.back")}</Text>
         </PressScale>
 
-        <PressScale style={styles.playButton} scaleTo={0.92} onPress={handleTogglePlay}>
-          <Text style={styles.playButtonText}>{isPlaying ? "II" : "▶"}</Text>
+        <PressScale
+          style={styles.playButton}
+          scaleTo={0.92}
+          onPress={handleTogglePlay}
+          aria-label={isPlaying ? "Pause narration" : "Play narration"}
+        >
+          <Ionicons
+            name={isPlaying ? "pause" : "play"}
+            size={34}
+            color={colors.onPrimary}
+            // Nudges the play triangle right so it looks centred in the circle.
+            style={isPlaying ? undefined : styles.playIconNudge}
+          />
         </PressScale>
 
         <PressScale style={styles.secondaryButton} scaleTo={0.9} onPress={handleSkipNext}>
@@ -310,7 +358,7 @@ export default function ActiveTourScreen() {
         </PressScale>
       </View>
 
-      <Pressable style={styles.replayLink} onPress={handleReplay}>
+      <Pressable style={styles.replayLink} role="button" onPress={handleReplay}>
         <Text style={styles.replayLinkText}>{t("activeTour.replayLink")}</Text>
       </Pressable>
     </SafeAreaView>
@@ -408,7 +456,7 @@ function createStyles(colors: ThemeColors) {
     alignItems: "center",
     justifyContent: "center",
   },
-  playButtonText: { color: colors.onPrimary, fontSize: 30, fontWeight: "700" },
+  playIconNudge: { marginLeft: 4 },
   replayLink: { alignItems: "center", paddingBottom: 24, paddingTop: 4 },
   replayLinkText: { color: colors.textDim, fontSize: 13, textDecorationLine: "underline" },
   completeTitle: { color: colors.text, fontSize: 28, fontWeight: "700" },

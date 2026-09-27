@@ -1,6 +1,6 @@
-import type { TranslationDict } from "./en";
+import type { PartialTranslationDict } from "./en";
 
-const vi: TranslationDict = {
+const vi: PartialTranslationDict = {
   nav: { home: "Trang chủ", map: "Bản đồ 3D", tours: "Tour", account: "Tài khoản", help: "Trợ giúp" },
 
   common: {
