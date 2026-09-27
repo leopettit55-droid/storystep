@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useCallback, useMemo, useState } from "react";
-import { Alert, Platform, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Alert, Platform, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import BackButton from "../components/BackButton";
 import PressScale from "../components/PressScale";
 import RouteMap from "../components/RouteMap";
@@ -14,6 +14,7 @@ import { useLanguage } from "../i18n/LanguageContext";
 import type { RootStackParamList } from "../navigation/types";
 import { hasTourAccess } from "../purchases/entitlements";
 import { openTourCheckout, stripeIsConfigured } from "../purchases/stripeConfig";
+import { clearTourProgress, loadTourProgress, type SavedProgress } from "../state/tourProgress";
 import { useTourStore } from "../state/tourStore";
 import { useTheme } from "../ThemeContext";
 import { CONTENT_MAX_WIDTH, type ThemeColors } from "../theme";
@@ -27,6 +28,8 @@ export default function TourPreviewScreen() {
   const area = getAreaById(params.areaId);
   const selectArea = useTourStore((s) => s.selectArea);
   const [owned, setOwned] = useState<boolean | null>(null);
+  /** Unfinished progress on this device (under 7 days old), offered as "Continue". */
+  const [saved, setSaved] = useState<SavedProgress | null>(null);
   const { language, t } = useLanguage();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -38,6 +41,9 @@ export default function TourPreviewScreen() {
       setOwned(null);
       hasTourAccess(area.id).then((result) => {
         if (!cancelled) setOwned(result);
+      });
+      loadTourProgress(area.id).then((progress) => {
+        if (!cancelled) setSaved(progress);
       });
       return () => {
         cancelled = true;
@@ -60,6 +66,21 @@ export default function TourPreviewScreen() {
   const handleGetToStart = () => {
     selectArea(area.id);
     navigation.navigate("GetToStart", { areaId: area.id });
+  };
+
+  // Straight back into the tour at the saved stop — no "Get to the start",
+  // and stop 1 doesn't replay.
+  const handleContinue = () => {
+    if (!saved) return;
+    selectArea(area.id);
+    useTourStore.getState().resumeAt(saved.currentIndex, saved.visitedIds);
+    navigation.navigate("ActiveTour", { areaId: area.id, resume: true });
+  };
+
+  const handleStartAgain = () => {
+    setSaved(null);
+    void clearTourProgress(area.id);
+    handleGetToStart();
   };
 
   // Free for everyone, no purchase needed. On the web it opens the camera
@@ -139,6 +160,24 @@ export default function TourPreviewScreen() {
             <Text style={styles.startLabel}>
               {t("tourPreview.startsAt", { label: area.startingPoint.label })}
             </Text>
+
+            {/* The stops, in walking order, so people can see what the tour
+                covers before they head to the start. Scrolls if a tour is long,
+                so the map above always keeps most of the screen. */}
+            {area.route.length > 0 && (
+              <ScrollView style={styles.stopList} nestedScrollEnabled>
+                {area.route.map((w) => (
+                  <View key={w.id} style={styles.stopRow}>
+                    <View style={styles.stopNumber}>
+                      <Text style={styles.stopNumberText}>{w.order}</Text>
+                    </View>
+                    <Text style={styles.stopName} numberOfLines={2}>
+                      {w.name}
+                    </Text>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
           </>
         )}
 
@@ -147,6 +186,17 @@ export default function TourPreviewScreen() {
         {!scannerOnly &&
           (owned === null ? (
             <Skeleton style={[styles.cta, styles.ctaSkeleton]} borderRadius={14} />
+          ) : owned && saved ? (
+            <>
+              <PressScale style={styles.cta} scaleTo={0.96} onPress={handleContinue}>
+                <Text style={styles.ctaText}>
+                  {t("tourPreview.continueFromStop", { number: saved.currentIndex + 1 })}
+                </Text>
+              </PressScale>
+              <PressScale style={styles.startAgain} scaleTo={0.96} onPress={handleStartAgain}>
+                <Text style={styles.startAgainText}>{t("tourPreview.startAgain")}</Text>
+              </PressScale>
+            </>
           ) : owned ? (
             <PressScale style={styles.cta} scaleTo={0.96} onPress={handleGetToStart}>
               <Text style={styles.ctaText}>{t("tourPreview.getMeToStart")}</Text>
@@ -198,6 +248,19 @@ function createStyles(colors: ThemeColors) {
   price: { fontSize: 18, fontWeight: "700", color: colors.primary },
   meta: { fontSize: 14, color: colors.textMid, marginTop: 6 },
   startLabel: { fontSize: 13, color: colors.textDim, marginTop: 4 },
+  stopList: { maxHeight: 150, marginTop: 12 },
+  stopRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 5 },
+  stopNumber: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  stopNumberText: { color: colors.primary, fontSize: 11, fontWeight: "700" },
+  stopName: { flex: 1, fontSize: 14, color: colors.text },
   cta: {
     marginTop: 16,
     backgroundColor: colors.primary,
@@ -207,6 +270,8 @@ function createStyles(colors: ThemeColors) {
   },
   ctaText: { color: colors.onPrimary, fontSize: 16, fontWeight: "600" },
   ctaSkeleton: { height: 52 },
+  startAgain: { marginTop: 8, paddingVertical: 10, alignItems: "center" },
+  startAgainText: { color: colors.textMid, fontSize: 14, fontWeight: "600", textDecorationLine: "underline" },
   accessNote: {
     fontSize: 12,
     lineHeight: 17,

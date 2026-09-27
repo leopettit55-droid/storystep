@@ -89,6 +89,22 @@ export class DemoWalker {
     }
   }
 
+  /** Begin from the path point nearest `coords` instead of the path's start. */
+  startNear(coords: Coordinates): void {
+    const x = (coords.lng - this.lng0) * this.mPerDegLng;
+    const y = (coords.lat - this.lat0) * 111320;
+    let best = 0;
+    let bestDist = Infinity;
+    this.xy.forEach(([px, py], i) => {
+      const d = Math.hypot(px - x, py - y);
+      if (d < bestDist) {
+        bestDist = d;
+        best = i;
+      }
+    });
+    this.along = this.cumulative[best];
+  }
+
   start(): void {
     this.emit();
     this.timer = setInterval(() => {

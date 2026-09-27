@@ -1,6 +1,6 @@
-import type { TranslationDict } from "./en";
+import type { PartialTranslationDict } from "./en";
 
-const pl: TranslationDict = {
+const pl: PartialTranslationDict = {
   nav: { home: "Start", map: "Mapa 3D", tours: "Wycieczki", account: "Konto", help: "Pomoc" },
 
   common: {

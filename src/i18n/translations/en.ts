@@ -113,6 +113,8 @@ const en = {
     useScanner: "Use our landmark scanner",
     scannerFree: "Point your camera at a building to hear its story",
     getMeToStart: "Get me to the start",
+    continueFromStop: "Continue from stop {{number}}",
+    startAgain: "Start again",
     buyTour: "Buy tour — {{price}}",
     startsAt: "Starts at {{label}}",
     paymentsNotSetTitle: "Payments not set up yet",
@@ -122,7 +124,7 @@ const en = {
 
   getToStart: {
     title: "Get to the start",
-    permissionDenied: "Location permission was denied — enable it in Settings to see live directions.",
+    permissionDenied: "Location is switched off for StoryStep. Turn it on in your browser or phone settings, then tap Try again.",
     findingYou: "Finding you…",
     directions: "About {{distance}}m to go, heading {{bearing}}.",
     openInMaps: "Open in Google Maps",
@@ -233,3 +235,8 @@ const en = {
 
 export default en;
 export type TranslationDict = typeof en;
+
+/** Other languages may leave keys out; t() falls back to English for them.
+ * Arrays (e.g. the Help FAQs) are replaced whole, not merged item by item. */
+type DeepPartial<T> = T extends readonly unknown[] ? T : T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;
+export type PartialTranslationDict = DeepPartial<TranslationDict>;

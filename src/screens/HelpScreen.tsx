@@ -4,6 +4,7 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "rea
 import FadeInItem from "../components/FadeInItem";
 import PressScale from "../components/PressScale";
 import { useLanguage } from "../i18n/LanguageContext";
+import en from "../i18n/translations/en";
 import type { TabScreenNav } from "../navigation/types";
 import { useTheme } from "../ThemeContext";
 import { CONTENT_MAX_WIDTH, type ThemeColors } from "../theme";
@@ -13,7 +14,7 @@ export default function HelpScreen() {
   const { t, dict } = useLanguage();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const faqs = dict.help.faqs;
+  const faqs = dict.help?.faqs ?? en.help.faqs;
 
   return (
     <SafeAreaView style={styles.container}>

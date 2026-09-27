@@ -140,11 +140,23 @@ export class ProximityTracker {
     private path?: Coordinates[]
   ) {}
 
+  /** Stops already heard (e.g. when continuing a saved tour) — they won't fire again. */
+  markTriggered(waypointIds: string[]): void {
+    for (const id of waypointIds) this.triggeredIds.add(id);
+  }
+
+  /** Demo walk only: begin the simulated walk at the path point nearest here. */
+  private demoStartNear: Coordinates | null = null;
+  setDemoStart(coords: Coordinates): void {
+    this.demoStartNear = coords;
+  }
+
   async start(): Promise<void> {
     if (isDemoWalk() && this.path && this.path.length > 1) {
       this.demoWalker = new DemoWalker(this.path, (coords, accuracy, timestamp) =>
         this.handleRawFix(coords, accuracy, timestamp)
       );
+      if (this.demoStartNear) this.demoWalker.startNear(this.demoStartNear);
       this.demoWalker.start();
       return;
     }
