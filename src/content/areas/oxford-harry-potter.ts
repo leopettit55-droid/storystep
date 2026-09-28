@@ -11,6 +11,14 @@ export const oxfordHarryPotter: Area = {
   estimatedDurationMin: 40,
   estimatedDistanceKm: 1.8,
   difficulty: "easy",
+  // Suggested on the tour-complete screen. Location from OpenStreetMap;
+  // facts checked against Wikipedia / CAMRA (September 2026).
+  nearbyPub: {
+    name: "Turf Tavern",
+    blurb:
+      "You've finished right by the Turf Tavern, one of Oxford's best-loved historic pubs. Head down the alley, past the old city wall, and step inside.",
+    coordinates: { lat: 51.75469, lng: -1.25286 },
+  },
   isContentComplete: true,
   image: require("../../../assets/tours/oxford-harry-potter.jpg"),
   price: { singleTour: 4.99 },

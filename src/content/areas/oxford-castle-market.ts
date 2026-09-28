@@ -11,6 +11,14 @@ export const oxfordCastleMarket: Area = {
   estimatedDurationMin: 35,
   estimatedDistanceKm: 0.8,
   difficulty: "easy",
+  // Suggested on the tour-complete screen. Location from OpenStreetMap;
+  // facts checked against Wikipedia / CAMRA (September 2026).
+  nearbyPub: {
+    name: "Jolly Farmers",
+    blurb:
+      "Check out the Jolly Farmers, just round the corner on Paradise Street: a late-17th-century building and one of the UK's longest-running LGBTQ+ pubs.",
+    coordinates: { lat: 51.75066, lng: -1.26265 },
+  },
   isContentComplete: true,
   image: require("../../../assets/tours/oxford-castle.jpg"),
   price: { singleTour: 4.99 },

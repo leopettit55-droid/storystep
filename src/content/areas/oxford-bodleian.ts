@@ -11,6 +11,14 @@ export const oxfordBodleian: Area = {
   estimatedDurationMin: 35,
   estimatedDistanceKm: 0.9,
   difficulty: "easy",
+  // Suggested on the tour-complete screen. Location from OpenStreetMap;
+  // facts checked against Wikipedia / CAMRA (September 2026).
+  nearbyPub: {
+    name: "Turf Tavern",
+    blurb:
+      "Check out the Turf Tavern, one of Oxford's best-loved historic pubs, tucked down a narrow alley beside a surviving stretch of the old city wall.",
+    coordinates: { lat: 51.75469, lng: -1.25286 },
+  },
   isContentComplete: true,
   image: require("../../../assets/tours/oxford-radcliffe.jpg"),
   price: { singleTour: 4.99 },

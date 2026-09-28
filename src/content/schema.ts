@@ -76,6 +76,13 @@ export interface Area {
   /** Stops only trigger in order, and never cut off narration that's still playing.
    * For compact routes where stops sit closer together than GPS can separate. */
   sequentialStops?: boolean;
+  /** A historic pub near where the tour ends, suggested on the tour-complete
+   * screen ("Feeling thirsty?"). Keep the blurb to facts you can source. */
+  nearbyPub?: {
+    name: string;
+    blurb: string;
+    coordinates: Coordinates;
+  };
   /** false for areas that only have a route stub so far (no narration content yet). */
   isContentComplete: boolean;
   /** Local asset module (require(...)) shown as the card thumbnail. */

@@ -11,6 +11,14 @@ export const oxfordInklings: Area = {
   estimatedDurationMin: 45,
   estimatedDistanceKm: 1.8,
   difficulty: "moderate",
+  // Suggested on the tour-complete screen. Location from OpenStreetMap;
+  // facts checked against Wikipedia / CAMRA (September 2026).
+  nearbyPub: {
+    name: "The Bear",
+    blurb:
+      "Check out The Bear, which claims to be one of Oxford's oldest pubs and is famous for the thousands of snipped-off tie ends covering its walls.",
+    coordinates: { lat: 51.75156, lng: -1.2557 },
+  },
   isContentComplete: true,
   image: require("../../../assets/tours/oxford-inklings.jpg"),
   price: { singleTour: 4.99 },
