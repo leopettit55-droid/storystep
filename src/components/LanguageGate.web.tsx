@@ -1,16 +1,15 @@
 import { useRef, useState } from "react";
 import { Animated, StyleSheet } from "react-native";
 import { useLanguage } from "../i18n/LanguageContext";
-import { useTheme } from "../ThemeContext";
-import FirstLanguagePicker from "./FirstLanguagePicker.web";
+import FlagLanguagePicker from "./FlagLanguagePicker.web";
 
 const SESSION_KEY = "storystep.languageChosen";
 
-/** First page on web (the page a QR code opens): pick a language. Sits above
- * the whole app, so once a language is chosen it fades away to reveal the usual app underneath. Shown once per session. */
+/** First page on web (the page a QR code opens): a white page of flags to
+ * pick a language. Sits above the whole app, so once a flag is chosen it
+ * fades away to reveal the usual app underneath. Shown once per session. */
 export default function LanguageGate() {
   const { language, setLanguage } = useLanguage();
-  const { colors } = useTheme();
   const alreadyChosen = typeof window !== "undefined" && sessionStorage.getItem(SESSION_KEY) === "1";
   const [done, setDone] = useState(alreadyChosen);
   const opacity = useRef(new Animated.Value(1)).current;
@@ -20,12 +19,12 @@ export default function LanguageGate() {
   const handleSelect = (code: string) => {
     setLanguage(code);
     sessionStorage.setItem(SESSION_KEY, "1");
-    Animated.timing(opacity, { toValue: 0, duration: 250, useNativeDriver: false }).start(() => setDone(true));
+    Animated.timing(opacity, { toValue: 0, duration: 300, useNativeDriver: true }).start(() => setDone(true));
   };
 
   return (
-    <Animated.View style={[styles.page, { opacity, backgroundColor: colors.background }]}>
-      <FirstLanguagePicker current={language} onSelect={handleSelect} />
+    <Animated.View style={[styles.page, { opacity }]}>
+      <FlagLanguagePicker current={language} onSelect={handleSelect} />
     </Animated.View>
   );
 }
@@ -40,6 +39,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    backgroundColor: "#FFFFFF",
     zIndex: 1000,
     alignItems: "center",
     justifyContent: "center",
