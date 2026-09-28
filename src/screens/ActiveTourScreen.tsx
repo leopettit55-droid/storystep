@@ -28,6 +28,7 @@ import { localizedAreaText } from "../i18n/areaTranslations";
 import { useLanguage } from "../i18n/LanguageContext";
 import type { RootStackParamList } from "../navigation/types";
 import { clearTourProgress, saveTourProgress } from "../state/tourProgress";
+import { useAccountStore } from "../account/accountStore";
 import {
   selectCurrentWaypoint,
   selectNextWaypoint,
@@ -38,6 +39,7 @@ import { useTheme } from "../ThemeContext";
 import type { ThemeColors } from "../theme";
 import CharacterGuide from "../components/CharacterGuide";
 import ShareWalkButton from "../components/ShareWalkButton";
+import PubSuggestion from "../components/PubSuggestion";
 
 type Nav = NativeStackNavigationProp<RootStackParamList, "ActiveTour">;
 type RouteProp = { params: RootStackParamList["ActiveTour"] };
@@ -77,9 +79,11 @@ export default function ActiveTourScreen() {
   /** A stop that fired while the previous narration was still playing (sequential tours only). */
   const queuedRef = useRef<string | null>(null);
 
-  // A finished tour has nothing to continue.
   useEffect(() => {
-    if (area && status === "complete") void clearTourProgress(area.id);
+    if (area && status === "complete") {
+      void clearTourProgress(area.id);
+      void useAccountStore.getState().markTourCompleted(area.id);
+    }
   }, [area, status]);
 
   useEffect(() => {
@@ -216,6 +220,7 @@ export default function ActiveTourScreen() {
             {t("activeTour.tourCompleteBody", { area: areaText.name })}
           </Text>
           <ShareWalkButton area={area} />
+          <PubSuggestion area={area} />
           <Pressable
             style={styles.cta}
             role="button"

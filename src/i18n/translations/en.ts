@@ -71,6 +71,7 @@ const en = {
     title: "Tours",
     subtitle: "Pick a neighbourhood. Put your headphones in, walk, and let it guide you.",
     moreCitiesTitle: "More cities",
+    completed: "Completed",
   },
 
   map: {
@@ -99,7 +100,16 @@ const en = {
     passwordPlaceholder: "Password",
     errorFillIn: "Fill in your name, email, and a password.",
     errorInvalidEmail: "That doesn't look like a valid email address.",
+    errorPasswordTooShort: "Use at least 6 characters for your password.",
+    errorAccountExists: "There's already an account with that email. Log in above instead.",
+    errorLoginFillIn: "Enter your email and password.",
+    errorNoAccount: "No account with that email on this device. Create one below.",
+    errorWrongPassword: "That password doesn't match. Please try again.",
     createAccountButton: "Create account",
+    logInTitle: "Log in",
+    logInBody: "Welcome back. Log in with the account you created.",
+    logInButton: "Log in",
+    toursCompleted: "Tours completed: {{count}}",
     signOut: "Sign out",
     downloadedTours: "Downloaded tours",
     downloadedToursBody: "Mayfair — narration bundled with the app",
@@ -198,6 +208,13 @@ const en = {
     home: "StoryStep: AI-narrated walking tours of London, Paris & Oxford",
     tour: "{{tour}}: free audio walking tour of {{city}} | StoryStep",
     section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Feeling thirsty?",
+    walk: "About {{minutes}} min walk",
+    nextDoor: "Right where you finished",
+    directions: "Directions",
   },
 
   share: {

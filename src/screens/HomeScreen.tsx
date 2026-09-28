@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { useAccountStore } from "../account/accountStore";
 import { useMemo, useState } from "react";
 import {
   ImageBackground,
@@ -239,6 +240,7 @@ function FeaturedCard({
   const styles = useMemo(() => createStyles(colors), [colors]);
   const text = localizedAreaText(area.id, language, area);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const completed = useAccountStore((s) => s.completedTourIds.includes(area.id));
   return (
     <HoverLift style={styles.featuredCardFill} onPress={onPress}>
       {area.image && (
@@ -251,6 +253,11 @@ function FeaturedCard({
             onLoad={() => setImageLoaded(true)}
           >
             <View style={styles.featuredOverlay}>
+              {completed && (
+                <View style={styles.featuredCompleted} aria-label={t("tours.completed")}>
+                  <Ionicons name="checkmark" size={16} color="#FFFFFF" />
+                </View>
+              )}
               <Text style={styles.featuredCity}>{localizedCityName(area.city, language)}</Text>
               <Text style={styles.featuredTitle}>{text.name}</Text>
               <Text style={styles.featuredMeta}>
@@ -382,6 +389,18 @@ function createStyles(colors: ThemeColors) {
     justifyContent: "flex-end",
     padding: 12,
     backgroundColor: "rgba(32,22,19,0.35)",
+  },
+  // Tick in the card's corner for a tour already walked.
+  featuredCompleted: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.success,
+    alignItems: "center",
+    justifyContent: "center",
   },
   featuredCity: {
     fontSize: 10,

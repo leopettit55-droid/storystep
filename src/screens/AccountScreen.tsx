@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import {
@@ -11,6 +10,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useAccountStore, type AccountError } from "../account/accountStore";
 import LanguagePicker from "../components/LanguagePicker";
 import PressScale from "../components/PressScale";
 import Skeleton from "../components/Skeleton";
@@ -21,19 +21,23 @@ import { openCustomerPortal, openSubscriptionCheckout, stripeIsConfigured } from
 import { useTheme } from "../ThemeContext";
 import { CONTENT_MAX_WIDTH, type ThemeColors } from "../theme";
 
-const STORAGE_KEY = "storystep.localAccount";
-
-interface LocalAccount {
-  name: string;
-  email: string;
-}
+const ERROR_KEYS: Record<AccountError, string> = {
+  fillIn: "account.errorFillIn",
+  invalidEmail: "account.errorInvalidEmail",
+  passwordTooShort: "account.errorPasswordTooShort",
+  accountExists: "account.errorAccountExists",
+  noAccount: "account.errorNoAccount",
+  wrongPassword: "account.errorWrongPassword",
+};
 
 export default function AccountScreen() {
   const { t } = useLanguage();
   const { colors, isDark, toggleMode } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const [loading, setLoading] = useState(true);
-  const [account, setAccount] = useState<LocalAccount | null>(null);
+  const ready = useAccountStore((s) => s.ready);
+  const account = useAccountStore((s) => s.account);
+  const completedCount = useAccountStore((s) => s.completedTourIds.length);
+  const loading = !ready;
   const [subscription, setSubscription] = useState<{ plan: SubscriptionPlan; expiresAt: number } | null>(null);
 
   const [name, setName] = useState("");
@@ -41,12 +45,12 @@ export default function AccountScreen() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState<string | null>(null);
+
   useEffect(() => {
-    (async () => {
-      const raw = await AsyncStorage.getItem(STORAGE_KEY);
-      if (raw) setAccount(JSON.parse(raw));
-      setLoading(false);
-    })();
+    if (!useAccountStore.getState().ready) void useAccountStore.getState().load();
   }, []);
 
   useFocusEffect(
@@ -70,28 +74,34 @@ export default function AccountScreen() {
 
   const handleCreateAccount = async () => {
     setError(null);
-    if (!name.trim() || !email.trim() || !password) {
+    const problem = await useAccountStore.getState().createAccount(name, email, password);
+    if (problem) {
       notifyError();
-      setError(t("account.errorFillIn"));
+      setError(t(ERROR_KEYS[problem]));
       return;
     }
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      notifyError();
-      setError(t("account.errorInvalidEmail"));
-      return;
-    }
-    const newAccount: LocalAccount = { name: name.trim(), email: email.trim() };
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newAccount));
     notifySuccess();
-    setAccount(newAccount);
-  };
-
-  const handleSignOut = async () => {
-    await AsyncStorage.removeItem(STORAGE_KEY);
-    setAccount(null);
     setName("");
     setEmail("");
     setPassword("");
+  };
+
+  const handleLogIn = async () => {
+    setLoginError(null);
+    const problem = await useAccountStore.getState().logIn(loginEmail, loginPassword);
+    if (problem) {
+      notifyError();
+      setLoginError(t(problem === "fillIn" ? "account.errorLoginFillIn" : ERROR_KEYS[problem]));
+      return;
+    }
+    notifySuccess();
+    setLoginEmail("");
+    setLoginPassword("");
+  };
+
+  // Logs out; the account stays on this device to log back into.
+  const handleSignOut = async () => {
+    await useAccountStore.getState().signOut();
   };
 
   if (loading) {
@@ -148,6 +158,9 @@ export default function AccountScreen() {
               </View>
               <Text style={styles.name}>{account.name}</Text>
               <Text style={styles.body}>{account.email}</Text>
+              <Text style={styles.completedCount}>
+                {t("account.toursCompleted", { count: completedCount })}
+              </Text>
               <PressScale style={styles.signOutButton} scaleTo={0.95} onPress={handleSignOut}>
                 <Text style={styles.signOutButtonText}>{t("account.signOut")}</Text>
               </PressScale>
@@ -159,6 +172,39 @@ export default function AccountScreen() {
             </View>
           </>
         ) : (
+          <>
+          <View style={styles.card}>
+            <Text style={styles.rowTitle}>{t("account.logInTitle")}</Text>
+            <Text style={styles.body}>{t("account.logInBody")}</Text>
+
+            <TextInput
+              style={styles.input}
+              placeholder={t("account.emailPlaceholder")}
+              placeholderTextColor={colors.textFaint}
+              value={loginEmail}
+              onChangeText={setLoginEmail}
+              autoCapitalize="none"
+              autoComplete="email"
+              keyboardType="email-address"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder={t("account.passwordPlaceholder")}
+              placeholderTextColor={colors.textFaint}
+              value={loginPassword}
+              onChangeText={setLoginPassword}
+              autoComplete="current-password"
+              secureTextEntry
+              onSubmitEditing={handleLogIn}
+            />
+
+            {loginError && <Text style={styles.error}>{loginError}</Text>}
+
+            <PressScale style={styles.createButton} scaleTo={0.96} onPress={handleLogIn}>
+              <Text style={styles.createButtonText}>{t("account.logInButton")}</Text>
+            </PressScale>
+          </View>
+
           <View style={styles.card}>
             <Text style={styles.rowTitle}>{t("account.createAccountTitle")}</Text>
             <Text style={styles.body}>{t("account.storedLocally")}</Text>
@@ -186,7 +232,10 @@ export default function AccountScreen() {
               placeholderTextColor={colors.textFaint}
               value={password}
               onChangeText={setPassword}
+              // Lets the browser or phone offer to save it for logging in later.
+              autoComplete="new-password"
               secureTextEntry
+              onSubmitEditing={handleCreateAccount}
             />
 
             {error && <Text style={styles.error}>{error}</Text>}
@@ -195,6 +244,7 @@ export default function AccountScreen() {
               <Text style={styles.createButtonText}>{t("account.createAccountButton")}</Text>
             </PressScale>
           </View>
+          </>
         )}
 
         <View style={styles.card}>
@@ -241,6 +291,7 @@ function createStyles(colors: ThemeColors) {
     avatarText: { fontSize: 22, fontWeight: "700", color: colors.primary },
     name: { fontSize: 17, fontWeight: "700", color: colors.text },
     body: { fontSize: 14, color: colors.textMid, marginTop: 6, lineHeight: 20 },
+    completedCount: { fontSize: 13, color: colors.primary, fontWeight: "600", marginTop: 8 },
     rowTitle: { fontSize: 15, fontWeight: "700", color: colors.text },
     rowBody: { fontSize: 13, color: colors.textMid, marginTop: 4 },
     planRow: { flexDirection: "row", gap: 10, marginTop: 14, alignSelf: "stretch" },

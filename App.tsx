@@ -5,6 +5,7 @@ import {
   createNavigationContainerRef,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { Alert, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -24,6 +25,7 @@ import ComingSoonScreen from "./src/screens/ComingSoonScreen";
 import ContactUsScreen from "./src/screens/ContactUsScreen";
 import type { RootStackParamList } from "./src/navigation/types";
 import { getAreaById } from "./src/content";
+import { useAccountStore } from "./src/account/accountStore";
 import { localizedAreaText } from "./src/i18n/areaTranslations";
 import { localizedCityName } from "./src/i18n/cityNames";
 import { notifySuccess } from "./src/haptics";
@@ -90,6 +92,9 @@ function pageTitle(routeName: string | undefined, params: unknown, t: Translate,
 
 function AppInner() {
   const { language, t } = useLanguage();
+  useEffect(() => {
+    void useAccountStore.getState().load();
+  }, []);
   const { colors, isDark } = useTheme();
   const navTheme = isDark ? NavDarkTheme : NavDefaultTheme;
   return (

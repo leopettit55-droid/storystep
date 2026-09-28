@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo } from "react";
 import {
@@ -9,6 +10,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useAccountStore } from "../account/accountStore";
 import { areas } from "../content";
 import type { Area } from "../content";
 import { COMING_SOON_CITIES, type ComingSoonCity } from "../content/comingSoonCities";
@@ -35,6 +37,7 @@ export default function AreaSelectScreen() {
   const navigation = useNavigation<Nav>();
   const { language, t } = useLanguage();
   const { colors } = useTheme();
+  const completedTourIds = useAccountStore((s) => s.completedTourIds);
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const citySections = CITIES.map((city) => ({
@@ -51,6 +54,7 @@ export default function AreaSelectScreen() {
 
   const renderAreaItem = (item: Area) => {
     const disabled = !item.isContentComplete;
+    const completed = completedTourIds.includes(item.id);
     const text = localizedAreaText(item.id, language, item);
     return (
       <Pressable
@@ -76,6 +80,11 @@ export default function AreaSelectScreen() {
           <View style={styles.cardHeaderRow}>
             <Text style={styles.cardTitle}>{text.name}</Text>
             {disabled && <Text style={styles.badge}>{t("common.comingSoon")}</Text>}
+            {completed && (
+              <View style={styles.completedBadge} aria-label={t("tours.completed")}>
+                <Ionicons name="checkmark-circle" size={20} color={colors.success} />
+              </View>
+            )}
           </View>
           <Text style={styles.cardDescription} numberOfLines={2}>
             {text.description}
@@ -193,6 +202,7 @@ function createStyles(colors: ThemeColors) {
       alignItems: "center",
     },
     cardTitle: { fontSize: 17, fontWeight: "700", color: colors.text, flexShrink: 1 },
+    completedBadge: { marginLeft: 8 },
     badge: {
       fontSize: 10,
       color: colors.primary,
