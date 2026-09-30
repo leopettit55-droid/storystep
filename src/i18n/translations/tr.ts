@@ -134,6 +134,18 @@ const tr: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "Rehberli turuna hoş geldin",
+    introGreeting: "Merhaba! {{area}}'e hoş geldin. Ben tur rehberinim.",
+    introHeadphones: "Bu tur için kulaklık kullanmanı öneririz.",
+    startTour: "Turu başlat",
+    distanceToStart: "Başlangıç noktasına yaklaşık {{distance}} m uzaktasın",
+    directions: "Yol tarifi",
+    guideGreeting: "Merhaba! Ben rehberinim. {{area}}'e hoş geldin!",
+    guideArrived: "{{stop}} noktasına vardık!",
+    guideHeadTo: "Haydi {{stop}} noktasına!",
+    proceedSpoken: "Şimdi {{number}}. durağa, {{stop}} noktasına ilerle. Haydi!",
+    nextStopLabel: "Sıradaki: {{number}}. durak",
+    distanceAway: "{{distance}} m uzakta",
     stopOf: "Durak {{current}} / {{total}}",
     walkingToFirst: "İlk durağa doğru yürünüyor…",
     back: "Geri",

@@ -13,7 +13,6 @@ export type MainTabParamList = {
 export type RootStackParamList = {
   MainTabs: undefined;
   TourPreview: { areaId: string };
-  GetToStart: { areaId: string };
   /** resume: continue from progress already loaded into the tour store. */
   ActiveTour: { areaId: string; resume?: boolean };
   CameraTour: { areaId?: string } | undefined;

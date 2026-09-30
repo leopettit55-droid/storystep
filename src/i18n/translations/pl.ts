@@ -134,6 +134,18 @@ const pl: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "Witaj na wycieczce z przewodnikiem",
+    introGreeting: "Cześć! Witaj w {{area}}. Jestem twoim przewodnikiem.",
+    introHeadphones: "Na tę wycieczkę polecamy słuchawki.",
+    startTour: "Rozpocznij wycieczkę",
+    distanceToStart: "Jesteś około {{distance}} m od startu",
+    directions: "Trasa",
+    guideGreeting: "Cześć! Jestem twoim przewodnikiem. Witaj w {{area}}!",
+    guideArrived: "Dotarliśmy do {{stop}}!",
+    guideHeadTo: "Chodźmy do {{stop}}!",
+    proceedSpoken: "Teraz idź do przystanku {{number}}, {{stop}}. Ruszamy!",
+    nextStopLabel: "Dalej: przystanek {{number}}",
+    distanceAway: "{{distance}} m stąd",
     stopOf: "Przystanek {{current}} z {{total}}",
     walkingToFirst: "W drodze do pierwszego przystanku…",
     back: "Wstecz",

@@ -134,6 +134,18 @@ const pt: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "Bem-vindo à sua visita guiada",
+    introGreeting: "Olá! Bem-vindo a {{area}}. Sou o seu guia.",
+    introHeadphones: "Recomendamos usar auscultadores nesta visita.",
+    startTour: "Começar visita",
+    distanceToStart: "Está a cerca de {{distance}} m do início",
+    directions: "Direções",
+    guideGreeting: "Olá! Sou o seu guia. Bem-vindo a {{area}}!",
+    guideArrived: "Chegámos a {{stop}}!",
+    guideHeadTo: "Vamos para {{stop}}!",
+    proceedSpoken: "Agora siga para a paragem {{number}}, {{stop}}. Vamos!",
+    nextStopLabel: "Seguinte: paragem {{number}}",
+    distanceAway: "a {{distance}} m",
     stopOf: "Paragem {{current}} de {{total}}",
     walkingToFirst: "A caminho da primeira paragem…",
     back: "Voltar",

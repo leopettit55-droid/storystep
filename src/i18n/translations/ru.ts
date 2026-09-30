@@ -134,6 +134,18 @@ const ru: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "Добро пожаловать на экскурсию",
+    introGreeting: "Привет! Добро пожаловать в {{area}}. Я твой гид.",
+    introHeadphones: "Для этой экскурсии рекомендуем наушники.",
+    startTour: "Начать экскурсию",
+    distanceToStart: "До старта около {{distance}} м",
+    directions: "Маршрут",
+    guideGreeting: "Привет! Я твой гид. Добро пожаловать в {{area}}!",
+    guideArrived: "Мы пришли: {{stop}}!",
+    guideHeadTo: "Идём к {{stop}}!",
+    proceedSpoken: "Теперь направляйся к остановке {{number}}, {{stop}}. Вперёд!",
+    nextStopLabel: "Далее: остановка {{number}}",
+    distanceAway: "{{distance}} м",
     stopOf: "Остановка {{current}} из {{total}}",
     walkingToFirst: "Идём к первой остановке…",
     back: "Назад",

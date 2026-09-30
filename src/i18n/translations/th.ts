@@ -134,6 +134,18 @@ const th: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "ยินดีต้อนรับสู่ทัวร์พร้อมไกด์",
+    introGreeting: "สวัสดี! ยินดีต้อนรับสู่ {{area}} ฉันคือไกด์ของคุณ",
+    introHeadphones: "แนะนำให้ใช้หูฟังสำหรับทัวร์นี้",
+    startTour: "เริ่มทัวร์",
+    distanceToStart: "คุณอยู่ห่างจากจุดเริ่มต้นประมาณ {{distance}} ม.",
+    directions: "เส้นทาง",
+    guideGreeting: "สวัสดี! ฉันคือไกด์ของคุณ ยินดีต้อนรับสู่ {{area}}!",
+    guideArrived: "เรามาถึง {{stop}} แล้ว!",
+    guideHeadTo: "ไปที่ {{stop}} กันเลย!",
+    proceedSpoken: "ต่อไปไปที่จุดที่ {{number}} {{stop}} ไปกันเลย!",
+    nextStopLabel: "ถัดไป: จุดที่ {{number}}",
+    distanceAway: "อีก {{distance}} ม.",
     stopOf: "จุดแวะที่ {{current}} จาก {{total}}",
     walkingToFirst: "กำลังเดินไปยังจุดแวะแรก…",
     back: "ย้อนกลับ",

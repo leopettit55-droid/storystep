@@ -134,6 +134,18 @@ const hi: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "आपके गाइडेड टूर में स्वागत है",
+    introGreeting: "नमस्ते! {{area}} में आपका स्वागत है। मैं आपका टूर गाइड हूँ।",
+    introHeadphones: "इस टूर के लिए हेडफ़ोन इस्तेमाल करने की सलाह दी जाती है।",
+    startTour: "टूर शुरू करें",
+    distanceToStart: "आप शुरुआती बिंदु से लगभग {{distance}} मी दूर हैं",
+    directions: "रास्ता",
+    guideGreeting: "नमस्ते! मैं आपका गाइड हूँ। {{area}} में आपका स्वागत है!",
+    guideArrived: "हम {{stop}} पहुँच गए हैं!",
+    guideHeadTo: "चलिए {{stop}} चलते हैं!",
+    proceedSpoken: "अब पड़ाव {{number}}, {{stop}} की ओर चलिए। चलो चलें!",
+    nextStopLabel: "अगला: पड़ाव {{number}}",
+    distanceAway: "{{distance}} मी दूर",
     stopOf: "पड़ाव {{current}} / {{total}}",
     walkingToFirst: "पहले पड़ाव की ओर चल रहे हैं…",
     back: "पीछे",

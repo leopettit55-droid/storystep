@@ -134,6 +134,18 @@ const id: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "Selamat datang di tur berpemandumu",
+    introGreeting: "Hai! Selamat datang di {{area}}. Aku pemandu turmu.",
+    introHeadphones: "Kami sarankan memakai headphone untuk tur ini.",
+    startTour: "Mulai tur",
+    distanceToStart: "Kamu sekitar {{distance}} m dari titik awal",
+    directions: "Petunjuk arah",
+    guideGreeting: "Hai! Aku pemandumu. Selamat datang di {{area}}!",
+    guideArrived: "Kita sudah sampai di {{stop}}!",
+    guideHeadTo: "Ayo ke {{stop}}!",
+    proceedSpoken: "Sekarang lanjut ke perhentian {{number}}, {{stop}}. Ayo jalan!",
+    nextStopLabel: "Berikutnya: perhentian {{number}}",
+    distanceAway: "{{distance}} m lagi",
     stopOf: "Titik {{current}} dari {{total}}",
     walkingToFirst: "Berjalan menuju titik pertama…",
     back: "Kembali",

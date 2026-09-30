@@ -134,6 +134,18 @@ const ko: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "가이드 투어에 오신 것을 환영해요",
+    introGreeting: "안녕하세요! {{area}}에 오신 걸 환영해요. 저는 투어 가이드예요.",
+    introHeadphones: "이 투어에는 헤드폰 사용을 권장해요.",
+    startTour: "투어 시작",
+    distanceToStart: "출발 지점까지 약 {{distance}}m",
+    directions: "길찾기",
+    guideGreeting: "안녕하세요! 저는 여러분의 가이드예요. {{area}}에 오신 걸 환영해요!",
+    guideArrived: "{{stop}}에 도착했어요!",
+    guideHeadTo: "{{stop}}(으)로 가요!",
+    proceedSpoken: "이제 {{number}}번 정류장, {{stop}}(으)로 이동하세요. 출발!",
+    nextStopLabel: "다음: {{number}}번 정류장",
+    distanceAway: "{{distance}}m 남음",
     stopOf: "{{total}}개 중 {{current}}번째 정류장",
     walkingToFirst: "첫 번째 정류장으로 이동 중…",
     back: "이전",

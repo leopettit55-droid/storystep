@@ -134,6 +134,18 @@ const ja: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "ガイドツアーへようこそ",
+    introGreeting: "こんにちは！{{area}}へようこそ。ツアーガイドだよ。",
+    introHeadphones: "このツアーではヘッドホンのご使用をおすすめします。",
+    startTour: "ツアーを始める",
+    distanceToStart: "スタート地点まで約{{distance}}m",
+    directions: "経路",
+    guideGreeting: "こんにちは！ガイドだよ。{{area}}へようこそ！",
+    guideArrived: "{{stop}}に着いたよ！",
+    guideHeadTo: "{{stop}}へ行こう！",
+    proceedSpoken: "次はスポット{{number}}、{{stop}}へ進もう。さあ行こう！",
+    nextStopLabel: "次：スポット{{number}}",
+    distanceAway: "あと{{distance}}m",
     stopOf: "{{total}}か所中{{current}}か所目",
     walkingToFirst: "最初のスポットへ向かっています…",
     back: "戻る",

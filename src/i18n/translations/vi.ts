@@ -134,6 +134,18 @@ const vi: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "Chào mừng đến với chuyến tham quan có hướng dẫn",
+    introGreeting: "Xin chào! Chào mừng đến {{area}}. Mình là hướng dẫn viên của bạn.",
+    introHeadphones: "Bạn nên dùng tai nghe cho chuyến tham quan này.",
+    startTour: "Bắt đầu tham quan",
+    distanceToStart: "Bạn cách điểm xuất phát khoảng {{distance}} m",
+    directions: "Chỉ đường",
+    guideGreeting: "Xin chào! Mình là hướng dẫn viên của bạn. Chào mừng đến {{area}}!",
+    guideArrived: "Chúng ta đã đến {{stop}}!",
+    guideHeadTo: "Cùng đến {{stop}} nào!",
+    proceedSpoken: "Giờ hãy đi tiếp đến điểm dừng {{number}}, {{stop}}. Đi thôi!",
+    nextStopLabel: "Tiếp theo: điểm dừng {{number}}",
+    distanceAway: "cách {{distance}} m",
     stopOf: "Điểm dừng {{current}} / {{total}}",
     walkingToFirst: "Đang đi đến điểm dừng đầu tiên…",
     back: "Quay lại",

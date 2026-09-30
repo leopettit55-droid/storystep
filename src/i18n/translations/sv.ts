@@ -134,6 +134,18 @@ const sv: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "Välkommen till din guidade tur",
+    introGreeting: "Hej! Välkommen till {{area}}. Jag är din guide.",
+    introHeadphones: "Vi rekommenderar hörlurar för den här turen.",
+    startTour: "Starta turen",
+    distanceToStart: "Du är cirka {{distance}} m från starten",
+    directions: "Vägbeskrivning",
+    guideGreeting: "Hej! Jag är din guide. Välkommen till {{area}}!",
+    guideArrived: "Vi har kommit fram till {{stop}}!",
+    guideHeadTo: "Nu går vi till {{stop}}!",
+    proceedSpoken: "Fortsätt nu till stopp {{number}}, {{stop}}. Nu kör vi!",
+    nextStopLabel: "Nästa: stopp {{number}}",
+    distanceAway: "{{distance}} m bort",
     stopOf: "Stopp {{current}} av {{total}}",
     walkingToFirst: "På väg till första stoppet…",
     back: "Tillbaka",

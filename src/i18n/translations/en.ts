@@ -144,6 +144,18 @@ const en = {
   },
 
   activeTour: {
+    introSubtitle: "Welcome to your guided tour",
+    introGreeting: "Hi there! Welcome to {{area}}. I'm your tour guide.",
+    introHeadphones: "We recommend using headphones for this tour.",
+    startTour: "Start tour",
+    distanceToStart: "You're about {{distance}} m from the start",
+    directions: "Directions",
+    guideGreeting: "Hi! I'm your guide. Welcome to {{area}}!",
+    guideArrived: "We've arrived at {{stop}}!",
+    guideHeadTo: "Let's head to {{stop}}!",
+    proceedSpoken: "Now proceed to stop {{number}}, {{stop}}. Let's move!",
+    nextStopLabel: "Next: stop {{number}}",
+    distanceAway: "{{distance}} m away",
     stopOf: "Stop {{current}} of {{total}}",
     walkingToFirst: "Walking to the first stop…",
     back: "Back",

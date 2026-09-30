@@ -134,6 +134,18 @@ const zh: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "欢迎参加导览之旅",
+    introGreeting: "你好！欢迎来到{{area}}。我是你的导游。",
+    introHeadphones: "建议在本次导览中使用耳机。",
+    startTour: "开始导览",
+    distanceToStart: "你距离起点约{{distance}}米",
+    directions: "路线",
+    guideGreeting: "你好！我是你的导游。欢迎来到{{area}}！",
+    guideArrived: "我们到达{{stop}}了！",
+    guideHeadTo: "我们去{{stop}}吧！",
+    proceedSpoken: "现在请前往第{{number}}站，{{stop}}。出发吧！",
+    nextStopLabel: "下一站：第{{number}}站",
+    distanceAway: "还有{{distance}}米",
     stopOf: "第 {{current}} / {{total}} 站",
     walkingToFirst: "正在前往第一站…",
     back: "上一段",

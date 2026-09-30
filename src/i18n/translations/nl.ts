@@ -134,6 +134,18 @@ const nl: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "Welkom bij je rondleiding",
+    introGreeting: "Hoi! Welkom bij {{area}}. Ik ben je gids.",
+    introHeadphones: "We raden koptelefoon of oordopjes aan voor deze tour.",
+    startTour: "Start tour",
+    distanceToStart: "Je bent ongeveer {{distance}} m van het startpunt",
+    directions: "Route",
+    guideGreeting: "Hoi! Ik ben je gids. Welkom bij {{area}}!",
+    guideArrived: "We zijn bij {{stop}} aangekomen!",
+    guideHeadTo: "Op naar {{stop}}!",
+    proceedSpoken: "Ga nu verder naar stop {{number}}, {{stop}}. Daar gaan we!",
+    nextStopLabel: "Volgende: stop {{number}}",
+    distanceAway: "{{distance}} m verderop",
     stopOf: "Stop {{current}} van {{total}}",
     walkingToFirst: "Op weg naar de eerste stop…",
     back: "Terug",

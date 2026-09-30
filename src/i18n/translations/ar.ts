@@ -134,6 +134,18 @@ const ar: PartialTranslationDict = {
   },
 
   activeTour: {
+    introSubtitle: "مرحبًا بك في جولتك المصحوبة بمرشد",
+    introGreeting: "مرحبًا! أهلًا بك في {{area}}. أنا مرشدك في هذه الجولة.",
+    introHeadphones: "ننصحك باستخدام سماعات الرأس في هذه الجولة.",
+    startTour: "ابدأ الجولة",
+    distanceToStart: "أنت على بُعد {{distance}} م تقريبًا من نقطة البداية",
+    directions: "الاتجاهات",
+    guideGreeting: "مرحبًا! أنا مرشدك. أهلًا بك في {{area}}!",
+    guideArrived: "لقد وصلنا إلى {{stop}}!",
+    guideHeadTo: "هيا بنا إلى {{stop}}!",
+    proceedSpoken: "والآن توجّه إلى المحطة {{number}}، {{stop}}. هيا بنا!",
+    nextStopLabel: "التالي: المحطة {{number}}",
+    distanceAway: "على بُعد {{distance}} م",
     stopOf: "المحطة {{current}} من {{total}}",
     walkingToFirst: "في الطريق إلى المحطة الأولى…",
     back: "السابق",

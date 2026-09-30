@@ -1,27 +1,30 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useEffect, useMemo, useRef } from "react";
-import { Platform, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import * as Location from "expo-location";
+import { Animated, Easing, Linking, Platform, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import PressScale from "../components/PressScale";
-import { notifySuccess } from "../haptics";
+import { notifySuccess, tapMedium } from "../haptics";
 import {
   isNarrationPlaying,
   pauseNarration,
   playWaypointNarration,
-  replayCurrentNarration,
   resumeNarration,
   setNarrationEndedHandler,
   setupAudioPlayback,
   stopNarration,
 } from "../audio/narrationPlayer";
+import { speakPrompt, stopSpeaking, unlockSpeech } from "../audio/speakPrompt";
 import { getAreaById } from "../content";
 import {
+  requestLocationPermissions,
   setGeofenceEnterHandler,
   startWaypointGeofencing,
   stopWaypointGeofencing,
 } from "../geofencing/geofenceManager";
-import { ProximityTracker } from "../geofencing/proximityTracker";
+import { bearingDegrees, distanceMeters, ProximityTracker } from "../geofencing/proximityTracker";
 import { demoSpeed, isDemoWalk } from "../demo/demoWalk";
 import { requestOrientationPermission } from "../landmark/orientationPermission";
 import { localizedAreaText } from "../i18n/areaTranslations";
@@ -37,9 +40,11 @@ import {
 } from "../state/tourStore";
 import { useTheme } from "../ThemeContext";
 import type { ThemeColors } from "../theme";
-import CharacterGuide from "../components/CharacterGuide";
 import ShareWalkButton from "../components/ShareWalkButton";
 import PubSuggestion from "../components/PubSuggestion";
+import TourIntro from "../components/TourIntro";
+import TourMap, { type AvatarLine } from "../components/TourMap";
+import type { Waypoint } from "../content";
 
 type Nav = NativeStackNavigationProp<RootStackParamList, "ActiveTour">;
 type RouteProp = { params: RootStackParamList["ActiveTour"] };
@@ -73,11 +78,79 @@ export default function ActiveTourScreen() {
   const setOffRoute = useTourStore((s) => s.setOffRoute);
   const setLastKnownLocation = useTourStore((s) => s.setLastKnownLocation);
   const completeTour = useTourStore((s) => s.completeTour);
+  const currentWaypointIndex = useTourStore((s) => s.currentWaypointIndex);
+  const visitedWaypointIds = useTourStore((s) => s.visitedWaypointIds);
+  const lastKnownLocation = useTourStore((s) => s.lastKnownLocation);
+
+  const insets = useSafeAreaInsets();
+
+  // A fresh tour opens on the cinematic intro; the tour itself (GPS,
+  // narration) only starts once Start is tapped. Continuing skips the intro.
+  const [started, setStarted] = useState(resuming);
+  const [introShowing, setIntroShowing] = useState(!resuming);
+  const [distanceToStart, setDistanceToStart] = useState<number | null>(null);
+  /** 0 → 1 as the in-tour controls slide in. */
+  const chrome = useRef(new Animated.Value(resuming ? 1 : 0)).current;
 
   const trackerRef = useRef<ProximityTracker | null>(null);
   const visitedRef = useRef(new Set<string>());
   /** A stop that fired while the previous narration was still playing (sequential tours only). */
   const queuedRef = useRef<string | null>(null);
+
+  // Latest language/t for callbacks created once when the tour starts.
+  const tRef = useRef(t);
+  tRef.current = t;
+  const languageRef = useRef(language);
+  languageRef.current = language;
+
+  // The guide's speech bubbles, shown one after another.
+  const [speech, setSpeech] = useState<AvatarLine | null>(null);
+  const speechQueue = useRef<{ text: string; durationMs: number }[]>([]);
+  const speechTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const say = useCallback((text: string, durationMs = 3000) => {
+    const showNext = () => {
+      const next = speechQueue.current.shift();
+      if (!next) {
+        speechTimer.current = null;
+        return;
+      }
+      setSpeech({ id: Date.now(), ...next });
+      speechTimer.current = setTimeout(showNext, next.durationMs + 150);
+    };
+    speechQueue.current.push({ text, durationMs });
+    if (!speechTimer.current) showNext();
+  }, []);
+
+  // "Proceed to stop N" card shown after a stop's narration ends.
+  const [transition, setTransition] = useState<{ number: number; name: string; distance: number } | null>(null);
+  const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [faceBearing, setFaceBearing] = useState<number | null>(null);
+
+  const announceNextStop = useCallback(
+    (current: Waypoint, next: Waypoint) => {
+      const from = useTourStore.getState().lastKnownLocation ?? current.coordinates;
+      const distance = Math.max(5, Math.round(distanceMeters(from, next.coordinates) / 5) * 5);
+      setFaceBearing(bearingDegrees(from, next.coordinates));
+      setTransition({ number: next.order, name: next.name, distance });
+      if (transitionTimer.current) clearTimeout(transitionTimer.current);
+      transitionTimer.current = setTimeout(() => setTransition(null), 6000);
+      say(tRef.current("activeTour.guideHeadTo", { stop: next.name }), 3000);
+      speakPrompt(
+        tRef.current("activeTour.proceedSpoken", { number: next.order, stop: next.name }),
+        languageRef.current
+      );
+    },
+    [say]
+  );
+
+  useEffect(
+    () => () => {
+      if (speechTimer.current) clearTimeout(speechTimer.current);
+      if (transitionTimer.current) clearTimeout(transitionTimer.current);
+      stopSpeaking();
+    },
+    []
+  );
 
   useEffect(() => {
     if (area && status === "complete") {
@@ -86,8 +159,37 @@ export default function ActiveTourScreen() {
     }
   }, [area, status]);
 
+  // During the intro, one quick location check: if the walker isn't at the
+  // start yet, the intro offers walking directions (replacing the old
+  // "Get to the start" page). Skipped in the demo walk, which needs no GPS.
   useEffect(() => {
-    if (!area) return;
+    if (!area || resuming || isDemoWalk()) return;
+    let cancelled = false;
+    const report = (lat: number, lng: number) => {
+      if (!cancelled) setDistanceToStart(distanceMeters({ lat, lng }, area.startingPoint));
+    };
+    if (Platform.OS === "web") {
+      navigator.geolocation?.getCurrentPosition(
+        (pos) => report(pos.coords.latitude, pos.coords.longitude),
+        () => {},
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      );
+    } else {
+      (async () => {
+        const { status: perm } = await Location.requestForegroundPermissionsAsync();
+        if (perm !== "granted") return;
+        const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        report(pos.coords.latitude, pos.coords.longitude);
+      })().catch(() => {});
+    }
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [area?.id]);
+
+  useEffect(() => {
+    if (!area || !started) return;
 
     let cancelled = false;
 
@@ -130,6 +232,8 @@ export default function ActiveTourScreen() {
       queuedRef.current = null;
       visitedRef.current.add(waypointId);
       enterWaypoint(waypointId);
+      setTransition(null);
+      say(tRef.current("activeTour.guideArrived", { stop: waypoint.name }), 2500);
       persistProgress();
       void playWaypointNarration(waypoint);
     };
@@ -145,7 +249,10 @@ export default function ActiveTourScreen() {
       if (isLast) {
         notifySuccess();
         completeTour();
+        return;
       }
+      const next = area.route[area.route.indexOf(current) + 1];
+      if (next) announceNextStop(current, next);
     };
 
     (async () => {
@@ -199,7 +306,7 @@ export default function ActiveTourScreen() {
       stopNarration();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [area?.id]);
+  }, [area?.id, started]);
 
   if (!area) {
     return (
@@ -245,10 +352,6 @@ export default function ActiveTourScreen() {
     }
   };
 
-  const handleReplay = () => {
-    replayCurrentNarration();
-  };
-
   const handleSkipNext = () => {
     if (!nextWaypoint) return;
     visitedRef.current.delete(nextWaypoint.id);
@@ -269,6 +372,12 @@ export default function ActiveTourScreen() {
     }
   };
 
+  // Tapping a stop on the map that's already been reached replays its story.
+  const handleMapStopPress = (waypoint: Waypoint) => {
+    if (status === "paused") resume();
+    void playWaypointNarration(waypoint);
+  };
+
   // iOS Safari requires DeviceOrientationEvent.requestPermission() to be
   // called essentially synchronously from within the original tap — calling
   // it after any other awaits (e.g. after a screen transition) causes it to
@@ -281,68 +390,129 @@ export default function ActiveTourScreen() {
     navigation.navigate("ARCamera", { areaId: area.id, orientationGranted, mode: "tour" });
   };
 
+  // Everything that needs a user gesture (speech unlock, audio) runs in this tap.
+  const handleStart = async () => {
+    tapMedium();
+    unlockSpeech();
+    Animated.timing(chrome, { toValue: 1, duration: 700, delay: 250, easing: Easing.out(Easing.back(1.2)), useNativeDriver: true }).start();
+    const { background } = await requestLocationPermissions().catch(() => ({ background: false }));
+    if (!background) {
+      // Same as before: without "Always" location, narration only triggers
+      // while the app is open.
+      console.warn("[ActiveTourScreen] background location not granted; foreground tracking only");
+    }
+    useTourStore.getState().arrivedAtStart();
+    setStarted(true);
+  };
+
+  const handleDirections = () => {
+    const start = area.startingPoint;
+    void Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${start.lat},${start.lng}&travelmode=walking`);
+  };
+
+  const hudStyle = {
+    opacity: chrome,
+    transform: [{ translateY: chrome.interpolate({ inputRange: [0, 1], outputRange: [-120, 0] }) }],
+  };
+  const controlsStyle = {
+    opacity: chrome,
+    transform: [{ translateY: chrome.interpolate({ inputRange: [0, 1], outputRange: [140, 0] }) }],
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
-      </View>
+    <View style={styles.fullscreen}>
+      <TourMap
+        style={StyleSheet.absoluteFill}
+        area={area}
+        currentWaypointIndex={currentWaypointIndex}
+        visitedWaypointIds={visitedWaypointIds}
+        userLocation={lastKnownLocation}
+        onWaypointPress={handleMapStopPress}
+        speech={speech}
+        faceBearing={faceBearing}
+        flyIn={!resuming}
+      />
 
-      <View style={styles.scanRow}>
-        <PressScale
-          style={styles.exitButton}
-          scaleTo={0.9}
-          onPress={() => navigation.goBack()}
-          hitSlop={8}
-          aria-label={t("camera.close")}
-        >
-          <Ionicons name="close" size={20} color={colors.textMid} />
-        </PressScale>
-        <PressScale style={styles.scanButton} scaleTo={0.94} onPress={() => navigation.navigate("CameraTour", { areaId: area.id })}>
-          <Ionicons name="camera" size={16} color={colors.onPrimary} />
-          <Text style={styles.scanButtonText}>{t("activeTour.scanLandmarks")}</Text>
-        </PressScale>
-      </View>
+      {introShowing && (
+        <TourIntro
+          title={areaText.name}
+          distanceToStart={distanceToStart}
+          onDirections={handleDirections}
+          onStart={handleStart}
+          onDone={() => setIntroShowing(false)}
+        />
+      )}
 
-      {isDemoWalk() && (
-        <View style={styles.demoBanner}>
-          <Text style={styles.demoText}>
-            Demo walk: a simulated walker is following the route{demoSpeed() !== 1 ? ` at ${demoSpeed()}× speed` : ""}. It waits at each stop until the narration ends. Tap “Open AR camera guide” to watch the penguin lead.
-          </Text>
+      <Animated.View
+        style={[styles.hudColumn, { top: insets.top + 10 }, hudStyle]}
+        pointerEvents={started ? "box-none" : "none"}
+      >
+        <View style={styles.hudRow}>
+          <PressScale
+            style={styles.closeButton}
+            scaleTo={0.9}
+            onPress={() => navigation.goBack()}
+            hitSlop={8}
+            aria-label={t("camera.close")}
+          >
+            <Ionicons name="close" size={22} color="#FFFFFF" />
+          </PressScale>
+          <View style={styles.hud}>
+            <View style={styles.hudTop}>
+              <Text style={styles.hudLabel}>
+                {t("activeTour.stopOf", { current: currentWaypoint?.order ?? 0, total: area.route.length })}
+              </Text>
+              {isDemoWalk() && (
+                <Text style={styles.demoChip}>
+                  DEMO{demoSpeed() !== 1 ? ` ${demoSpeed()}×` : ""}
+                </Text>
+              )}
+            </View>
+            <Text style={styles.hudName} numberOfLines={1}>
+              {currentWaypoint?.name ?? t("activeTour.walkingToFirst")}
+            </Text>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+            </View>
+          </View>
         </View>
-      )}
 
-      {isOffRoute && (
-        <View style={styles.offRouteBanner}>
-          <Text style={styles.offRouteText}>
-            {t("activeTour.offRoute", {
-              waypoint: currentWaypoint?.name ?? t("activeTour.offRouteFallback"),
-            })}
-          </Text>
-        </View>
-      )}
+        {isOffRoute && (
+          <View style={styles.offRouteBanner}>
+            <Text style={styles.offRouteText}>
+              {t("activeTour.offRoute", {
+                waypoint: currentWaypoint?.name ?? t("activeTour.offRouteFallback"),
+              })}
+            </Text>
+          </View>
+        )}
 
-      <View style={styles.centered}>
-        <CharacterGuide isTalking={isPlaying} size={110} />
-        <Text style={styles.stopLabel}>
-          {t("activeTour.stopOf", { current: currentWaypoint?.order ?? 0, total: area.route.length })}
-        </Text>
-        <Text style={styles.waypointName}>
-          {currentWaypoint?.name ?? t("activeTour.walkingToFirst")}
-        </Text>
-      </View>
+        {transition && (
+          <View style={styles.transitionCard}>
+            <View style={styles.transitionIcon}>
+              <Ionicons name="walk" size={20} color="#FFFFFF" />
+            </View>
+            <View style={styles.transitionText}>
+              <Text style={styles.transitionLabel}>{t("activeTour.nextStopLabel", { number: transition.number })}</Text>
+              <Text style={styles.transitionName} numberOfLines={1}>{transition.name}</Text>
+            </View>
+            <Text style={styles.transitionDistance}>{t("activeTour.distanceAway", { distance: transition.distance })}</Text>
+          </View>
+        )}
+      </Animated.View>
 
-      {Platform.OS === "web" && (
-        <PressScale style={styles.arGuideButton} scaleTo={0.96} onPress={handleOpenARGuide}>
-          <Ionicons name="camera" size={18} color={colors.onPrimary} />
-          <Text style={styles.arGuideButtonText}>Open AR camera guide</Text>
+      <Animated.View
+        style={[styles.controls, { bottom: insets.bottom + 24 }, controlsStyle]}
+        pointerEvents={started ? "box-none" : "none"}
+      >
+        {Platform.OS === "web" && (
+          <PressScale style={styles.smallControl} scaleTo={0.9} onPress={handleOpenARGuide} aria-label="Open AR camera guide">
+            <Ionicons name="camera" size={20} color={PLAY_COLOR} />
+          </PressScale>
+        )}
+        <PressScale style={styles.smallControl} scaleTo={0.9} onPress={handleSkipPrevious} aria-label={t("activeTour.back")}>
+          <Ionicons name="play-skip-back" size={18} color={PLAY_COLOR} />
         </PressScale>
-      )}
-
-      <View style={styles.controls}>
-        <PressScale style={styles.secondaryButton} scaleTo={0.9} onPress={handleSkipPrevious}>
-          <Text style={styles.secondaryButtonText}>{t("activeTour.back")}</Text>
-        </PressScale>
-
         <PressScale
           style={styles.playButton}
           scaleTo={0.92}
@@ -351,119 +521,133 @@ export default function ActiveTourScreen() {
         >
           <Ionicons
             name={isPlaying ? "pause" : "play"}
-            size={34}
-            color={colors.onPrimary}
+            size={28}
+            color={PLAY_COLOR}
             // Nudges the play triangle right so it looks centred in the circle.
             style={isPlaying ? undefined : styles.playIconNudge}
           />
         </PressScale>
-
-        <PressScale style={styles.secondaryButton} scaleTo={0.9} onPress={handleSkipNext}>
-          <Text style={styles.secondaryButtonText}>{t("activeTour.skip")}</Text>
+        <PressScale style={styles.smallControl} scaleTo={0.9} onPress={handleSkipNext} aria-label={t("activeTour.skip")}>
+          <Ionicons name="play-skip-forward" size={18} color={PLAY_COLOR} />
         </PressScale>
-      </View>
-
-      <Pressable style={styles.replayLink} role="button" onPress={handleReplay}>
-        <Text style={styles.replayLinkText}>{t("activeTour.replayLink")}</Text>
-      </Pressable>
-    </SafeAreaView>
+      </Animated.View>
+    </View>
   );
 }
 
+const PLAY_COLOR = "#2E9E6B";
+
 function createStyles(colors: ThemeColors) {
+  const floating = {
+    shadowColor: "#000",
+    shadowOpacity: 0.22,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  };
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, justifyContent: "space-between" },
+  fullscreen: { flex: 1, backgroundColor: "#A6E6A0", overflow: "hidden" },
+  hudColumn: { position: "absolute", left: 12, right: 12, gap: 8 },
+  hudRow: { flexDirection: "row", alignItems: "stretch", gap: 8 },
+  closeButton: {
+    width: 44,
+    borderRadius: 14,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    alignItems: "center",
+    justifyContent: "center",
+    ...(Platform.OS === "web" ? ({ backdropFilter: "blur(8px)" } as object) : {}),
+  },
+  hud: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    borderRadius: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    gap: 2,
+    ...(Platform.OS === "web" ? ({ backdropFilter: "blur(8px)" } as object) : {}),
+  },
+  hudTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  hudLabel: { color: "#FFFFFF", fontSize: 13, opacity: 0.85 },
+  hudName: { color: "#FFFFFF", fontSize: 18, fontWeight: "700" },
+  demoChip: {
+    color: "#FFFFFF",
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+    backgroundColor: "rgba(255,255,255,0.22)",
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    overflow: "hidden",
+  },
   progressTrack: {
     height: 4,
-    backgroundColor: colors.border,
-    marginHorizontal: 20,
-    marginTop: 12,
+    backgroundColor: "rgba(255,255,255,0.3)",
     borderRadius: 2,
+    marginTop: 8,
+    overflow: "hidden",
   },
-  progressFill: { height: 4, backgroundColor: colors.primary, borderRadius: 2 },
-  scanRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    marginTop: 12,
-  },
-  exitButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  arGuideButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    alignSelf: "center",
-    backgroundColor: colors.primary,
-    borderRadius: 20,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    marginBottom: 16,
-  },
-  arGuideButtonText: { color: colors.onPrimary, fontSize: 14, fontWeight: "700" },
-  scanButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: colors.primary,
-    borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-  },
-  scanButtonText: { color: colors.onPrimary, fontSize: 13, fontWeight: "700" },
+  progressFill: { height: 4, backgroundColor: "#7BE0A6", borderRadius: 2 },
   offRouteBanner: {
-    marginHorizontal: 20,
-    marginTop: 16,
     backgroundColor: colors.warnBg,
     borderRadius: 12,
     padding: 12,
+    ...floating,
   },
   offRouteText: { color: colors.warnText, fontSize: 13 },
-  demoBanner: {
-    marginHorizontal: 20,
-    marginTop: 16,
-    backgroundColor: colors.surface,
-    borderColor: colors.primary,
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
-  },
-  demoText: { color: colors.text, fontSize: 13, lineHeight: 18 },
-  centered: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24, gap: 16 },
-  stopLabel: { color: colors.textDim, fontSize: 14 },
-  waypointName: { color: colors.text, fontSize: 32, fontWeight: "700", textAlign: "center" },
-  controls: {
+  transitionCard: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 24,
-    paddingBottom: 8,
+    gap: 10,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    borderLeftWidth: 4,
+    borderLeftColor: "#2F9BFF",
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    ...floating,
   },
-  secondaryButton: {
-    paddingVertical: 14,
-    paddingHorizontal: 18,
-  },
-  secondaryButtonText: { color: colors.textMid, fontSize: 15, fontWeight: "600" },
-  playButton: {
-    width: 84,
-    height: 84,
-    borderRadius: 42,
-    backgroundColor: colors.primary,
+  transitionIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#2F9BFF",
     alignItems: "center",
     justifyContent: "center",
   },
-  playIconNudge: { marginLeft: 4 },
-  replayLink: { alignItems: "center", paddingBottom: 24, paddingTop: 4 },
-  replayLinkText: { color: colors.textDim, fontSize: 13, textDecorationLine: "underline" },
+  transitionText: { flex: 1, gap: 2 },
+  transitionLabel: { color: "#8C7B72", fontSize: 12, fontWeight: "600" },
+  transitionName: { color: "#201613", fontSize: 15, fontWeight: "700" },
+  transitionDistance: { color: "#2F9BFF", fontSize: 13, fontWeight: "700" },
+  controls: {
+    position: "absolute",
+    right: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  smallControl: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    ...floating,
+  },
+  playButton: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    ...floating,
+  },
+  playIconNudge: { marginLeft: 3 },
+  centered: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24, gap: 16 },
+  waypointName: { color: colors.text, fontSize: 32, fontWeight: "700", textAlign: "center" },
   completeTitle: { color: colors.text, fontSize: 28, fontWeight: "700" },
   completeSubtitle: { color: colors.textMid, fontSize: 15, marginTop: 8, textAlign: "center" },
   cta: {
