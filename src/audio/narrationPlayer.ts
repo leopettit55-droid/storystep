@@ -5,6 +5,23 @@ import { resolveAudioSource } from "./audioCache";
 let player: AudioPlayer | null = null;
 let endedHandler: (() => void) | null = null;
 
+/** Which stop's recording is loaded, for subtitles (null once it has finished or stopped). */
+let currentWaypointId: string | null = null;
+/** The stop whose recording is in the player, so a replay after it ends gets its subtitles back. */
+let loadedWaypointId: string | null = null;
+type ProgressListener = (waypointId: string | null, seconds: number) => void;
+const progressListeners = new Set<ProgressListener>();
+
+/** Follows the narration's position — which stop, and how far in — to time its subtitles. */
+export function subscribeNarrationProgress(listener: ProgressListener): () => void {
+  progressListeners.add(listener);
+  return () => progressListeners.delete(listener);
+}
+
+function emitProgress(seconds: number): void {
+  progressListeners.forEach((listener) => listener(currentWaypointId, seconds));
+}
+
 // While the landmark scanner is speaking, tour narration must not start over
 // it. A waypoint that fires meanwhile is parked here and played when released.
 let held = false;
@@ -57,13 +74,22 @@ export async function playWaypointNarration(waypoint: Waypoint): Promise<void> {
   }
 
   if (!player) {
-    player = createAudioPlayer(source);
+    // Frequent updates keep subtitles in step with the voice.
+    player = createAudioPlayer(source, { updateInterval: 250 });
     player.addListener("playbackStatusUpdate", (status: AudioStatus) => {
-      if (status.didJustFinish) endedHandler?.();
+      if (status.didJustFinish) {
+        currentWaypointId = null;
+        emitProgress(0);
+        endedHandler?.();
+        return;
+      }
+      emitProgress(status.currentTime);
     });
   } else {
     player.replace(source);
   }
+  currentWaypointId = loadedWaypointId = waypoint.id;
+  emitProgress(0);
 
   // Only one player can hold the lock screen at a time; doNotMix (set in
   // setupAudioPlayback) is required for the OS to associate it correctly.
@@ -84,11 +110,14 @@ export function resumeNarration(): void {
 
 export function replayCurrentNarration(): void {
   if (!player) return;
+  currentWaypointId = loadedWaypointId;
   void player.seekTo(0);
   player.play();
 }
 
 export function stopNarration(): void {
+  currentWaypointId = null;
+  emitProgress(0);
   if (!player) return;
   player.pause();
   void player.seekTo(0);

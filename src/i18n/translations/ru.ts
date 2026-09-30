@@ -70,6 +70,7 @@ const ru: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Пройдено",
     title: "Туры",
     subtitle: "Выберите район. Наденьте наушники, идите — и следуйте за подсказками.",
     moreCitiesTitle: "Другие города",
@@ -83,6 +84,15 @@ const ru: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Пароль должен содержать не менее 6 символов.",
+    errorAccountExists: "Аккаунт с этим адресом уже есть. Войдите выше.",
+    errorLoginFillIn: "Введите e-mail и пароль.",
+    errorNoAccount: "На этом устройстве нет аккаунта с этим адресом. Создайте его ниже.",
+    errorWrongPassword: "Пароль не подходит. Попробуйте ещё раз.",
+    logInTitle: "Войти",
+    logInBody: "С возвращением! Войдите в созданный аккаунт.",
+    logInButton: "Войти",
+    toursCompleted: "Пройдено экскурсий: {{count}}",
     title: "Аккаунт",
     darkMode: "Тёмная тема",
     unlimitedTours: "Безлимитные туры",
@@ -112,6 +122,8 @@ const ru: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "Продолжить с остановки {{number}}",
+    startAgain: "Начать заново",
     useScanner: "Использовать наш сканер достопримечательностей",
     scannerFree: "Наведите камеру на здание, чтобы услышать его историю",
     getMeToStart: "Проводить к старту",
@@ -246,6 +258,33 @@ const ru: PartialTranslationDict = {
     weeklyActiveBody: "Безлимитные туры на ближайшие 7 дней.",
     monthlyActiveBody: "Безлимитные туры на ближайшие 30 дней.",
   },
+
+  pageTitle: {
+    home: "StoryStep: пешие экскурсии с ИИ-рассказчиком по Лондону, Парижу и Оксфорду",
+    tour: "{{tour}}: бесплатная аудиоэкскурсия по городу {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Хочется пить?",
+    walk: "Около {{minutes}} мин пешком",
+    nextDoor: "Прямо там, где вы закончили",
+    directions: "Маршрут",
+  },
+
+  share: {
+    button: "Поделиться прогулкой",
+    iWalked: "Я прошёл",
+    stops: "Остановок: {{count}}",
+    distance: "{{km}} км",
+    tagline: "Бесплатные пешие аудиоэкскурсии",
+    shareText: "Я прошёл «{{tour}}» ({{city}}) со StoryStep — бесплатной пешей аудиоэкскурсией.",
+    downloadedCopied: "Изображение сохранено, ссылка скопирована.",
+    downloaded: "Изображение сохранено.",
+    copied: "Ссылка скопирована.",
+    failed: "Не удалось поделиться. Попробуйте ещё раз.",
+  },
+
 };
 
 export default ru;

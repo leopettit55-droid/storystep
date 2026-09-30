@@ -70,6 +70,7 @@ const pl: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Ukończono",
     title: "Wycieczki",
     subtitle: "Wybierz dzielnicę. Załóż słuchawki, idź i daj się poprowadzić.",
     moreCitiesTitle: "Więcej miast",
@@ -83,6 +84,15 @@ const pl: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Hasło musi mieć co najmniej 6 znaków.",
+    errorAccountExists: "Konto z tym adresem e-mail już istnieje. Zaloguj się powyżej.",
+    errorLoginFillIn: "Wpisz e-mail i hasło.",
+    errorNoAccount: "Na tym urządzeniu nie ma konta z tym adresem e-mail. Utwórz je poniżej.",
+    errorWrongPassword: "Hasło się nie zgadza. Spróbuj ponownie.",
+    logInTitle: "Zaloguj się",
+    logInBody: "Witaj ponownie. Zaloguj się na konto, które utworzyłeś.",
+    logInButton: "Zaloguj się",
+    toursCompleted: "Ukończone wycieczki: {{count}}",
     title: "Konto",
     darkMode: "Tryb ciemny",
     unlimitedTours: "Nielimitowane wycieczki",
@@ -112,6 +122,8 @@ const pl: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "Kontynuuj od przystanku {{number}}",
+    startAgain: "Zacznij od nowa",
     useScanner: "Użyj naszego skanera zabytków",
     scannerFree: "Skieruj aparat na budynek, aby usłyszeć jego historię",
     getMeToStart: "Zaprowadź mnie na start",
@@ -246,6 +258,33 @@ const pl: PartialTranslationDict = {
     weeklyActiveBody: "Nielimitowane wycieczki przez najbliższe 7 dni.",
     monthlyActiveBody: "Nielimitowane wycieczki przez najbliższe 30 dni.",
   },
+
+  pageTitle: {
+    home: "StoryStep: piesze wycieczki z narracją AI po Londynie, Paryżu i Oksfordzie",
+    tour: "{{tour}}: darmowa piesza wycieczka audio po {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Masz pragnienie?",
+    walk: "Około {{minutes}} min pieszo",
+    nextDoor: "Tuż tam, gdzie skończyłeś",
+    directions: "Trasa",
+  },
+
+  share: {
+    button: "Udostępnij swój spacer",
+    iWalked: "Przeszedłem",
+    stops: "Przystanki: {{count}}",
+    distance: "{{km}} km",
+    tagline: "Darmowe piesze wycieczki audio",
+    shareText: "Przeszedłem {{tour}} w {{city}} ze StoryStep, darmową pieszą wycieczką audio.",
+    downloadedCopied: "Obraz zapisany, a link skopiowany.",
+    downloaded: "Obraz zapisany.",
+    copied: "Link skopiowany.",
+    failed: "Nie udało się udostępnić. Spróbuj ponownie.",
+  },
+
 };
 
 export default pl;

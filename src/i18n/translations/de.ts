@@ -70,6 +70,7 @@ const de: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Abgeschlossen",
     title: "Touren",
     subtitle: "Wähle ein Viertel. Kopfhörer rein, losgehen, und lass dich führen.",
     moreCitiesTitle: "Weitere Städte",
@@ -83,6 +84,15 @@ const de: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Verwende mindestens 6 Zeichen für dein Passwort.",
+    errorAccountExists: "Es gibt bereits ein Konto mit dieser E-Mail. Melde dich oben an.",
+    errorLoginFillIn: "Gib deine E-Mail und dein Passwort ein.",
+    errorNoAccount: "Auf diesem Gerät gibt es kein Konto mit dieser E-Mail. Erstelle unten eines.",
+    errorWrongPassword: "Das Passwort stimmt nicht. Bitte versuche es erneut.",
+    logInTitle: "Anmelden",
+    logInBody: "Willkommen zurück. Melde dich mit deinem Konto an.",
+    logInButton: "Anmelden",
+    toursCompleted: "Abgeschlossene Touren: {{count}}",
     title: "Konto",
     darkMode: "Dunkelmodus",
     unlimitedTours: "Unbegrenzte Touren",
@@ -112,6 +122,8 @@ const de: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "Weiter ab Station {{number}}",
+    startAgain: "Neu beginnen",
     useScanner: "Unseren Sehenswürdigkeiten-Scanner nutzen",
     scannerFree: "Richten Sie die Kamera auf ein Gebäude und hören Sie seine Geschichte",
     getMeToStart: "Bring mich zum Start",
@@ -246,6 +258,33 @@ const de: PartialTranslationDict = {
     weeklyActiveBody: "Unbegrenzte Touren für die nächsten 7 Tage.",
     monthlyActiveBody: "Unbegrenzte Touren für die nächsten 30 Tage.",
   },
+
+  pageTitle: {
+    home: "StoryStep: KI-erzählte Stadtspaziergänge durch London, Paris & Oxford",
+    tour: "{{tour}}: kostenloser Audio-Stadtspaziergang durch {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Durst bekommen?",
+    walk: "Etwa {{minutes}} Min. zu Fuß",
+    nextDoor: "Genau dort, wo du aufgehört hast",
+    directions: "Route",
+  },
+
+  share: {
+    button: "Teile deinen Spaziergang",
+    iWalked: "Ich bin gelaufen:",
+    stops: "{{count}} Stationen",
+    distance: "{{km}} km",
+    tagline: "Kostenlose Audio-Stadtspaziergänge",
+    shareText: "Ich bin {{tour}} in {{city}} mit StoryStep gelaufen, einem kostenlosen Audio-Stadtspaziergang.",
+    downloadedCopied: "Bild gespeichert und Link kopiert.",
+    downloaded: "Bild gespeichert.",
+    copied: "Link kopiert.",
+    failed: "Teilen hat nicht geklappt. Bitte versuche es erneut.",
+  },
+
 };
 
 export default de;

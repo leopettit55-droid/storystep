@@ -70,6 +70,7 @@ const th: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "เสร็จแล้ว",
     title: "ทัวร์",
     subtitle: "เลือกย่านที่ต้องการ ใส่หูฟัง เดิน แล้วให้แอปพาคุณไป",
     moreCitiesTitle: "เมืองอื่นๆ",
@@ -83,6 +84,15 @@ const th: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
+    errorAccountExists: "มีบัญชีที่ใช้อีเมลนี้อยู่แล้ว เข้าสู่ระบบด้านบนแทน",
+    errorLoginFillIn: "กรอกอีเมลและรหัสผ่าน",
+    errorNoAccount: "ไม่มีบัญชีที่ใช้อีเมลนี้ในอุปกรณ์นี้ สร้างบัญชีใหม่ด้านล่าง",
+    errorWrongPassword: "รหัสผ่านไม่ตรงกัน ลองอีกครั้ง",
+    logInTitle: "เข้าสู่ระบบ",
+    logInBody: "ยินดีต้อนรับกลับ เข้าสู่ระบบด้วยบัญชีที่คุณสร้างไว้",
+    logInButton: "เข้าสู่ระบบ",
+    toursCompleted: "ทัวร์ที่ทำเสร็จ: {{count}}",
     title: "บัญชี",
     darkMode: "โหมดมืด",
     unlimitedTours: "ทัวร์ไม่จำกัด",
@@ -112,6 +122,8 @@ const th: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "ทำต่อจากจุดที่ {{number}}",
+    startAgain: "เริ่มใหม่",
     useScanner: "ใช้เครื่องสแกนสถานที่สำคัญของเรา",
     scannerFree: "หันกล้องไปที่อาคารเพื่อฟังเรื่องราวของมัน",
     getMeToStart: "พาฉันไปยังจุดเริ่มต้น",
@@ -246,6 +258,33 @@ const th: PartialTranslationDict = {
     weeklyActiveBody: "ทัวร์ไม่จำกัดเป็นเวลา 7 วันข้างหน้า",
     monthlyActiveBody: "ทัวร์ไม่จำกัดเป็นเวลา 30 วันข้างหน้า",
   },
+
+  pageTitle: {
+    home: "StoryStep: ทัวร์เดินเท้าบรรยายโดย AI ในลอนดอน ปารีส และออกซ์ฟอร์ด",
+    tour: "{{tour}}: ทัวร์เดินเท้าพร้อมเสียงบรรยายฟรีใน{{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "หิวน้ำไหม?",
+    walk: "เดินประมาณ {{minutes}} นาที",
+    nextDoor: "ตรงที่คุณเดินจบพอดี",
+    directions: "เส้นทาง",
+  },
+
+  share: {
+    button: "แชร์การเดินของคุณ",
+    iWalked: "ฉันเดิน",
+    stops: "{{count}} จุด",
+    distance: "{{km}} กม.",
+    tagline: "ทัวร์เดินเท้าพร้อมเสียงบรรยายฟรี",
+    shareText: "ฉันเดิน {{tour}} ใน{{city}} กับ StoryStep ทัวร์เดินเท้าพร้อมเสียงบรรยายฟรี",
+    downloadedCopied: "บันทึกรูปแล้ว และคัดลอกลิงก์แล้ว",
+    downloaded: "บันทึกรูปแล้ว",
+    copied: "คัดลอกลิงก์แล้ว",
+    failed: "แชร์ไม่สำเร็จ ลองอีกครั้ง",
+  },
+
 };
 
 export default th;

@@ -70,6 +70,7 @@ const ja: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "完了",
     title: "ツアー",
     subtitle: "エリアを選んで、ヘッドホンをつけて歩くだけ。あとは案内にお任せください。",
     moreCitiesTitle: "その他の都市",
@@ -83,6 +84,15 @@ const ja: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "パスワードは6文字以上にしてください。",
+    errorAccountExists: "このメールアドレスのアカウントは既にあります。上からログインしてください。",
+    errorLoginFillIn: "メールアドレスとパスワードを入力してください。",
+    errorNoAccount: "この端末にはこのメールアドレスのアカウントがありません。下で作成してください。",
+    errorWrongPassword: "パスワードが一致しません。もう一度お試しください。",
+    logInTitle: "ログイン",
+    logInBody: "おかえりなさい。作成したアカウントでログインしてください。",
+    logInButton: "ログイン",
+    toursCompleted: "完了したツアー：{{count}}",
     title: "アカウント",
     darkMode: "ダークモード",
     unlimitedTours: "ツアー乗り放題",
@@ -112,6 +122,8 @@ const ja: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "スポット{{number}}から再開",
+    startAgain: "最初から始める",
     useScanner: "ランドマークスキャナーを使う",
     scannerFree: "カメラを建物に向けると、その物語が聞けます",
     getMeToStart: "出発地点まで案内する",
@@ -246,6 +258,33 @@ const ja: PartialTranslationDict = {
     weeklyActiveBody: "今後7日間、ツアーが乗り放題です。",
     monthlyActiveBody: "今後30日間、ツアーが乗り放題です。",
   },
+
+  pageTitle: {
+    home: "StoryStep：AIが語るロンドン・パリ・オックスフォードの徒歩ツアー",
+    tour: "{{tour}}：{{city}}の無料オーディオ徒歩ツアー | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "喉が渇いた？",
+    walk: "徒歩約{{minutes}}分",
+    nextDoor: "ゴール地点のすぐそば",
+    directions: "経路",
+  },
+
+  share: {
+    button: "散策をシェア",
+    iWalked: "歩きました",
+    stops: "{{count}}スポット",
+    distance: "{{km}} km",
+    tagline: "無料のオーディオ徒歩ツアー",
+    shareText: "StoryStepで{{city}}の「{{tour}}」を歩きました。無料のオーディオ徒歩ツアーです。",
+    downloadedCopied: "画像を保存し、リンクをコピーしました。",
+    downloaded: "画像を保存しました。",
+    copied: "リンクをコピーしました。",
+    failed: "共有できませんでした。もう一度お試しください。",
+  },
+
 };
 
 export default ja;

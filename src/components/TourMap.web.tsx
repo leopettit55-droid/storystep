@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import type { StyleProp, ViewStyle } from "react-native";
 import { Pressable, StyleSheet, View } from "react-native";
 import type { Coordinates, Waypoint } from "../content";
+import { useLanguage } from "../i18n/LanguageContext";
 import { bearingDegrees, distanceMeters } from "../geofencing/proximityTracker";
 import { mascotSvg } from "./mascotSvg";
 import type { TourMapProps } from "./TourMap";
@@ -342,6 +343,7 @@ export default function TourMap({
   focusStop,
   style,
 }: TourMapProps) {
+  const { t } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const avatarRef = useRef<{ figure: Marker; ring: Marker; el: HTMLDivElement; ringEl: HTMLDivElement } | null>(null);
@@ -686,7 +688,7 @@ export default function TourMap({
     <View style={[styles.container, style as StyleProp<ViewStyle>]}>
       <div ref={containerRef} style={{ position: "absolute", inset: 0, background: PALETTE.ground }} />
       {!following && !focusStop && userLocation && (
-        <Pressable style={styles.recentre} onPress={recentre} aria-label="Re-centre on me">
+        <Pressable style={styles.recentre} onPress={recentre} aria-label={t("activeTour.recentre")}>
           <Ionicons name="locate" size={22} color={PALETTE.route} />
         </Pressable>
       )}
@@ -697,9 +699,9 @@ export default function TourMap({
 const styles = StyleSheet.create({
   container: { overflow: "hidden", position: "relative" },
   recentre: {
-    // Bottom-right, above the tour's play controls (the top is the tour's HUD).
+    // Bottom-right, above the tour's play controls and subtitles (the top is the tour's HUD).
     position: "absolute",
-    bottom: 140,
+    bottom: 250,
     right: 16,
     width: 44,
     height: 44,

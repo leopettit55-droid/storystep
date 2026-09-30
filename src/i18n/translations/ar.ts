@@ -70,6 +70,7 @@ const ar: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "مكتملة",
     title: "الجولات",
     subtitle: "اختر حيًا. ضع سماعاتك، وامشِ، ودع التطبيق يرشدك.",
     moreCitiesTitle: "المزيد من المدن",
@@ -83,6 +84,15 @@ const ar: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "استخدم 6 أحرف على الأقل لكلمة المرور.",
+    errorAccountExists: "يوجد حساب بهذا البريد الإلكتروني بالفعل. سجّل الدخول في الأعلى.",
+    errorLoginFillIn: "أدخل بريدك الإلكتروني وكلمة المرور.",
+    errorNoAccount: "لا يوجد حساب بهذا البريد على هذا الجهاز. أنشئ حسابًا في الأسفل.",
+    errorWrongPassword: "كلمة المرور غير صحيحة. حاول مرة أخرى.",
+    logInTitle: "تسجيل الدخول",
+    logInBody: "مرحبًا بعودتك. سجّل الدخول بالحساب الذي أنشأته.",
+    logInButton: "تسجيل الدخول",
+    toursCompleted: "الجولات المكتملة: {{count}}",
     title: "الحساب",
     darkMode: "الوضع الداكن",
     unlimitedTours: "جولات غير محدودة",
@@ -112,6 +122,8 @@ const ar: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "المتابعة من المحطة {{number}}",
+    startAgain: "البدء من جديد",
     useScanner: "استخدم ماسح المعالم لدينا",
     scannerFree: "وجّه الكاميرا نحو مبنى لتسمع قصته",
     getMeToStart: "خذني إلى نقطة البداية",
@@ -246,6 +258,33 @@ const ar: PartialTranslationDict = {
     weeklyActiveBody: "جولات غير محدودة للأيام السبعة القادمة.",
     monthlyActiveBody: "جولات غير محدودة للثلاثين يومًا القادمة.",
   },
+
+  pageTitle: {
+    home: "StoryStep: جولات سير بصوت راوٍ بالذكاء الاصطناعي في لندن وباريس وأكسفورد",
+    tour: "{{tour}}: جولة سير صوتية مجانية في {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "هل تشعر بالعطش؟",
+    walk: "نحو {{minutes}} دقيقة سيرًا",
+    nextDoor: "حيث انتهيت تمامًا",
+    directions: "الاتجاهات",
+  },
+
+  share: {
+    button: "شارك جولتك",
+    iWalked: "مشيت",
+    stops: "{{count}} محطات",
+    distance: "{{km}} كم",
+    tagline: "جولات سير صوتية مجانية",
+    shareText: "مشيت {{tour}} في {{city}} مع StoryStep، جولة سير صوتية مجانية.",
+    downloadedCopied: "حُفظت الصورة ونُسخ الرابط.",
+    downloaded: "حُفظت الصورة.",
+    copied: "نُسخ الرابط.",
+    failed: "تعذّرت المشاركة. حاول مرة أخرى.",
+  },
+
 };
 
 export default ar;

@@ -70,6 +70,7 @@ const it: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Completato",
     title: "Tour",
     subtitle: "Scegli un quartiere. Metti le cuffie, cammina e lasciati guidare.",
     moreCitiesTitle: "Altre città",
@@ -83,6 +84,15 @@ const it: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Usa almeno 6 caratteri per la password.",
+    errorAccountExists: "Esiste già un account con questa email. Accedi qui sopra.",
+    errorLoginFillIn: "Inserisci email e password.",
+    errorNoAccount: "Nessun account con questa email su questo dispositivo. Creane uno qui sotto.",
+    errorWrongPassword: "La password non corrisponde. Riprova.",
+    logInTitle: "Accedi",
+    logInBody: "Bentornato. Accedi con l'account che hai creato.",
+    logInButton: "Accedi",
+    toursCompleted: "Tour completati: {{count}}",
     title: "Account",
     darkMode: "Modalità scura",
     unlimitedTours: "Tour illimitati",
@@ -112,6 +122,8 @@ const it: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "Continua dalla tappa {{number}}",
+    startAgain: "Ricomincia",
     useScanner: "Usa il nostro scanner di monumenti",
     scannerFree: "Inquadra un edificio con la fotocamera per ascoltarne la storia",
     getMeToStart: "Portami alla partenza",
@@ -246,6 +258,33 @@ const it: PartialTranslationDict = {
     weeklyActiveBody: "Tour illimitati per i prossimi 7 giorni.",
     monthlyActiveBody: "Tour illimitati per i prossimi 30 giorni.",
   },
+
+  pageTitle: {
+    home: "StoryStep: tour a piedi narrati dall'IA a Londra, Parigi e Oxford",
+    tour: "{{tour}}: tour audio a piedi gratuito di {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Hai sete?",
+    walk: "Circa {{minutes}} min a piedi",
+    nextDoor: "Proprio dove hai finito",
+    directions: "Indicazioni",
+  },
+
+  share: {
+    button: "Condividi la tua passeggiata",
+    iWalked: "Ho percorso",
+    stops: "{{count}} tappe",
+    distance: "{{km}} km",
+    tagline: "Tour audio a piedi gratuiti",
+    shareText: "Ho percorso {{tour}} a {{city}} con StoryStep, un tour audio a piedi gratuito.",
+    downloadedCopied: "Immagine salvata e link copiato.",
+    downloaded: "Immagine salvata.",
+    copied: "Link copiato.",
+    failed: "Impossibile condividere. Riprova.",
+  },
+
 };
 
 export default it;

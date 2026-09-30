@@ -70,6 +70,7 @@ const zh: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "已完成",
     title: "行程",
     subtitle: "选择一个街区，戴上耳机走起来，剩下的交给它来引导你。",
     moreCitiesTitle: "更多城市",
@@ -83,6 +84,15 @@ const zh: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "密码至少需要6个字符。",
+    errorAccountExists: "该邮箱已有账户，请在上方登录。",
+    errorLoginFillIn: "请输入邮箱和密码。",
+    errorNoAccount: "此设备上没有该邮箱的账户，请在下方创建。",
+    errorWrongPassword: "密码不正确，请重试。",
+    logInTitle: "登录",
+    logInBody: "欢迎回来，请使用你创建的账户登录。",
+    logInButton: "登录",
+    toursCompleted: "已完成的导览：{{count}}",
     title: "账户",
     darkMode: "深色模式",
     unlimitedTours: "无限畅游",
@@ -112,6 +122,8 @@ const zh: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "从第{{number}}站继续",
+    startAgain: "重新开始",
     useScanner: "使用我们的地标扫描器",
     scannerFree: "将相机对准建筑，聆听它的故事",
     getMeToStart: "带我去起点",
@@ -245,6 +257,33 @@ const zh: PartialTranslationDict = {
     weeklyActiveBody: "未来 7 天内可畅玩所有行程。",
     monthlyActiveBody: "未来 30 天内可畅玩所有行程。",
   },
+
+  pageTitle: {
+    home: "StoryStep：AI讲解的伦敦、巴黎和牛津徒步导览",
+    tour: "{{tour}}：{{city}}免费语音徒步导览 | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "口渴了吗？",
+    walk: "步行约{{minutes}}分钟",
+    nextDoor: "就在你结束的地方",
+    directions: "路线",
+  },
+
+  share: {
+    button: "分享你的徒步",
+    iWalked: "我走过了",
+    stops: "{{count}}站",
+    distance: "{{km}}公里",
+    tagline: "免费语音徒步导览",
+    shareText: "我用StoryStep在{{city}}走完了{{tour}}，一个免费的语音徒步导览。",
+    downloadedCopied: "图片已保存，链接已复制。",
+    downloaded: "图片已保存。",
+    copied: "链接已复制。",
+    failed: "分享失败，请重试。",
+  },
+
 };
 
 export default zh;

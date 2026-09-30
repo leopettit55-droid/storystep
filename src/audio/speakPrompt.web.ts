@@ -1,3 +1,5 @@
+import { preferredVoice } from "./voices";
+
 /**
  * Short spoken prompts between stops ("Now proceed to stop 3…"), using the
  * browser's built-in text-to-speech so they work in every language without
@@ -18,6 +20,8 @@ export function speakPrompt(text: string, language: string): void {
   speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = language;
+  const voice = preferredVoice(language);
+  if (voice) utterance.voice = voice;
   utterance.rate = 0.9;
   speechSynthesis.speak(utterance);
 }

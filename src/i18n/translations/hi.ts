@@ -70,6 +70,7 @@ const hi: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "पूरा हुआ",
     title: "टूर",
     subtitle: "एक इलाका चुनें। हेडफ़ोन लगाएँ, चलें, और इसे आपको रास्ता दिखाने दें।",
     moreCitiesTitle: "और शहर",
@@ -83,6 +84,15 @@ const hi: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "पासवर्ड में कम से कम 6 अक्षर रखें।",
+    errorAccountExists: "इस ईमेल से पहले से एक खाता है। ऊपर लॉग इन करें।",
+    errorLoginFillIn: "अपना ईमेल और पासवर्ड डालें।",
+    errorNoAccount: "इस डिवाइस पर इस ईमेल का कोई खाता नहीं है। नीचे नया बनाएँ।",
+    errorWrongPassword: "पासवर्ड मेल नहीं खाता। कृपया फिर से कोशिश करें।",
+    logInTitle: "लॉग इन करें",
+    logInBody: "फिर से स्वागत है। अपने बनाए खाते से लॉग इन करें।",
+    logInButton: "लॉग इन करें",
+    toursCompleted: "पूरे किए गए टूर: {{count}}",
     title: "खाता",
     darkMode: "डार्क मोड",
     unlimitedTours: "असीमित टूर",
@@ -112,6 +122,8 @@ const hi: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "पड़ाव {{number}} से जारी रखें",
+    startAgain: "फिर से शुरू करें",
     useScanner: "हमारा लैंडमार्क स्कैनर इस्तेमाल करें",
     scannerFree: "किसी इमारत की कहानी सुनने के लिए कैमरा उसकी ओर करें",
     getMeToStart: "मुझे शुरुआत तक ले चलें",
@@ -246,6 +258,33 @@ const hi: PartialTranslationDict = {
     weeklyActiveBody: "अगले 7 दिनों तक असीमित टूर।",
     monthlyActiveBody: "अगले 30 दिनों तक असीमित टूर।",
   },
+
+  pageTitle: {
+    home: "StoryStep: लंदन, पेरिस और ऑक्सफ़ोर्ड के AI-वर्णित पैदल टूर",
+    tour: "{{tour}}: {{city}} का मुफ़्त ऑडियो पैदल टूर | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "प्यास लगी है?",
+    walk: "लगभग {{minutes}} मिनट पैदल",
+    nextDoor: "ठीक वहीं जहाँ आपने खत्म किया",
+    directions: "रास्ता",
+  },
+
+  share: {
+    button: "अपनी सैर साझा करें",
+    iWalked: "मैंने पैदल घूमा",
+    stops: "{{count}} पड़ाव",
+    distance: "{{km}} किमी",
+    tagline: "मुफ़्त ऑडियो पैदल टूर",
+    shareText: "मैंने StoryStep के साथ {{city}} में {{tour}} का पैदल टूर किया, एक मुफ़्त ऑडियो पैदल टूर।",
+    downloadedCopied: "तस्वीर सहेजी गई और लिंक कॉपी हो गया।",
+    downloaded: "तस्वीर सहेजी गई।",
+    copied: "लिंक कॉपी हो गया।",
+    failed: "साझा नहीं हो सका। कृपया फिर से कोशिश करें।",
+  },
+
 };
 
 export default hi;

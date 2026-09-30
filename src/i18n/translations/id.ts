@@ -70,6 +70,7 @@ const id: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Selesai",
     title: "Tur",
     subtitle: "Pilih sebuah kawasan. Pasang headphone-mu, berjalanlah, dan biarkan dipandu.",
     moreCitiesTitle: "Kota lainnya",
@@ -83,6 +84,15 @@ const id: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Gunakan minimal 6 karakter untuk kata sandi.",
+    errorAccountExists: "Sudah ada akun dengan email itu. Masuk di atas.",
+    errorLoginFillIn: "Masukkan email dan kata sandimu.",
+    errorNoAccount: "Tidak ada akun dengan email itu di perangkat ini. Buat di bawah.",
+    errorWrongPassword: "Kata sandi tidak cocok. Coba lagi.",
+    logInTitle: "Masuk",
+    logInBody: "Selamat datang kembali. Masuk dengan akun yang kamu buat.",
+    logInButton: "Masuk",
+    toursCompleted: "Tur selesai: {{count}}",
     title: "Akun",
     darkMode: "Mode gelap",
     unlimitedTours: "Tur tak terbatas",
@@ -112,6 +122,8 @@ const id: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "Lanjutkan dari perhentian {{number}}",
+    startAgain: "Mulai lagi",
     useScanner: "Gunakan pemindai landmark kami",
     scannerFree: "Arahkan kamera ke bangunan untuk mendengar kisahnya",
     getMeToStart: "Antar aku ke titik awal",
@@ -246,6 +258,33 @@ const id: PartialTranslationDict = {
     weeklyActiveBody: "Tur tak terbatas untuk 7 hari ke depan.",
     monthlyActiveBody: "Tur tak terbatas untuk 30 hari ke depan.",
   },
+
+  pageTitle: {
+    home: "StoryStep: tur jalan kaki dengan narasi AI di London, Paris & Oxford",
+    tour: "{{tour}}: tur audio jalan kaki gratis di {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Haus?",
+    walk: "Sekitar {{minutes}} menit jalan kaki",
+    nextDoor: "Tepat di tempat kamu selesai",
+    directions: "Petunjuk arah",
+  },
+
+  share: {
+    button: "Bagikan jalan-jalanmu",
+    iWalked: "Aku berjalan",
+    stops: "{{count}} perhentian",
+    distance: "{{km}} km",
+    tagline: "Tur audio jalan kaki gratis",
+    shareText: "Aku menjalani {{tour}} di {{city}} bersama StoryStep, tur audio jalan kaki gratis.",
+    downloadedCopied: "Gambar disimpan dan tautan disalin.",
+    downloaded: "Gambar disimpan.",
+    copied: "Tautan disalin.",
+    failed: "Gagal membagikan. Coba lagi.",
+  },
+
 };
 
 export default id;

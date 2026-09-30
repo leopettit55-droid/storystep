@@ -70,6 +70,7 @@ const ko: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "완료",
     title: "투어",
     subtitle: "동네를 선택하고, 헤드폰을 끼고 걸으며 안내를 따라가세요.",
     moreCitiesTitle: "더 많은 도시",
@@ -83,6 +84,15 @@ const ko: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "비밀번호는 6자 이상으로 해 주세요.",
+    errorAccountExists: "이 이메일로 된 계정이 이미 있어요. 위에서 로그인하세요.",
+    errorLoginFillIn: "이메일과 비밀번호를 입력하세요.",
+    errorNoAccount: "이 기기에는 이 이메일로 된 계정이 없어요. 아래에서 만드세요.",
+    errorWrongPassword: "비밀번호가 맞지 않아요. 다시 시도해 주세요.",
+    logInTitle: "로그인",
+    logInBody: "다시 오신 걸 환영해요. 만든 계정으로 로그인하세요.",
+    logInButton: "로그인",
+    toursCompleted: "완료한 투어: {{count}}",
     title: "계정",
     darkMode: "다크 모드",
     unlimitedTours: "투어 무제한 이용",
@@ -112,6 +122,8 @@ const ko: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "{{number}}번 정류장부터 계속하기",
+    startAgain: "처음부터 다시",
     useScanner: "랜드마크 스캐너 사용하기",
     scannerFree: "카메라를 건물에 비추면 그 이야기를 들을 수 있어요",
     getMeToStart: "출발 지점으로 안내",
@@ -246,6 +258,33 @@ const ko: PartialTranslationDict = {
     weeklyActiveBody: "앞으로 7일간 투어를 무제한으로 이용할 수 있습니다.",
     monthlyActiveBody: "앞으로 30일간 투어를 무제한으로 이용할 수 있습니다.",
   },
+
+  pageTitle: {
+    home: "StoryStep: AI가 들려주는 런던·파리·옥스퍼드 도보 투어",
+    tour: "{{tour}}: {{city}} 무료 오디오 도보 투어 | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "목마르세요?",
+    walk: "도보 약 {{minutes}}분",
+    nextDoor: "투어를 마친 바로 그곳",
+    directions: "길찾기",
+  },
+
+  share: {
+    button: "산책 공유하기",
+    iWalked: "걸었어요",
+    stops: "정류장 {{count}}곳",
+    distance: "{{km}} km",
+    tagline: "무료 오디오 도보 투어",
+    shareText: "StoryStep으로 {{city}}의 {{tour}}을(를) 걸었어요. 무료 오디오 도보 투어예요.",
+    downloadedCopied: "이미지를 저장하고 링크를 복사했어요.",
+    downloaded: "이미지를 저장했어요.",
+    copied: "링크를 복사했어요.",
+    failed: "공유하지 못했어요. 다시 시도해 주세요.",
+  },
+
 };
 
 export default ko;

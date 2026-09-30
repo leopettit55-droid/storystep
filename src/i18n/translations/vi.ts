@@ -70,6 +70,7 @@ const vi: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Đã hoàn thành",
     title: "Tour",
     subtitle: "Chọn một khu vực. Đeo tai nghe, đi bộ, và để ứng dụng dẫn đường cho bạn.",
     moreCitiesTitle: "Thêm thành phố",
@@ -83,6 +84,15 @@ const vi: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Mật khẩu cần ít nhất 6 ký tự.",
+    errorAccountExists: "Đã có tài khoản với email này. Hãy đăng nhập ở trên.",
+    errorLoginFillIn: "Nhập email và mật khẩu của bạn.",
+    errorNoAccount: "Không có tài khoản với email này trên thiết bị. Hãy tạo mới bên dưới.",
+    errorWrongPassword: "Mật khẩu không khớp. Vui lòng thử lại.",
+    logInTitle: "Đăng nhập",
+    logInBody: "Chào mừng trở lại. Đăng nhập bằng tài khoản bạn đã tạo.",
+    logInButton: "Đăng nhập",
+    toursCompleted: "Tour đã hoàn thành: {{count}}",
     title: "Tài khoản",
     darkMode: "Chế độ tối",
     unlimitedTours: "Tour không giới hạn",
@@ -112,6 +122,8 @@ const vi: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "Tiếp tục từ điểm dừng {{number}}",
+    startAgain: "Bắt đầu lại",
     useScanner: "Dùng trình quét địa danh của chúng tôi",
     scannerFree: "Hướng camera vào một tòa nhà để nghe câu chuyện của nó",
     getMeToStart: "Đưa tôi đến điểm bắt đầu",
@@ -246,6 +258,33 @@ const vi: PartialTranslationDict = {
     weeklyActiveBody: "Tour không giới hạn trong 7 ngày tới.",
     monthlyActiveBody: "Tour không giới hạn trong 30 ngày tới.",
   },
+
+  pageTitle: {
+    home: "StoryStep: tour đi bộ có AI thuyết minh ở London, Paris và Oxford",
+    tour: "{{tour}}: tour đi bộ có thuyết minh miễn phí tại {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Khát rồi à?",
+    walk: "Khoảng {{minutes}} phút đi bộ",
+    nextDoor: "Ngay nơi bạn kết thúc",
+    directions: "Chỉ đường",
+  },
+
+  share: {
+    button: "Chia sẻ chuyến đi bộ",
+    iWalked: "Tôi đã đi",
+    stops: "{{count}} điểm dừng",
+    distance: "{{km}} km",
+    tagline: "Tour đi bộ có thuyết minh miễn phí",
+    shareText: "Tôi đã đi {{tour}} ở {{city}} cùng StoryStep, một tour đi bộ có thuyết minh miễn phí.",
+    downloadedCopied: "Đã lưu ảnh và sao chép liên kết.",
+    downloaded: "Đã lưu ảnh.",
+    copied: "Đã sao chép liên kết.",
+    failed: "Không chia sẻ được. Vui lòng thử lại.",
+  },
+
 };
 
 export default vi;

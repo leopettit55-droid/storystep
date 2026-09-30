@@ -70,6 +70,7 @@ const pt: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Concluído",
     title: "Passeios",
     subtitle: "Escolha um bairro. Ponha os auscultadores, caminhe e deixe-se guiar.",
     moreCitiesTitle: "Mais cidades",
@@ -83,6 +84,15 @@ const pt: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Usa pelo menos 6 caracteres na palavra-passe.",
+    errorAccountExists: "Já existe uma conta com esse e-mail. Inicia sessão acima.",
+    errorLoginFillIn: "Introduz o teu e-mail e palavra-passe.",
+    errorNoAccount: "Não há nenhuma conta com esse e-mail neste dispositivo. Cria uma abaixo.",
+    errorWrongPassword: "A palavra-passe não corresponde. Tenta novamente.",
+    logInTitle: "Iniciar sessão",
+    logInBody: "Bem-vindo de volta. Inicia sessão com a conta que criaste.",
+    logInButton: "Iniciar sessão",
+    toursCompleted: "Visitas concluídas: {{count}}",
     title: "Conta",
     darkMode: "Modo escuro",
     unlimitedTours: "Passeios ilimitados",
@@ -112,6 +122,8 @@ const pt: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "Continuar a partir da paragem {{number}}",
+    startAgain: "Recomeçar",
     useScanner: "Usar o nosso scanner de marcos",
     scannerFree: "Aponte a câmara para um edifício para ouvir a sua história",
     getMeToStart: "Leve-me à partida",
@@ -246,6 +258,33 @@ const pt: PartialTranslationDict = {
     weeklyActiveBody: "Passeios ilimitados durante os próximos 7 dias.",
     monthlyActiveBody: "Passeios ilimitados durante os próximos 30 dias.",
   },
+
+  pageTitle: {
+    home: "StoryStep: passeios a pé narrados por IA em Londres, Paris e Oxford",
+    tour: "{{tour}}: passeio áudio a pé gratuito por {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Com sede?",
+    walk: "Cerca de {{minutes}} min a pé",
+    nextDoor: "Mesmo onde terminaste",
+    directions: "Direções",
+  },
+
+  share: {
+    button: "Partilha o teu passeio",
+    iWalked: "Eu percorri",
+    stops: "{{count}} paragens",
+    distance: "{{km}} km",
+    tagline: "Passeios áudio a pé gratuitos",
+    shareText: "Percorri {{tour}} em {{city}} com o StoryStep, um passeio áudio a pé gratuito.",
+    downloadedCopied: "Imagem guardada e link copiado.",
+    downloaded: "Imagem guardada.",
+    copied: "Link copiado.",
+    failed: "Não foi possível partilhar. Tenta novamente.",
+  },
+
 };
 
 export default pt;

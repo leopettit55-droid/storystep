@@ -70,6 +70,7 @@ const nl: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Voltooid",
     title: "Tours",
     subtitle: "Kies een buurt. Koptelefoon op, lopen, en laat je leiden.",
     moreCitiesTitle: "Meer steden",
@@ -83,6 +84,15 @@ const nl: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Gebruik minstens 6 tekens voor je wachtwoord.",
+    errorAccountExists: "Er is al een account met dat e-mailadres. Log hierboven in.",
+    errorLoginFillIn: "Vul je e-mailadres en wachtwoord in.",
+    errorNoAccount: "Geen account met dat e-mailadres op dit apparaat. Maak er hieronder een aan.",
+    errorWrongPassword: "Dat wachtwoord klopt niet. Probeer het opnieuw.",
+    logInTitle: "Inloggen",
+    logInBody: "Welkom terug. Log in met het account dat je hebt aangemaakt.",
+    logInButton: "Inloggen",
+    toursCompleted: "Voltooide tours: {{count}}",
     title: "Account",
     darkMode: "Donkere modus",
     unlimitedTours: "Onbeperkte tours",
@@ -112,6 +122,8 @@ const nl: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "Verder vanaf stop {{number}}",
+    startAgain: "Opnieuw beginnen",
     useScanner: "Gebruik onze monumentenscanner",
     scannerFree: "Richt je camera op een gebouw om het verhaal te horen",
     getMeToStart: "Breng me naar de start",
@@ -246,6 +258,33 @@ const nl: PartialTranslationDict = {
     weeklyActiveBody: "Onbeperkte tours voor de komende 7 dagen.",
     monthlyActiveBody: "Onbeperkte tours voor de komende 30 dagen.",
   },
+
+  pageTitle: {
+    home: "StoryStep: door AI vertelde wandeltours door Londen, Parijs & Oxford",
+    tour: "{{tour}}: gratis audiowandeltour door {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Dorst gekregen?",
+    walk: "Ongeveer {{minutes}} min lopen",
+    nextDoor: "Precies waar je eindigde",
+    directions: "Route",
+  },
+
+  share: {
+    button: "Deel je wandeling",
+    iWalked: "Ik liep",
+    stops: "{{count}} stops",
+    distance: "{{km}} km",
+    tagline: "Gratis audiowandeltours",
+    shareText: "Ik liep {{tour}} in {{city}} met StoryStep, een gratis audiowandeltour.",
+    downloadedCopied: "Afbeelding opgeslagen en link gekopieerd.",
+    downloaded: "Afbeelding opgeslagen.",
+    copied: "Link gekopieerd.",
+    failed: "Delen lukte niet. Probeer het opnieuw.",
+  },
+
 };
 
 export default nl;

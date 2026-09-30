@@ -70,6 +70,7 @@ const fr: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Terminé",
     title: "Parcours",
     subtitle: "Choisissez un quartier. Mettez vos écouteurs, marchez, et laissez-vous guider.",
     moreCitiesTitle: "Plus de villes",
@@ -83,6 +84,15 @@ const fr: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Utilise au moins 6 caractères pour ton mot de passe.",
+    errorAccountExists: "Un compte existe déjà avec cet e-mail. Connecte-toi plus haut.",
+    errorLoginFillIn: "Saisis ton e-mail et ton mot de passe.",
+    errorNoAccount: "Aucun compte avec cet e-mail sur cet appareil. Crée-en un ci-dessous.",
+    errorWrongPassword: "Ce mot de passe ne correspond pas. Réessaie.",
+    logInTitle: "Se connecter",
+    logInBody: "Bon retour. Connecte-toi avec le compte que tu as créé.",
+    logInButton: "Se connecter",
+    toursCompleted: "Visites terminées : {{count}}",
     title: "Compte",
     darkMode: "Mode sombre",
     unlimitedTours: "Parcours illimités",
@@ -112,6 +122,8 @@ const fr: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "Reprendre à l'étape {{number}}",
+    startAgain: "Recommencer",
     useScanner: "Utiliser notre scanner de monuments",
     scannerFree: "Pointez l'appareil photo vers un bâtiment pour entendre son histoire",
     getMeToStart: "Emmenez-moi au départ",
@@ -246,6 +258,33 @@ const fr: PartialTranslationDict = {
     weeklyActiveBody: "Parcours illimités pendant les 7 prochains jours.",
     monthlyActiveBody: "Parcours illimités pendant les 30 prochains jours.",
   },
+
+  pageTitle: {
+    home: "StoryStep : visites à pied narrées par IA à Londres, Paris et Oxford",
+    tour: "{{tour}} : visite audio à pied gratuite de {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Une petite soif ?",
+    walk: "Environ {{minutes}} min à pied",
+    nextDoor: "Juste là où tu as terminé",
+    directions: "Itinéraire",
+  },
+
+  share: {
+    button: "Partage ta balade",
+    iWalked: "J'ai parcouru",
+    stops: "{{count}} étapes",
+    distance: "{{km}} km",
+    tagline: "Visites audio à pied gratuites",
+    shareText: "J'ai parcouru {{tour}} à {{city}} avec StoryStep, une visite audio à pied gratuite.",
+    downloadedCopied: "Image enregistrée, et le lien est copié.",
+    downloaded: "Image enregistrée.",
+    copied: "Lien copié.",
+    failed: "Impossible de partager. Réessaie.",
+  },
+
 };
 
 export default fr;

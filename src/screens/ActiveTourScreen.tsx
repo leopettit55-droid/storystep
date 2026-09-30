@@ -42,6 +42,7 @@ import { useTheme } from "../ThemeContext";
 import type { ThemeColors } from "../theme";
 import ShareWalkButton from "../components/ShareWalkButton";
 import PubSuggestion from "../components/PubSuggestion";
+import NarrationSubtitle from "../components/NarrationSubtitle";
 import StopDetail, { type StopDetailMode } from "../components/StopDetail";
 import TourIntro from "../components/TourIntro";
 import TourMap, { type AvatarLine } from "../components/TourMap";
@@ -532,8 +533,12 @@ export default function ActiveTourScreen() {
           isTalking={isPlaying && detail.mode !== "preview"}
           onExit={() => setDetail(null)}
           topInset={insets.top}
-          bottomClearance={insets.bottom + CONTROLS_BOTTOM + 70 + 16}
+          bottomClearance={insets.bottom + CONTROLS_BOTTOM + 70 + 16 + SUBTITLE_SPACE}
         />
+      )}
+
+      {started && (
+        <NarrationSubtitle area={area} bottom={insets.bottom + CONTROLS_BOTTOM + 70 + 14} paused={!isPlaying} />
       )}
 
       <Animated.View
@@ -541,7 +546,7 @@ export default function ActiveTourScreen() {
         pointerEvents={started ? "box-none" : "none"}
       >
         {Platform.OS === "web" && (
-          <PressScale style={styles.smallControl} scaleTo={0.9} onPress={handleOpenARGuide} aria-label="Open AR camera guide">
+          <PressScale style={styles.smallControl} scaleTo={0.9} onPress={handleOpenARGuide} aria-label={t("activeTour.openArGuide")}>
             <Ionicons name="camera" size={20} color={PLAY_COLOR} />
           </PressScale>
         )}
@@ -552,7 +557,7 @@ export default function ActiveTourScreen() {
           style={styles.playButton}
           scaleTo={0.92}
           onPress={handleTogglePlay}
-          aria-label={isPlaying ? "Pause narration" : "Play narration"}
+          aria-label={t(isPlaying ? "activeTour.pauseNarration" : "activeTour.playNarration")}
         >
           <Ionicons
             name={isPlaying ? "pause" : "play"}
@@ -573,6 +578,8 @@ export default function ActiveTourScreen() {
 const PLAY_COLOR = "#2E9E6B";
 /** Gap between the bottom of the screen (above the safe area) and the play controls. */
 const CONTROLS_BOTTOM = 40;
+/** Room kept above the controls for the narration subtitles (about 4 lines). */
+const SUBTITLE_SPACE = 110;
 
 function createStyles(colors: ThemeColors) {
   const floating = {

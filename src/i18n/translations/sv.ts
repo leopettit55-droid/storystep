@@ -70,6 +70,7 @@ const sv: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Klar",
     title: "Turer",
     subtitle: "Välj ett område. Sätt på hörlurarna, gå, och låt dig guidas.",
     moreCitiesTitle: "Fler städer",
@@ -83,6 +84,15 @@ const sv: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Använd minst 6 tecken i lösenordet.",
+    errorAccountExists: "Det finns redan ett konto med den e-postadressen. Logga in ovan.",
+    errorLoginFillIn: "Ange din e-postadress och ditt lösenord.",
+    errorNoAccount: "Inget konto med den e-postadressen på den här enheten. Skapa ett nedan.",
+    errorWrongPassword: "Lösenordet stämmer inte. Försök igen.",
+    logInTitle: "Logga in",
+    logInBody: "Välkommen tillbaka. Logga in med kontot du skapade.",
+    logInButton: "Logga in",
+    toursCompleted: "Avklarade turer: {{count}}",
     title: "Konto",
     darkMode: "Mörkt läge",
     unlimitedTours: "Obegränsade turer",
@@ -112,6 +122,8 @@ const sv: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "Fortsätt från stopp {{number}}",
+    startAgain: "Börja om",
     useScanner: "Använd vår sevärdhetsskanner",
     scannerFree: "Rikta kameran mot en byggnad för att höra dess historia",
     getMeToStart: "Ta mig till starten",
@@ -246,6 +258,33 @@ const sv: PartialTranslationDict = {
     weeklyActiveBody: "Obegränsade turer i 7 dagar till.",
     monthlyActiveBody: "Obegränsade turer i 30 dagar till.",
   },
+
+  pageTitle: {
+    home: "StoryStep: AI-berättade stadsvandringar i London, Paris och Oxford",
+    tour: "{{tour}}: gratis ljudvandring i {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Törstig?",
+    walk: "Cirka {{minutes}} min promenad",
+    nextDoor: "Precis där du slutade",
+    directions: "Vägbeskrivning",
+  },
+
+  share: {
+    button: "Dela din promenad",
+    iWalked: "Jag gick",
+    stops: "{{count}} stopp",
+    distance: "{{km}} km",
+    tagline: "Gratis ljudvandringar",
+    shareText: "Jag gick {{tour}} i {{city}} med StoryStep, en gratis ljudvandring.",
+    downloadedCopied: "Bilden sparad och länken kopierad.",
+    downloaded: "Bilden sparad.",
+    copied: "Länken kopierad.",
+    failed: "Det gick inte att dela. Försök igen.",
+  },
+
 };
 
 export default sv;
