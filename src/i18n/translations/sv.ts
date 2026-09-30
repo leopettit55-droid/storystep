@@ -134,6 +134,9 @@ const sv: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "Vi lyssnar på den här igen!",
+    guideLater: "Den här historien hör vi när vi kommer hit!",
+    backToMap: "Karta",
     introSubtitle: "Välkommen till din guidade tur",
     introGreeting: "Hej! Välkommen till {{area}}. Jag är din guide.",
     introHeadphones: "Vi rekommenderar hörlurar för den här turen.",

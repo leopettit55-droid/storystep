@@ -134,6 +134,9 @@ const es: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "¡Escuchémosla otra vez!",
+    guideLater: "¡Oiremos esta historia cuando lleguemos aquí!",
+    backToMap: "Mapa",
     introSubtitle: "Bienvenido a tu visita guiada",
     introGreeting: "¡Hola! Bienvenido a {{area}}. Soy tu guía.",
     introHeadphones: "Te recomendamos usar auriculares en esta visita.",

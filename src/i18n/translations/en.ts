@@ -144,6 +144,9 @@ const en = {
   },
 
   activeTour: {
+    guideReplay: "Let's hear this one again!",
+    guideLater: "We'll hear this story when we get here!",
+    backToMap: "Map",
     introSubtitle: "Welcome to your guided tour",
     introGreeting: "Hi there! Welcome to {{area}}. I'm your tour guide.",
     introHeadphones: "We recommend using headphones for this tour.",

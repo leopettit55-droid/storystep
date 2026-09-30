@@ -47,6 +47,11 @@ const MAX_PITCH = 65;
 /** The intro swoop: from a flat, high view of the city down to street level. */
 const FLY_IN_FROM_ZOOM = 13;
 const FLY_IN_MS = 3200;
+/** Street-level view of a focused stop: low and close, slowly circling. */
+const DETAIL_ZOOM = 18.6;
+const DETAIL_PITCH = 74;
+const DETAIL_MAX_PITCH = 78;
+const DETAIL_ORBIT_DEG_PER_S = 3;
 /** Buildings rise out of the ground between these zooms, then keep growing
  * (x1.3 per zoom level past 16) so close-up views feel dramatically 3D. */
 const BUILDINGS_APPEAR_ZOOM = 15;
@@ -196,6 +201,9 @@ function buildStyle(): StyleSpecification {
 
 // Marker styling lives in one injected stylesheet (keyframes can't be inline styles).
 const CSS = `
+.ss-stop, .ss-avatar, .ss-ring { transition: opacity 0.4s ease; }
+/* !important: MapLibre writes each marker's opacity inline. */
+.ss-detail .ss-stop, .ss-detail .ss-avatar, .ss-detail .ss-ring { opacity: 0 !important; pointer-events: none !important; }
 .ss-avatar { position: relative; width: 56px; height: 68px; pointer-events: none; }
 .ss-avatar svg { overflow: visible; transform: scale(var(--ss-scale, 1)); transform-origin: 50% 100%; }
 .ss-avatar .ss-body { transform-box: view-box; transform-origin: 50px 110px; }
@@ -331,6 +339,7 @@ export default function TourMap({
   speech,
   faceBearing,
   flyIn,
+  focusStop,
   style,
 }: TourMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -340,6 +349,9 @@ export default function TourMap({
   speechRef.current = speech;
   const stopsRef = useRef<Record<string, HTMLDivElement>>({});
   const followRef = useRef(true);
+  /** True while a stop is focused: the camera belongs to the stop view, not the walker. */
+  const focusRef = useRef(false);
+  const orbitRef = useRef(0);
   const [following, setFollowing] = useState(true);
   const [mapReady, setMapReady] = useState(false);
 
@@ -389,6 +401,8 @@ export default function TourMap({
       // Any manual pan/rotate hands the camera to the walker until they tap re-centre.
       const stopFollowing = (e: { originalEvent?: unknown }) => {
         if (!e.originalEvent) return;
+        cancelAnimationFrame(orbitRef.current);
+        if (focusRef.current) return;
         followRef.current = false;
         setFollowing(false);
       };
@@ -437,8 +451,7 @@ export default function TourMap({
           const el = makeStopElement(waypoint);
           el.addEventListener("click", (ev) => {
             ev.stopPropagation();
-            // Stops already reached replay their story; stops ahead just show their name.
-            if (visitedRef.current.includes(waypoint.id)) onPressRef.current?.(waypoint);
+            onPressRef.current?.(waypoint);
             el.classList.add("labelled");
             window.setTimeout(() => el.classList.remove("labelled"), 3000);
           });
@@ -530,7 +543,7 @@ export default function TourMap({
       }
       g.shown = userLocation;
       g.to = userLocation;
-      if (followRef.current) map.easeTo({ center: at, zoom: FOLLOW_ZOOM, pitch: FOLLOW_PITCH, duration: 800 });
+      if (followRef.current && !focusRef.current) map.easeTo({ center: at, zoom: FOLLOW_ZOOM, pitch: FOLLOW_PITCH, duration: 800 });
       return;
     }
 
@@ -566,7 +579,7 @@ export default function TourMap({
       avatar.ring.setLngLat([pos.lng, pos.lat]);
       avatar.figure.setLngLat([pos.lng, pos.lat]);
       // Following turns the map with the walker, so "ahead" is always up the screen.
-      if (followRef.current) {
+      if (followRef.current && !focusRef.current) {
         map.jumpTo({
           center: [pos.lng, pos.lat],
           bearing: g.bearingFrom + angleDelta(g.bearingFrom, g.heading) * e,
@@ -601,8 +614,63 @@ export default function TourMap({
     const g = glide.current;
     g.heading = faceBearing;
     avatar.ring.setRotation(faceBearing);
-    if (followRef.current) map.easeTo({ bearing: faceBearing, duration: 1200 });
+    if (followRef.current && !focusRef.current) map.easeTo({ bearing: faceBearing, duration: 1200 });
   }, [faceBearing]);
+
+  // Stop view: dive to street level at the stop, then circle it slowly.
+  // Clearing it flies back up to the walker and resumes following.
+  useEffect(() => {
+    const map = mapRef.current;
+    const root = containerRef.current;
+    if (!mapReady || !map || !root) return;
+
+    if (focusStop) {
+      focusRef.current = true;
+      root.classList.add("ss-detail");
+      map.setMaxPitch(DETAIL_MAX_PITCH);
+      const { lat, lng } = focusStop.coordinates;
+      map.flyTo({
+        center: [lng, lat],
+        zoom: DETAIL_ZOOM,
+        pitch: DETAIL_PITCH,
+        bearing: map.getBearing() + 40,
+        duration: 1800,
+        curve: 1.6,
+        essential: true,
+      });
+      map.once("moveend", () => {
+        if (!focusRef.current) return;
+        let last = performance.now();
+        const orbit = (now: number) => {
+          map.setBearing(map.getBearing() + ((now - last) / 1000) * DETAIL_ORBIT_DEG_PER_S);
+          last = now;
+          orbitRef.current = requestAnimationFrame(orbit);
+        };
+        orbitRef.current = requestAnimationFrame(orbit);
+      });
+      return () => cancelAnimationFrame(orbitRef.current);
+    }
+
+    if (focusRef.current) {
+      focusRef.current = false;
+      root.classList.remove("ss-detail");
+      followRef.current = true;
+      setFollowing(true);
+      const at = glide.current.shown ?? userLocation;
+      map.easeTo({
+        ...(at ? { center: [at.lng, at.lat] as [number, number] } : {}),
+        zoom: FOLLOW_ZOOM,
+        pitch: FOLLOW_PITCH,
+        bearing: glide.current.heading,
+        duration: 1400,
+      });
+      map.once("moveend", () => {
+        if (!focusRef.current) map.setMaxPitch(MAX_PITCH);
+      });
+    }
+    // Keyed on the stop, not the object, so re-renders don't restart the dive.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapReady, focusStop?.id]);
 
   const recentre = () => {
     const map = mapRef.current;
@@ -617,7 +685,7 @@ export default function TourMap({
   return (
     <View style={[styles.container, style as StyleProp<ViewStyle>]}>
       <div ref={containerRef} style={{ position: "absolute", inset: 0, background: PALETTE.ground }} />
-      {!following && userLocation && (
+      {!following && !focusStop && userLocation && (
         <Pressable style={styles.recentre} onPress={recentre} aria-label="Re-centre on me">
           <Ionicons name="locate" size={22} color={PALETTE.route} />
         </Pressable>
@@ -631,7 +699,7 @@ const styles = StyleSheet.create({
   recentre: {
     // Bottom-right, above the tour's play controls (the top is the tour's HUD).
     position: "absolute",
-    bottom: 120,
+    bottom: 140,
     right: 16,
     width: 44,
     height: 44,

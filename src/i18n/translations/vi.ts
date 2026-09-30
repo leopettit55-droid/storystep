@@ -134,6 +134,9 @@ const vi: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "Cùng nghe lại nhé!",
+    guideLater: "Mình sẽ nghe câu chuyện này khi đến đây!",
+    backToMap: "Bản đồ",
     introSubtitle: "Chào mừng đến với chuyến tham quan có hướng dẫn",
     introGreeting: "Xin chào! Chào mừng đến {{area}}. Mình là hướng dẫn viên của bạn.",
     introHeadphones: "Bạn nên dùng tai nghe cho chuyến tham quan này.",

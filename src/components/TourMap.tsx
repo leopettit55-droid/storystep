@@ -8,7 +8,7 @@ export interface TourMapProps {
   visitedWaypointIds: string[];
   /** Smoothed walker position from the tour's ProximityTracker. */
   userLocation: Coordinates | null;
-  /** Tapped a stop the walker has already reached. */
+  /** Tapped a stop marker (reached or not — the screen decides what to do). */
   onWaypointPress?: (waypoint: Waypoint) => void;
   /** A line for the avatar to say in a speech bubble (web). `id` is when it was said (ms), so a repeat re-shows. */
   speech?: AvatarLine | null;
@@ -16,6 +16,8 @@ export interface TourMapProps {
   faceBearing?: number | null;
   /** Open with a cinematic swoop down from high above the start (web). */
   flyIn?: boolean;
+  /** A stop to dive down to at street level and slowly circle (web); null returns to the walker. */
+  focusStop?: Waypoint | null;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -59,7 +61,7 @@ export default function TourMap({
             coordinate={{ latitude: waypoint.coordinates.lat, longitude: waypoint.coordinates.lng }}
             title={waypoint.name}
             pinColor={visited ? VISITED_COLOR : STOP_COLOR}
-            onPress={() => visited && onWaypointPress?.(waypoint)}
+            onPress={() => onWaypointPress?.(waypoint)}
           />
         );
       })}

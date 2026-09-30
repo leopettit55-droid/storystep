@@ -134,6 +134,9 @@ const tr: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "Bunu bir daha dinleyelim!",
+    guideLater: "Bu hikâyeyi buraya gelince dinleyeceğiz!",
+    backToMap: "Harita",
     introSubtitle: "Rehberli turuna hoş geldin",
     introGreeting: "Merhaba! {{area}}'e hoş geldin. Ben tur rehberinim.",
     introHeadphones: "Bu tur için kulaklık kullanmanı öneririz.",

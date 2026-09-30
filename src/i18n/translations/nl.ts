@@ -134,6 +134,9 @@ const nl: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "Laten we deze nog eens horen!",
+    guideLater: "Dit verhaal horen we als we hier zijn!",
+    backToMap: "Kaart",
     introSubtitle: "Welkom bij je rondleiding",
     introGreeting: "Hoi! Welkom bij {{area}}. Ik ben je gids.",
     introHeadphones: "We raden koptelefoon of oordopjes aan voor deze tour.",

@@ -134,6 +134,9 @@ const ar: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "لنستمع إلى هذه مرة أخرى!",
+    guideLater: "سنستمع إلى هذه القصة عندما نصل إلى هنا!",
+    backToMap: "الخريطة",
     introSubtitle: "مرحبًا بك في جولتك المصحوبة بمرشد",
     introGreeting: "مرحبًا! أهلًا بك في {{area}}. أنا مرشدك في هذه الجولة.",
     introHeadphones: "ننصحك باستخدام سماعات الرأس في هذه الجولة.",

@@ -134,6 +134,9 @@ const id: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "Ayo dengarkan sekali lagi!",
+    guideLater: "Kita akan mendengar cerita ini saat sampai di sini!",
+    backToMap: "Peta",
     introSubtitle: "Selamat datang di tur berpemandumu",
     introGreeting: "Hai! Selamat datang di {{area}}. Aku pemandu turmu.",
     introHeadphones: "Kami sarankan memakai headphone untuk tur ini.",

@@ -42,6 +42,7 @@ import { useTheme } from "../ThemeContext";
 import type { ThemeColors } from "../theme";
 import ShareWalkButton from "../components/ShareWalkButton";
 import PubSuggestion from "../components/PubSuggestion";
+import StopDetail, { type StopDetailMode } from "../components/StopDetail";
 import TourIntro from "../components/TourIntro";
 import TourMap, { type AvatarLine } from "../components/TourMap";
 import type { Waypoint } from "../content";
@@ -91,6 +92,16 @@ export default function ActiveTourScreen() {
   const [distanceToStart, setDistanceToStart] = useState<number | null>(null);
   /** 0 → 1 as the in-tour controls slide in. */
   const chrome = useRef(new Animated.Value(resuming ? 1 : 0)).current;
+
+  // The street-level stop view: open on arrival, or when a stop marker is tapped.
+  const [detail, setDetail] = useState<{ waypoint: Waypoint; mode: StopDetailMode } | null>(null);
+  const detailRef = useRef(detail);
+  detailRef.current = detail;
+  /** 0 → 1 as the stop view takes over (the map HUD fades out). */
+  const detailAnim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(detailAnim, { toValue: detail ? 1 : 0, duration: 350, useNativeDriver: true }).start();
+  }, [detail, detailAnim]);
 
   const trackerRef = useRef<ProximityTracker | null>(null);
   const visitedRef = useRef(new Set<string>());
@@ -233,7 +244,7 @@ export default function ActiveTourScreen() {
       visitedRef.current.add(waypointId);
       enterWaypoint(waypointId);
       setTransition(null);
-      say(tRef.current("activeTour.guideArrived", { stop: waypoint.name }), 2500);
+      setDetail({ waypoint, mode: "arrival" });
       persistProgress();
       void playWaypointNarration(waypoint);
     };
@@ -251,6 +262,9 @@ export default function ActiveTourScreen() {
         completeTour();
         return;
       }
+      // The story's over: back up to the map to head for the next stop
+      // (unless the walker is peeking at a different stop).
+      if (detailRef.current?.mode !== "preview") setDetail(null);
       const next = area.route[area.route.indexOf(current) + 1];
       if (next) announceNextStop(current, next);
     };
@@ -357,6 +371,7 @@ export default function ActiveTourScreen() {
     visitedRef.current.delete(nextWaypoint.id);
     skipToNext();
     persistProgress();
+    setDetail({ waypoint: nextWaypoint, mode: "arrival" });
     void playWaypointNarration(nextWaypoint);
   };
 
@@ -368,13 +383,20 @@ export default function ActiveTourScreen() {
       : null;
     if (wp) {
       trackerRef.current?.resetTriggeredWaypoint(wp.id);
+      setDetail({ waypoint: wp, mode: "arrival" });
       void playWaypointNarration(wp);
     }
   };
 
-  // Tapping a stop on the map that's already been reached replays its story.
+  // Tapping a stop marker opens its stop view: a stop already reached
+  // replays its story; one still ahead is just a look.
   const handleMapStopPress = (waypoint: Waypoint) => {
+    if (!visitedWaypointIds.includes(waypoint.id)) {
+      setDetail({ waypoint, mode: "preview" });
+      return;
+    }
     if (status === "paused") resume();
+    setDetail({ waypoint, mode: "replay" });
     void playWaypointNarration(waypoint);
   };
 
@@ -411,7 +433,7 @@ export default function ActiveTourScreen() {
   };
 
   const hudStyle = {
-    opacity: chrome,
+    opacity: Animated.multiply(chrome, detailAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0] })),
     transform: [{ translateY: chrome.interpolate({ inputRange: [0, 1], outputRange: [-120, 0] }) }],
   };
   const controlsStyle = {
@@ -431,6 +453,7 @@ export default function ActiveTourScreen() {
         speech={speech}
         faceBearing={faceBearing}
         flyIn={!resuming}
+        focusStop={detail?.waypoint ?? null}
       />
 
       {introShowing && (
@@ -445,7 +468,7 @@ export default function ActiveTourScreen() {
 
       <Animated.View
         style={[styles.hudColumn, { top: insets.top + 10 }, hudStyle]}
-        pointerEvents={started ? "box-none" : "none"}
+        pointerEvents={started && !detail ? "box-none" : "none"}
       >
         <View style={styles.hudRow}>
           <PressScale
@@ -501,8 +524,20 @@ export default function ActiveTourScreen() {
         )}
       </Animated.View>
 
+      {detail && (
+        <StopDetail
+          waypoint={detail.waypoint}
+          totalStops={area.route.length}
+          mode={detail.mode}
+          isTalking={isPlaying && detail.mode !== "preview"}
+          onExit={() => setDetail(null)}
+          topInset={insets.top}
+          bottomClearance={insets.bottom + CONTROLS_BOTTOM + 70 + 16}
+        />
+      )}
+
       <Animated.View
-        style={[styles.controls, { bottom: insets.bottom + 24 }, controlsStyle]}
+        style={[styles.controls, { bottom: insets.bottom + CONTROLS_BOTTOM }, controlsStyle]}
         pointerEvents={started ? "box-none" : "none"}
       >
         {Platform.OS === "web" && (
@@ -521,8 +556,8 @@ export default function ActiveTourScreen() {
         >
           <Ionicons
             name={isPlaying ? "pause" : "play"}
-            size={28}
-            color={PLAY_COLOR}
+            size={32}
+            color="#FFFFFF"
             // Nudges the play triangle right so it looks centred in the circle.
             style={isPlaying ? undefined : styles.playIconNudge}
           />
@@ -536,6 +571,8 @@ export default function ActiveTourScreen() {
 }
 
 const PLAY_COLOR = "#2E9E6B";
+/** Gap between the bottom of the screen (above the safe area) and the play controls. */
+const CONTROLS_BOTTOM = 40;
 
 function createStyles(colors: ThemeColors) {
   const floating = {
@@ -622,25 +659,30 @@ function createStyles(colors: ThemeColors) {
   transitionDistance: { color: "#2F9BFF", fontSize: 13, fontWeight: "700" },
   controls: {
     position: "absolute",
-    right: 16,
+    left: 0,
+    right: 0,
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    justifyContent: "center",
+    gap: 16,
   },
   smallControl: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
     ...floating,
   },
   playButton: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
-    backgroundColor: "#FFFFFF",
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: "#4ECDC4",
+    ...(Platform.OS === "web"
+      ? ({ backgroundImage: "linear-gradient(135deg, #76C893, #4ECDC4)" } as object)
+      : { experimental_backgroundImage: "linear-gradient(135deg, #76C893, #4ECDC4)" }),
     alignItems: "center",
     justifyContent: "center",
     ...floating,

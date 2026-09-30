@@ -134,6 +134,9 @@ const ru: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "Давай послушаем ещё раз!",
+    guideLater: "Эту историю мы услышим, когда придём сюда!",
+    backToMap: "Карта",
     introSubtitle: "Добро пожаловать на экскурсию",
     introGreeting: "Привет! Добро пожаловать в {{area}}. Я твой гид.",
     introHeadphones: "Для этой экскурсии рекомендуем наушники.",

@@ -134,6 +134,9 @@ const ja: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "もう一度聞いてみよう！",
+    guideLater: "ここに着いたらこのお話を聞こうね！",
+    backToMap: "地図",
     introSubtitle: "ガイドツアーへようこそ",
     introGreeting: "こんにちは！{{area}}へようこそ。ツアーガイドだよ。",
     introHeadphones: "このツアーではヘッドホンのご使用をおすすめします。",

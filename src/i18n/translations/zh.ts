@@ -134,6 +134,9 @@ const zh: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "我们再听一遍吧！",
+    guideLater: "到了这里我们就会听到这个故事！",
+    backToMap: "地图",
     introSubtitle: "欢迎参加导览之旅",
     introGreeting: "你好！欢迎来到{{area}}。我是你的导游。",
     introHeadphones: "建议在本次导览中使用耳机。",

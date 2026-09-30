@@ -134,6 +134,9 @@ const ko: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "이 이야기를 다시 들어 봐요!",
+    guideLater: "여기에 도착하면 이 이야기를 들을 거예요!",
+    backToMap: "지도",
     introSubtitle: "가이드 투어에 오신 것을 환영해요",
     introGreeting: "안녕하세요! {{area}}에 오신 걸 환영해요. 저는 투어 가이드예요.",
     introHeadphones: "이 투어에는 헤드폰 사용을 권장해요.",

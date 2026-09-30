@@ -134,6 +134,9 @@ const hi: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "चलिए इसे फिर से सुनते हैं!",
+    guideLater: "यहाँ पहुँचकर हम यह कहानी सुनेंगे!",
+    backToMap: "नक्शा",
     introSubtitle: "आपके गाइडेड टूर में स्वागत है",
     introGreeting: "नमस्ते! {{area}} में आपका स्वागत है। मैं आपका टूर गाइड हूँ।",
     introHeadphones: "इस टूर के लिए हेडफ़ोन इस्तेमाल करने की सलाह दी जाती है।",
