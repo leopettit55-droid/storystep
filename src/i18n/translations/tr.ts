@@ -287,16 +287,17 @@ const tr: PartialTranslationDict = {
 
 
   guides: {
+    scoutArrived: "Hoş geldin! Sana özel bir şey göstereyim.",
     chooseTitle: "Rehberini seç",
     previous: "Önceki rehber",
     next: "Sonraki rehber",
     scoutDescription: "StoryStep'in orijinali, yürüyüşe her zaman hazır",
     pipDescription: "Asla kaybolmayan neşeli bir penguen",
     hootDescription: "Tarih dolu, bilge yaşlı bir baykuş",
-    gusDescription: "Çatılardan inmiş yaramaz bir taş gargoyl",
-    pipArrived: "Paytak paytak… {{stop}} noktasındayız!",
-    hootArrived: "Harika! Burası {{stop}}.",
-    gusArrived: "Oo, {{stop}}! Bu eski taşları iyi bilirim.",
+    ollieDescription: "Her kestirmeyi bilen haylaz, genç bir kâşif",
+    pipArrived: "Burada olmak çok heyecanlı! Şu yere bak!",
+    hootArrived: "Ah, gerçekten de son derece büyüleyici bir yer.",
+    ollieArrived: "İşte geldik! Bahse girerim burayı bilmiyordun.",
   },
 };
 

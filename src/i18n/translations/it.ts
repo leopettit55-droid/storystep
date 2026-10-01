@@ -287,16 +287,17 @@ const it: PartialTranslationDict = {
 
 
   guides: {
+    scoutArrived: "Benvenuto! Lascia che ti mostri qualcosa di speciale.",
     chooseTitle: "Scegli la tua guida",
     previous: "Guida precedente",
     next: "Guida successiva",
     scoutDescription: "L'originale di StoryStep, sempre pronto a camminare",
     pipDescription: "Un pinguino allegro che non si perde mai",
     hootDescription: "Un vecchio gufo saggio con la testa piena di storia",
-    gusDescription: "Un gargoyle di pietra birichino sceso dai tetti",
-    pipArrived: "Dondola, dondola… siamo a {{stop}}!",
-    hootArrived: "Splendido! Questo è {{stop}}.",
-    gusArrived: "Oh, {{stop}}! Conosco bene queste vecchie pietre.",
+    ollieDescription: "Un giovane esploratore sfacciato che conosce ogni scorciatoia",
+    pipArrived: "Che emozione essere qui! Guarda che posto!",
+    hootArrived: "Ah, un luogo davvero affascinante.",
+    ollieArrived: "Eccoci qua! Scommetto che questo non lo conoscevi.",
   },
 };
 

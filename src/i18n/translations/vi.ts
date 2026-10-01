@@ -287,16 +287,17 @@ const vi: PartialTranslationDict = {
 
 
   guides: {
+    scoutArrived: "Chào mừng! Để mình cho bạn xem một điều đặc biệt.",
     chooseTitle: "Chọn hướng dẫn viên",
     previous: "Hướng dẫn viên trước",
     next: "Hướng dẫn viên tiếp theo",
     scoutDescription: "Hướng dẫn viên gốc của StoryStep, luôn sẵn sàng dạo bước",
     pipDescription: "Chú chim cánh cụt vui vẻ không bao giờ lạc đường",
     hootDescription: "Cú già thông thái với cái đầu đầy lịch sử",
-    gusDescription: "Tượng đá gargoyle tinh nghịch từ mái nhà xuống",
-    pipArrived: "Lạch bạch, lạch bạch… ta đến {{stop}} rồi!",
-    hootArrived: "Tuyệt vời! Đây là {{stop}}.",
-    gusArrived: "Ồ, {{stop}}! Tôi biết rõ những hòn đá cổ này.",
+    ollieDescription: "Nhà thám hiểm trẻ tinh nghịch biết mọi lối tắt",
+    pipArrived: "Háo hức quá! Nhìn nơi này xem!",
+    hootArrived: "À, quả là một nơi vô cùng thú vị.",
+    ollieArrived: "Đây rồi! Cá là bạn chưa biết chỗ này đâu.",
   },
 };
 

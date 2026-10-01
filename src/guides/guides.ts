@@ -8,7 +8,7 @@
  * walking animation moves. Feet rest on the bottom edge.
  */
 
-export type GuideId = "scout" | "pip" | "hoot" | "gus";
+export type GuideId = "scout" | "pip" | "hoot" | "ollie";
 
 export interface Guide {
   id: GuideId;
@@ -28,7 +28,6 @@ const SCOUT = `
     <ellipse cx="17" cy="70" rx="7" ry="15" transform="rotate(18 17 70)" fill="#E4533A" stroke="#6B1410" stroke-width="3"/>
     <ellipse cx="83" cy="70" rx="7" ry="15" transform="rotate(-18 83 70)" fill="#E4533A" stroke="#6B1410" stroke-width="3"/>
     <ellipse cx="50" cy="58" rx="33" ry="42" fill="#EE5A40" stroke="#6B1410" stroke-width="3"/>
-    <ellipse cx="37" cy="24" rx="6" ry="3.5" transform="rotate(-30 37 24)" fill="#FFFFFF" opacity="0.5"/>
     <circle cx="38" cy="44" r="14" fill="#FFFFFF"/>
     <circle cx="62" cy="44" r="14" fill="#FFFFFF"/>
     <ellipse cx="50" cy="52" rx="24" ry="13" fill="#FFFFFF"/>
@@ -37,6 +36,14 @@ const SCOUT = `
     <path d="M42 53 Q50 64 58 53 Z" fill="#5A0F0A"/>
     <ellipse cx="50" cy="58" rx="4.5" ry="2.4" fill="#F28A8A"/>
     <ellipse cx="50" cy="80" rx="17" ry="14" fill="#FFFFFF"/>
+    <path d="M22 50 Q27 70 35 88" stroke="#E07A3C" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M78 50 Q73 70 65 88" stroke="#E07A3C" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <circle cx="27" cy="66" r="2.5" fill="#F4C430" stroke="#7A3A12" stroke-width="1.2"/>
+    <circle cx="73" cy="66" r="2.5" fill="#F4C430" stroke="#7A3A12" stroke-width="1.2"/>
+    <path d="M30 22 Q31 4 50 4 Q69 4 70 22 Z" fill="#D8B87A" stroke="#6B4A22" stroke-width="2.5" ${OUTLINE}/>
+    <path d="M30.5 17 Q50 12 69.5 17 L70 22 Q50 17 30 22 Z" fill="#2E9E8F"/>
+    <ellipse cx="50" cy="22" rx="33" ry="6" fill="#C9A66B" stroke="#6B4A22" stroke-width="2.5"/>
+    <path d="M38 9 Q44 6 50 6" stroke="#FFFFFF" stroke-width="2" fill="none" opacity="0.5" stroke-linecap="round"/>
   </g>`;
 
 const PIP = `
@@ -44,7 +51,7 @@ const PIP = `
   <g class="ss-leg ss-leg-r"><rect x="55" y="96" width="8" height="10" rx="3" fill="#F39C34"/><ellipse cx="62" cy="110" rx="10" ry="4.5" fill="#F7A440" stroke="#9A5512" stroke-width="2.5"/></g>
   <g class="ss-body">
     <ellipse cx="17" cy="66" rx="7" ry="18" transform="rotate(22 17 66)" fill="#24324A" stroke="#111827" stroke-width="3"/>
-    <ellipse cx="83" cy="66" rx="7" ry="18" transform="rotate(-22 83 66)" fill="#24324A" stroke="#111827" stroke-width="3"/>
+    <ellipse cx="83" cy="62" rx="7" ry="17" transform="rotate(-40 83 62)" fill="#24324A" stroke="#111827" stroke-width="3"/>
     <ellipse cx="50" cy="60" rx="32" ry="40" fill="#2B3A55" stroke="#111827" stroke-width="3"/>
     <ellipse cx="50" cy="73" rx="21" ry="25" fill="#FFFFFF"/>
     <path d="M28 43 Q30 25 50 25 Q70 25 72 43 Q72 57 50 59 Q28 57 28 43 Z" fill="#FFFFFF"/>
@@ -54,8 +61,15 @@ const PIP = `
     <ellipse cx="34" cy="50" rx="4" ry="2.5" fill="#FF9AA2" opacity="0.7"/>
     <ellipse cx="66" cy="50" rx="4" ry="2.5" fill="#FF9AA2" opacity="0.7"/>
     <path d="M44 47 L56 47 L50 55 Z" fill="#F7A440" stroke="#9A5512" stroke-width="2" ${OUTLINE}/>
-    <path d="M25 61 Q50 72 75 61 L75 67 Q50 78 25 67 Z" fill="#4ECDC4" stroke="#1F8F88" stroke-width="2" ${OUTLINE}/>
-    <rect x="60" y="66" width="8" height="17" rx="3" fill="#4ECDC4" stroke="#1F8F88" stroke-width="2"/>
+    <path d="M33 54 Q41 66 43 68 M67 54 Q59 66 57 68" stroke="#1F2933" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <rect x="39" y="66" width="22" height="15" rx="3.5" fill="#3A3F47" stroke="#111827" stroke-width="2"/>
+    <rect x="42" y="63.5" width="7" height="4" rx="1.5" fill="#3A3F47" stroke="#111827" stroke-width="1.6"/>
+    <circle cx="50" cy="73.5" r="5" fill="#8FD3FF" stroke="#111827" stroke-width="2"/>
+    <circle cx="48.5" cy="72" r="1.4" fill="#FFFFFF"/>
+    <circle cx="57" cy="69.5" r="1.3" fill="#F4C430"/>
+    <path d="M89 26 L89 86" stroke="#6B4A22" stroke-width="3" stroke-linecap="round"/>
+    <path d="M89 25 L100 30.5 L89 36 Z" fill="#2E9E8F" stroke="#14524A" stroke-width="1.8" ${OUTLINE}/>
+    <circle cx="93" cy="30.5" r="1.6" fill="#FFFFFF"/>
   </g>`;
 
 const HOOT = `
@@ -83,32 +97,45 @@ const HOOT = `
     <circle cx="73" cy="40" r="3" fill="#F4C430"/>
   </g>`;
 
-const GUS = `
-  <g class="ss-leg ss-leg-l"><rect x="36" y="94" width="10" height="13" rx="3" fill="#8A939A" stroke="#4B5358" stroke-width="2.5"/><path d="M28 112 L31 106 L47 106 L48 112 Z" fill="#8A939A" stroke="#4B5358" stroke-width="2.5" ${OUTLINE}/></g>
-  <g class="ss-leg ss-leg-r"><rect x="54" y="94" width="10" height="13" rx="3" fill="#8A939A" stroke="#4B5358" stroke-width="2.5"/><path d="M52 112 L53 106 L69 106 L72 112 Z" fill="#8A939A" stroke="#4B5358" stroke-width="2.5" ${OUTLINE}/></g>
+const OLLIE = `
+  <g class="ss-leg ss-leg-l"><rect x="37" y="86" width="11" height="18" rx="3" fill="#B59A6A" stroke="#4A3A22" stroke-width="2.5"/><path d="M33 112 L35 102 L48 102 L50 112 Z" fill="#6B4A2E" stroke="#3A2616" stroke-width="2.5" ${OUTLINE}/></g>
+  <g class="ss-leg ss-leg-r"><rect x="52" y="86" width="11" height="18" rx="3" fill="#B59A6A" stroke="#4A3A22" stroke-width="2.5"/><path d="M50 112 L52 102 L65 102 L67 112 Z" fill="#6B4A2E" stroke="#3A2616" stroke-width="2.5" ${OUTLINE}/></g>
   <g class="ss-body">
-    <path d="M24 54 L4 42 L10 60 L2 66 L14 72 L10 82 L26 76 Z" fill="#6E777D" stroke="#3D4448" stroke-width="2.5" ${OUTLINE}/>
-    <path d="M76 54 L96 42 L90 60 L98 66 L86 72 L90 82 L74 76 Z" fill="#6E777D" stroke="#3D4448" stroke-width="2.5" ${OUTLINE}/>
-    <ellipse cx="50" cy="65" rx="29" ry="35" fill="#9AA3A8" stroke="#4B5358" stroke-width="3"/>
-    <ellipse cx="50" cy="78" rx="16" ry="17" fill="#B8C0C4"/>
-    <path d="M66 74 l4 6 l-3 5 M31 82 l-3 5" stroke="#7D868B" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-    <path d="M34 36 Q25 20 33 12 Q34 25 41 31 Z" fill="#D9CBA3" stroke="#6B5E3E" stroke-width="2" ${OUTLINE}/>
-    <path d="M66 36 Q75 20 67 12 Q66 25 59 31 Z" fill="#D9CBA3" stroke="#6B5E3E" stroke-width="2" ${OUTLINE}/>
-    <path d="M23 46 L31 39 L31 52 Z" fill="#9AA3A8" stroke="#4B5358" stroke-width="2.5" ${OUTLINE}/>
-    <path d="M77 46 L69 39 L69 52 Z" fill="#9AA3A8" stroke="#4B5358" stroke-width="2.5" ${OUTLINE}/>
-    <path d="M35 42 L46 40 M65 42 L54 40" stroke="#4B5358" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="41" cy="48" r="5" fill="#FFD45A" stroke="#4B5358" stroke-width="2"/><circle cx="41.5" cy="48.5" r="2.2" fill="#222222"/>
-    <circle cx="59" cy="48" r="5" fill="#FFD45A" stroke="#4B5358" stroke-width="2"/><circle cx="58.5" cy="48.5" r="2.2" fill="#222222"/>
-    <circle cx="47" cy="54" r="1.3" fill="#4B5358"/><circle cx="53" cy="54" r="1.3" fill="#4B5358"/>
-    <path d="M36 58 Q50 71 64 58 Q50 64 36 58 Z" fill="#3D2A2A" stroke="#4B5358" stroke-width="2" ${OUTLINE}/>
-    <path d="M42 60 L44 64.5 L46.5 61 Z M53.5 61 L56 64.5 L58 60 Z" fill="#FFFFFF"/>
+    <rect x="23" y="55" width="54" height="36" rx="10" fill="#E07A3C" stroke="#7A3A12" stroke-width="2.5"/>
+    <rect x="29" y="49" width="42" height="9" rx="4.5" fill="#3D7A5C" stroke="#1E4433" stroke-width="2"/>
+    <path d="M27 63 Q20 74 24 86" stroke="#14524A" stroke-width="11" fill="none" stroke-linecap="round"/>
+    <path d="M27 63 Q20 74 24 86" stroke="#2E9E8F" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path d="M73 63 Q82 56 84 46" stroke="#14524A" stroke-width="11" fill="none" stroke-linecap="round"/>
+    <path d="M73 63 Q82 56 84 46" stroke="#2E9E8F" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="24" cy="88" r="4.5" fill="#F2C9A0" stroke="#6B4A2E" stroke-width="2"/>
+    <circle cx="84.5" cy="43" r="4.5" fill="#F2C9A0" stroke="#6B4A2E" stroke-width="2"/>
+    <path d="M31 59 Q50 53 69 59 L70 91 Q50 95 30 91 Z" fill="#2E9E8F" stroke="#14524A" stroke-width="2.5" ${OUTLINE}/>
+    <path d="M43 57 L50 70 L57 57 Z" fill="#F6E7C8" stroke="#14524A" stroke-width="1.5" ${OUTLINE}/>
+    <path d="M50 70 L50 91" stroke="#14524A" stroke-width="1.6"/>
+    <path d="M37 59 L39 91 M63 59 L61 91" stroke="#7A3A12" stroke-width="3.5" stroke-linecap="round"/>
+    <rect x="45" y="51" width="10" height="7" fill="#F2C9A0"/>
+    <circle cx="29.5" cy="36" r="4" fill="#F2C9A0" stroke="#6B4A2E" stroke-width="2"/>
+    <circle cx="70.5" cy="36" r="4" fill="#F2C9A0" stroke="#6B4A2E" stroke-width="2"/>
+    <circle cx="50" cy="34" r="20" fill="#F2C9A0" stroke="#6B4A2E" stroke-width="2.5"/>
+    <path d="M30 32 Q28 12 50 11 Q72 11 70 30 Q66 22 58 24 Q55 17 47 21 Q39 17 35 26 Q32 27 30 32 Z" fill="#6B3E1F" stroke="#3A2010" stroke-width="2" ${OUTLINE}/>
+    <rect x="37" y="17" width="11" height="6" rx="2.5" fill="#1F2933"/>
+    <rect x="52" y="17" width="11" height="6" rx="2.5" fill="#1F2933"/>
+    <path d="M48 19.5 L52 19.5" stroke="#1F2933" stroke-width="1.6"/>
+    <path d="M38 29 L46 28" stroke="#3A2010" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M54 26.5 L62 28.5" stroke="#3A2010" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="43" cy="35" r="3.2" fill="#2B1A10"/><circle cx="44" cy="34" r="1.1" fill="#FFFFFF"/>
+    <path d="M54 35.5 Q57.5 32.5 61 35.5" stroke="#2B1A10" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <ellipse cx="38" cy="41" rx="3" ry="1.8" fill="#F28A8A" opacity="0.6"/>
+    <ellipse cx="62" cy="41" rx="3" ry="1.8" fill="#F28A8A" opacity="0.6"/>
+    <path d="M42 42 Q50 50 58 41 Q50 45 42 42 Z" fill="#7A2E1E" stroke="#3A2010" stroke-width="1.5" ${OUTLINE}/>
+    <path d="M45 43.3 L55 42.6 L54 44.6 Q50 45.6 46 45 Z" fill="#FFFFFF"/>
   </g>`;
 
 export const GUIDES: Guide[] = [
-  { id: "scout", name: "Scout", descriptionKey: "guides.scoutDescription", arrivalKey: "activeTour.guideArrived", svg: SCOUT },
+  { id: "scout", name: "Scout", descriptionKey: "guides.scoutDescription", arrivalKey: "guides.scoutArrived", svg: SCOUT },
   { id: "pip", name: "Pip", descriptionKey: "guides.pipDescription", arrivalKey: "guides.pipArrived", svg: PIP },
   { id: "hoot", name: "Professor Hoot", descriptionKey: "guides.hootDescription", arrivalKey: "guides.hootArrived", svg: HOOT },
-  { id: "gus", name: "Gus", descriptionKey: "guides.gusDescription", arrivalKey: "guides.gusArrived", svg: GUS },
+  { id: "ollie", name: "Ollie", descriptionKey: "guides.ollieDescription", arrivalKey: "guides.ollieArrived", svg: OLLIE },
 ];
 
 export const DEFAULT_GUIDE: GuideId = "scout";

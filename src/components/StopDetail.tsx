@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
+import { subscribeNarrationProgress } from "../audio/narrationPlayer";
 import { Animated, Easing, Platform, StyleSheet, Text, View } from "react-native";
 import type { Waypoint } from "../content";
 import { getGuide, type GuideId } from "../guides/guides";
@@ -53,6 +54,16 @@ export default function StopDetail({
   const bob = useRef(new Animated.Value(0)).current;
   const bubbleAnim = useRef(new Animated.Value(0)).current;
   const [bubble, setBubble] = useState<string | null>(null);
+  /** How far through this stop's narration (0–1), for the progress bar. */
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    setProgress(0);
+    return subscribeNarrationProgress((playing, seconds, duration) => {
+      if (playing?.waypointId !== waypoint.id || !duration) return;
+      // Steps of 1% keep re-renders down to a handful a second.
+      setProgress(Math.min(1, Math.round((seconds / duration) * 100) / 100));
+    });
+  }, [waypoint.id]);
 
   // Fade and settle the view in once (like a card); each new stop replays the guide's entrance.
   useEffect(() => {
@@ -163,6 +174,7 @@ export default function StopDetail({
         </Animated.View>
         <View style={styles.groundShadow} pointerEvents="none" />
         <Text style={styles.guideName}>{guide.name}</Text>
+        <Text style={styles.guideRole}>{t(guide.descriptionKey)}</Text>
 
         <Animated.View
           style={[styles.panel, gradient("linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0) 100%)"), { paddingBottom: bottomClearance }, panelStyle]}
@@ -170,6 +182,11 @@ export default function StopDetail({
         >
           <Text style={styles.stopNumber}>{t("activeTour.stopOf", { current: waypoint.order, total: totalStops })}</Text>
           <Text style={styles.title}>{waypoint.name}</Text>
+          {mode !== "preview" && (
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+            </View>
+          )}
         </Animated.View>
       </View>
 
@@ -237,6 +254,29 @@ const styles = StyleSheet.create({
   },
   stopNumber: { color: "#FFFFFF", fontSize: 14, opacity: 0.8 },
   title: { color: "#FFFFFF", fontSize: 28, fontWeight: "800", textAlign: "center", marginTop: 4 },
+  guideRole: {
+    marginTop: 2,
+    color: "#FFFFFF",
+    fontSize: 12,
+    opacity: 0.9,
+    textAlign: "center",
+    maxWidth: 260,
+    textShadowColor: "rgba(0,0,0,0.45)",
+    textShadowRadius: 4,
+    textShadowOffset: { width: 0, height: 1 },
+  },
+  progressTrack: {
+    alignSelf: "stretch",
+    maxWidth: 320,
+    width: "70%",
+    marginTop: 12,
+    height: 4,
+    borderRadius: 2,
+    overflow: "hidden",
+    backgroundColor: "rgba(255,255,255,0.3)",
+    marginHorizontal: "auto",
+  },
+  progressFill: { height: 4, borderRadius: 2, backgroundColor: "#7BE0A6" },
   guideName: {
     marginTop: 6,
     color: "#FFFFFF",

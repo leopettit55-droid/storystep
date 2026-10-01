@@ -287,16 +287,17 @@ const de: PartialTranslationDict = {
 
 
   guides: {
+    scoutArrived: "Willkommen! Ich zeige dir etwas Besonderes.",
     chooseTitle: "Wähle deinen Guide",
     previous: "Vorheriger Guide",
     next: "Nächster Guide",
     scoutDescription: "Das StoryStep-Original, immer bereit für einen Spaziergang",
     pipDescription: "Ein fröhlicher Pinguin, der sich nie verläuft",
     hootDescription: "Eine weise alte Eule voller Geschichte",
-    gusDescription: "Ein frecher Wasserspeier aus Stein, direkt vom Dach",
-    pipArrived: "Watschel, watschel… wir sind bei {{stop}}!",
-    hootArrived: "Großartig! Das ist {{stop}}.",
-    gusArrived: "Oh, {{stop}}! Diese alten Steine kenne ich gut.",
+    ollieDescription: "Ein frecher junger Entdecker, der jede Abkürzung kennt",
+    pipArrived: "Ich freu mich so, hier zu sein! Schau dir diesen Ort an!",
+    hootArrived: "Ah, ein höchst faszinierender Ort, in der Tat.",
+    ollieArrived: "So, da wären wir! Wetten, das kanntest du noch nicht?",
   },
 };
 

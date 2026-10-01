@@ -287,16 +287,17 @@ const id: PartialTranslationDict = {
 
 
   guides: {
+    scoutArrived: "Selamat datang! Biar kutunjukkan sesuatu yang istimewa.",
     chooseTitle: "Pilih pemandumu",
     previous: "Pemandu sebelumnya",
     next: "Pemandu berikutnya",
     scoutDescription: "Pemandu asli StoryStep, selalu siap berjalan",
     pipDescription: "Penguin ceria yang tak pernah tersesat",
     hootDescription: "Burung hantu tua yang bijak, penuh sejarah",
-    gusDescription: "Gargoyle batu jahil yang turun dari atap",
-    pipArrived: "Megal-megol… kita sampai di {{stop}}!",
-    hootArrived: "Luar biasa! Ini {{stop}}.",
-    gusArrived: "Wah, {{stop}}! Aku kenal baik batu-batu tua ini.",
+    ollieDescription: "Penjelajah muda yang jahil dan tahu semua jalan pintas",
+    pipArrived: "Senang sekali ada di sini! Lihat tempat ini!",
+    hootArrived: "Ah, sungguh tempat yang sangat menarik.",
+    ollieArrived: "Nah, kita sampai! Pasti kamu belum tahu tempat ini.",
   },
 };
 
