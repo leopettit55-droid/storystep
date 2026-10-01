@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { useAccountStore } from "../account/accountStore";
+import { useOfflineStore } from "../offline/offlineStore";
 import { areas } from "../content";
 import type { Area } from "../content";
 import { COMING_SOON_CITIES, type ComingSoonCity } from "../content/comingSoonCities";
@@ -38,6 +39,7 @@ export default function AreaSelectScreen() {
   const { language, t } = useLanguage();
   const { colors } = useTheme();
   const completedTourIds = useAccountStore((s) => s.completedTourIds);
+  const offlineTours = useOfflineStore((s) => s.tours);
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const citySections = CITIES.map((city) => ({
@@ -55,6 +57,7 @@ export default function AreaSelectScreen() {
   const renderAreaItem = (item: Area) => {
     const disabled = !item.isContentComplete;
     const completed = completedTourIds.includes(item.id);
+    const downloaded = offlineTours[item.id]?.status === "ready";
     const text = localizedAreaText(item.id, language, item);
     return (
       <Pressable
@@ -80,6 +83,11 @@ export default function AreaSelectScreen() {
           <View style={styles.cardHeaderRow}>
             <Text style={styles.cardTitle}>{text.name}</Text>
             {disabled && <Text style={styles.badge}>{t("common.comingSoon")}</Text>}
+            {downloaded && (
+              <View style={styles.completedBadge} aria-label={t("offline.badge")}>
+                <Ionicons name="cloud-done" size={19} color={colors.primary} />
+              </View>
+            )}
             {completed && (
               <View style={styles.completedBadge} aria-label={t("tours.completed")}>
                 <Ionicons name="checkmark-circle" size={20} color={colors.success} />

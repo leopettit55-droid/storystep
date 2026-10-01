@@ -18,7 +18,10 @@ import { DEFAULT_GUIDE, guideSvg } from "../guides/guides";
 import type { TourMapProps } from "./TourMap";
 
 // Same worker setup as the Explore map (see ExploreMapScreen.web.tsx).
-setWorkerUrl("https://unpkg.com/maplibre-gl@6.4.1/dist/maplibre-gl-worker.mjs");
+// The live site serves the map engine itself (copied in by
+// scripts/build-tour-pages.ts), so it's saved with downloaded tours and works
+// offline; the dev server uses the CDN copy of the same version.
+setWorkerUrl(__DEV__ ? "https://unpkg.com/maplibre-gl@6.4.1/dist/maplibre-gl-worker.mjs" : "/vendor/maplibre/maplibre-gl-worker.mjs");
 
 // OpenFreeMap supplies the vector data (roads, water, parks, buildings) and
 // font glyphs as a plain TileJSON feed; the colours are all ours, in a bright

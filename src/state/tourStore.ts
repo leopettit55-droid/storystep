@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { getAreaById, type Area, type Coordinates, type Waypoint } from "../content";
 
@@ -30,6 +31,8 @@ interface TourState {
   setLastKnownLocation: (coords: Coordinates) => void;
   completeTour: () => void;
   reset: () => void;
+  /** Puts back the last position saved on this device, if nothing newer is known. */
+  restoreLastLocation: () => Promise<void>;
 }
 
 const initialState = {
@@ -41,12 +44,26 @@ const initialState = {
   lastKnownLocation: null as Coordinates | null,
 };
 
+/** The last GPS position, kept between visits for offline use. */
+const LAST_LOCATION_KEY = "storystep.lastLocation";
+const SAVE_LOCATION_EVERY_MS = 15_000;
+let lastLocationSave = 0;
+
+function saveLastLocation(coords: Coordinates) {
+  const now = Date.now();
+  if (now - lastLocationSave < SAVE_LOCATION_EVERY_MS) return;
+  lastLocationSave = now;
+  void AsyncStorage.setItem(LAST_LOCATION_KEY, JSON.stringify({ ...coords, at: now })).catch(() => {});
+}
+
 export const useTourStore = create<TourState>((set, get) => ({
   ...initialState,
 
   selectArea: (areaId) => {
     const area = getAreaById(areaId) ?? null;
-    set({ ...initialState, area });
+    // Where the phone is doesn't depend on the tour, so keep it: with no
+    // signal it's the best guess at the distance to the start.
+    set({ ...initialState, area, lastKnownLocation: get().lastKnownLocation });
   },
 
   beginNavigationToStart: () => {
@@ -119,11 +136,26 @@ export const useTourStore = create<TourState>((set, get) => ({
 
   setOffRoute: (offRoute) => set({ isOffRoute: offRoute }),
 
-  setLastKnownLocation: (coords) => set({ lastKnownLocation: coords }),
+  setLastKnownLocation: (coords) => {
+    set({ lastKnownLocation: coords });
+    saveLastLocation(coords);
+  },
 
   completeTour: () => set({ status: "complete" }),
 
   reset: () => set({ ...initialState }),
+
+  restoreLastLocation: async () => {
+    if (get().lastKnownLocation) return;
+    try {
+      const saved = JSON.parse((await AsyncStorage.getItem(LAST_LOCATION_KEY)) ?? "null");
+      if (saved && typeof saved.lat === "number" && typeof saved.lng === "number" && !get().lastKnownLocation) {
+        set({ lastKnownLocation: { lat: saved.lat, lng: saved.lng } });
+      }
+    } catch {
+      // Nothing saved yet.
+    }
+  },
 }));
 
 export function selectCurrentWaypoint(state: TourState): Waypoint | null {
