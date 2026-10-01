@@ -39,6 +39,7 @@
     "@types/node": "^26.6.3",
     "@types/react": "~19.2.2",
     "@types/three": "^0.160.0",
+    "mpg123-decoder": "^1.0.3",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3"
   },

@@ -70,6 +70,7 @@ const hi: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "पूरा हुआ",
     title: "टूर",
     subtitle: "एक इलाका चुनें। हेडफ़ोन लगाएँ, चलें, और इसे आपको रास्ता दिखाने दें।",
     moreCitiesTitle: "और शहर",
@@ -83,6 +84,15 @@ const hi: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "पासवर्ड में कम से कम 6 अक्षर रखें।",
+    errorAccountExists: "इस ईमेल से पहले से एक खाता है। ऊपर लॉग इन करें।",
+    errorLoginFillIn: "अपना ईमेल और पासवर्ड डालें।",
+    errorNoAccount: "इस डिवाइस पर इस ईमेल का कोई खाता नहीं है। नीचे नया बनाएँ।",
+    errorWrongPassword: "पासवर्ड मेल नहीं खाता। कृपया फिर से कोशिश करें।",
+    logInTitle: "लॉग इन करें",
+    logInBody: "फिर से स्वागत है। अपने बनाए खाते से लॉग इन करें।",
+    logInButton: "लॉग इन करें",
+    toursCompleted: "पूरे किए गए टूर: {{count}}",
     title: "खाता",
     darkMode: "डार्क मोड",
     unlimitedTours: "असीमित टूर",
@@ -112,6 +122,8 @@ const hi: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "पड़ाव {{number}} से जारी रखें",
+    startAgain: "फिर से शुरू करें",
     useScanner: "हमारा लैंडमार्क स्कैनर इस्तेमाल करें",
     scannerFree: "किसी इमारत की कहानी सुनने के लिए कैमरा उसकी ओर करें",
     getMeToStart: "मुझे शुरुआत तक ले चलें",
@@ -134,6 +146,21 @@ const hi: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "चलिए इसे फिर से सुनते हैं!",
+    guideLater: "यहाँ पहुँचकर हम यह कहानी सुनेंगे!",
+    backToMap: "नक्शा",
+    introSubtitle: "आपके गाइडेड टूर में स्वागत है",
+    introGreeting: "नमस्ते! {{area}} में आपका स्वागत है। मैं आपका टूर गाइड हूँ।",
+    introHeadphones: "इस टूर के लिए हेडफ़ोन इस्तेमाल करने की सलाह दी जाती है।",
+    startTour: "टूर शुरू करें",
+    distanceToStart: "आप शुरुआती बिंदु से लगभग {{distance}} मी दूर हैं",
+    directions: "रास्ता",
+    guideGreeting: "नमस्ते! मैं आपका गाइड हूँ। {{area}} में आपका स्वागत है!",
+    guideArrived: "हम {{stop}} पहुँच गए हैं!",
+    guideHeadTo: "चलिए {{stop}} चलते हैं!",
+    proceedSpoken: "अब पड़ाव {{number}}, {{stop}} की ओर चलिए। चलो चलें!",
+    nextStopLabel: "अगला: पड़ाव {{number}}",
+    distanceAway: "{{distance}} मी दूर",
     stopOf: "पड़ाव {{current}} / {{total}}",
     walkingToFirst: "पहले पड़ाव की ओर चल रहे हैं…",
     back: "पीछे",
@@ -230,6 +257,46 @@ const hi: PartialTranslationDict = {
     subscriptionActiveTitle: "सब्सक्रिप्शन सक्रिय है",
     weeklyActiveBody: "अगले 7 दिनों तक असीमित टूर।",
     monthlyActiveBody: "अगले 30 दिनों तक असीमित टूर।",
+  },
+
+  pageTitle: {
+    home: "StoryStep: लंदन, पेरिस और ऑक्सफ़ोर्ड के AI-वर्णित पैदल टूर",
+    tour: "{{tour}}: {{city}} का मुफ़्त ऑडियो पैदल टूर | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "प्यास लगी है?",
+    walk: "लगभग {{minutes}} मिनट पैदल",
+    nextDoor: "ठीक वहीं जहाँ आपने खत्म किया",
+    directions: "रास्ता",
+  },
+
+  share: {
+    button: "अपनी सैर साझा करें",
+    iWalked: "मैंने पैदल घूमा",
+    stops: "{{count}} पड़ाव",
+    distance: "{{km}} किमी",
+    tagline: "मुफ़्त ऑडियो पैदल टूर",
+    shareText: "मैंने StoryStep के साथ {{city}} में {{tour}} का पैदल टूर किया, एक मुफ़्त ऑडियो पैदल टूर।",
+    downloadedCopied: "तस्वीर सहेजी गई और लिंक कॉपी हो गया।",
+    downloaded: "तस्वीर सहेजी गई।",
+    copied: "लिंक कॉपी हो गया।",
+    failed: "साझा नहीं हो सका। कृपया फिर से कोशिश करें।",
+  },
+
+
+  guides: {
+    chooseTitle: "अपना गाइड चुनें",
+    previous: "पिछला गाइड",
+    next: "अगला गाइड",
+    scoutDescription: "StoryStep का अपना गाइड, सैर के लिए हमेशा तैयार",
+    pipDescription: "एक खुशमिज़ाज पेंगुइन जो कभी रास्ता नहीं भूलता",
+    hootDescription: "इतिहास से भरा एक समझदार बूढ़ा उल्लू",
+    gusDescription: "छतों से उतरा एक शरारती पत्थर का गार्गॉयल",
+    pipArrived: "डगमग डगमग… हम {{stop}} पहुँच गए!",
+    hootArrived: "बढ़िया! यह है {{stop}}।",
+    gusArrived: "अरे, {{stop}}! इन पुराने पत्थरों को मैं अच्छी तरह जानता हूँ।",
   },
 };
 

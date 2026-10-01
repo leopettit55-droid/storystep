@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Pressable, SafeAreaView, StyleSheet, Text } from "react-native";
+import { useLanguage } from "../i18n/LanguageContext";
 import type { RootStackParamList } from "../navigation/types";
 
 type Nav = NativeStackNavigationProp<RootStackParamList, "ARCamera">;
@@ -9,12 +10,13 @@ type Nav = NativeStackNavigationProp<RootStackParamList, "ARCamera">;
  * passthrough) is web-only for now — no native equivalent yet. */
 export default function ARCameraScreen() {
   const navigation = useNavigation<Nav>();
+  const { t } = useLanguage();
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>AR camera guide isn't available on this device yet.</Text>
-      <Text style={styles.body}>The narration keeps playing — head back to continue the tour.</Text>
+      <Text style={styles.title}>{t("arCamera.unavailableTitle")}</Text>
+      <Text style={styles.body}>{t("arCamera.unavailableBody")}</Text>
       <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.backButtonText}>Back to tour</Text>
+        <Text style={styles.backButtonText}>{t("arCamera.backToTour")}</Text>
       </Pressable>
     </SafeAreaView>
   );

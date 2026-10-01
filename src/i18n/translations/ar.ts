@@ -70,6 +70,7 @@ const ar: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "مكتملة",
     title: "الجولات",
     subtitle: "اختر حيًا. ضع سماعاتك، وامشِ، ودع التطبيق يرشدك.",
     moreCitiesTitle: "المزيد من المدن",
@@ -83,6 +84,15 @@ const ar: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "استخدم 6 أحرف على الأقل لكلمة المرور.",
+    errorAccountExists: "يوجد حساب بهذا البريد الإلكتروني بالفعل. سجّل الدخول في الأعلى.",
+    errorLoginFillIn: "أدخل بريدك الإلكتروني وكلمة المرور.",
+    errorNoAccount: "لا يوجد حساب بهذا البريد على هذا الجهاز. أنشئ حسابًا في الأسفل.",
+    errorWrongPassword: "كلمة المرور غير صحيحة. حاول مرة أخرى.",
+    logInTitle: "تسجيل الدخول",
+    logInBody: "مرحبًا بعودتك. سجّل الدخول بالحساب الذي أنشأته.",
+    logInButton: "تسجيل الدخول",
+    toursCompleted: "الجولات المكتملة: {{count}}",
     title: "الحساب",
     darkMode: "الوضع الداكن",
     unlimitedTours: "جولات غير محدودة",
@@ -112,6 +122,8 @@ const ar: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "المتابعة من المحطة {{number}}",
+    startAgain: "البدء من جديد",
     useScanner: "استخدم ماسح المعالم لدينا",
     scannerFree: "وجّه الكاميرا نحو مبنى لتسمع قصته",
     getMeToStart: "خذني إلى نقطة البداية",
@@ -134,6 +146,21 @@ const ar: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "لنستمع إلى هذه مرة أخرى!",
+    guideLater: "سنستمع إلى هذه القصة عندما نصل إلى هنا!",
+    backToMap: "الخريطة",
+    introSubtitle: "مرحبًا بك في جولتك المصحوبة بمرشد",
+    introGreeting: "مرحبًا! أهلًا بك في {{area}}. أنا مرشدك في هذه الجولة.",
+    introHeadphones: "ننصحك باستخدام سماعات الرأس في هذه الجولة.",
+    startTour: "ابدأ الجولة",
+    distanceToStart: "أنت على بُعد {{distance}} م تقريبًا من نقطة البداية",
+    directions: "الاتجاهات",
+    guideGreeting: "مرحبًا! أنا مرشدك. أهلًا بك في {{area}}!",
+    guideArrived: "لقد وصلنا إلى {{stop}}!",
+    guideHeadTo: "هيا بنا إلى {{stop}}!",
+    proceedSpoken: "والآن توجّه إلى المحطة {{number}}، {{stop}}. هيا بنا!",
+    nextStopLabel: "التالي: المحطة {{number}}",
+    distanceAway: "على بُعد {{distance}} م",
     stopOf: "المحطة {{current}} من {{total}}",
     walkingToFirst: "في الطريق إلى المحطة الأولى…",
     back: "السابق",
@@ -230,6 +257,46 @@ const ar: PartialTranslationDict = {
     subscriptionActiveTitle: "الاشتراك نشط",
     weeklyActiveBody: "جولات غير محدودة للأيام السبعة القادمة.",
     monthlyActiveBody: "جولات غير محدودة للثلاثين يومًا القادمة.",
+  },
+
+  pageTitle: {
+    home: "StoryStep: جولات سير بصوت راوٍ بالذكاء الاصطناعي في لندن وباريس وأكسفورد",
+    tour: "{{tour}}: جولة سير صوتية مجانية في {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "هل تشعر بالعطش؟",
+    walk: "نحو {{minutes}} دقيقة سيرًا",
+    nextDoor: "حيث انتهيت تمامًا",
+    directions: "الاتجاهات",
+  },
+
+  share: {
+    button: "شارك جولتك",
+    iWalked: "مشيت",
+    stops: "{{count}} محطات",
+    distance: "{{km}} كم",
+    tagline: "جولات سير صوتية مجانية",
+    shareText: "مشيت {{tour}} في {{city}} مع StoryStep، جولة سير صوتية مجانية.",
+    downloadedCopied: "حُفظت الصورة ونُسخ الرابط.",
+    downloaded: "حُفظت الصورة.",
+    copied: "نُسخ الرابط.",
+    failed: "تعذّرت المشاركة. حاول مرة أخرى.",
+  },
+
+
+  guides: {
+    chooseTitle: "اختر مرشدك",
+    previous: "المرشد السابق",
+    next: "المرشد التالي",
+    scoutDescription: "مرشد StoryStep الأصلي، مستعد دائمًا للمشي",
+    pipDescription: "بطريق مرح لا يضل طريقه أبدًا",
+    hootDescription: "بومة حكيمة عجوز رأسها مليء بالتاريخ",
+    gusDescription: "تمثال حجري شقي نزل من فوق الأسطح",
+    pipArrived: "خطوة خطوة… وصلنا إلى {{stop}}!",
+    hootArrived: "رائع! هذا {{stop}}.",
+    gusArrived: "آه، {{stop}}! أعرف هذه الحجارة القديمة جيدًا.",
   },
 };
 

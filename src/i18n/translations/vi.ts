@@ -70,6 +70,7 @@ const vi: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Đã hoàn thành",
     title: "Tour",
     subtitle: "Chọn một khu vực. Đeo tai nghe, đi bộ, và để ứng dụng dẫn đường cho bạn.",
     moreCitiesTitle: "Thêm thành phố",
@@ -83,6 +84,15 @@ const vi: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Mật khẩu cần ít nhất 6 ký tự.",
+    errorAccountExists: "Đã có tài khoản với email này. Hãy đăng nhập ở trên.",
+    errorLoginFillIn: "Nhập email và mật khẩu của bạn.",
+    errorNoAccount: "Không có tài khoản với email này trên thiết bị. Hãy tạo mới bên dưới.",
+    errorWrongPassword: "Mật khẩu không khớp. Vui lòng thử lại.",
+    logInTitle: "Đăng nhập",
+    logInBody: "Chào mừng trở lại. Đăng nhập bằng tài khoản bạn đã tạo.",
+    logInButton: "Đăng nhập",
+    toursCompleted: "Tour đã hoàn thành: {{count}}",
     title: "Tài khoản",
     darkMode: "Chế độ tối",
     unlimitedTours: "Tour không giới hạn",
@@ -112,6 +122,8 @@ const vi: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "Tiếp tục từ điểm dừng {{number}}",
+    startAgain: "Bắt đầu lại",
     useScanner: "Dùng trình quét địa danh của chúng tôi",
     scannerFree: "Hướng camera vào một tòa nhà để nghe câu chuyện của nó",
     getMeToStart: "Đưa tôi đến điểm bắt đầu",
@@ -134,6 +146,21 @@ const vi: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "Cùng nghe lại nhé!",
+    guideLater: "Mình sẽ nghe câu chuyện này khi đến đây!",
+    backToMap: "Bản đồ",
+    introSubtitle: "Chào mừng đến với chuyến tham quan có hướng dẫn",
+    introGreeting: "Xin chào! Chào mừng đến {{area}}. Mình là hướng dẫn viên của bạn.",
+    introHeadphones: "Bạn nên dùng tai nghe cho chuyến tham quan này.",
+    startTour: "Bắt đầu tham quan",
+    distanceToStart: "Bạn cách điểm xuất phát khoảng {{distance}} m",
+    directions: "Chỉ đường",
+    guideGreeting: "Xin chào! Mình là hướng dẫn viên của bạn. Chào mừng đến {{area}}!",
+    guideArrived: "Chúng ta đã đến {{stop}}!",
+    guideHeadTo: "Cùng đến {{stop}} nào!",
+    proceedSpoken: "Giờ hãy đi tiếp đến điểm dừng {{number}}, {{stop}}. Đi thôi!",
+    nextStopLabel: "Tiếp theo: điểm dừng {{number}}",
+    distanceAway: "cách {{distance}} m",
     stopOf: "Điểm dừng {{current}} / {{total}}",
     walkingToFirst: "Đang đi đến điểm dừng đầu tiên…",
     back: "Quay lại",
@@ -230,6 +257,46 @@ const vi: PartialTranslationDict = {
     subscriptionActiveTitle: "Gói đăng ký đang hoạt động",
     weeklyActiveBody: "Tour không giới hạn trong 7 ngày tới.",
     monthlyActiveBody: "Tour không giới hạn trong 30 ngày tới.",
+  },
+
+  pageTitle: {
+    home: "StoryStep: tour đi bộ có AI thuyết minh ở London, Paris và Oxford",
+    tour: "{{tour}}: tour đi bộ có thuyết minh miễn phí tại {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Khát rồi à?",
+    walk: "Khoảng {{minutes}} phút đi bộ",
+    nextDoor: "Ngay nơi bạn kết thúc",
+    directions: "Chỉ đường",
+  },
+
+  share: {
+    button: "Chia sẻ chuyến đi bộ",
+    iWalked: "Tôi đã đi",
+    stops: "{{count}} điểm dừng",
+    distance: "{{km}} km",
+    tagline: "Tour đi bộ có thuyết minh miễn phí",
+    shareText: "Tôi đã đi {{tour}} ở {{city}} cùng StoryStep, một tour đi bộ có thuyết minh miễn phí.",
+    downloadedCopied: "Đã lưu ảnh và sao chép liên kết.",
+    downloaded: "Đã lưu ảnh.",
+    copied: "Đã sao chép liên kết.",
+    failed: "Không chia sẻ được. Vui lòng thử lại.",
+  },
+
+
+  guides: {
+    chooseTitle: "Chọn hướng dẫn viên",
+    previous: "Hướng dẫn viên trước",
+    next: "Hướng dẫn viên tiếp theo",
+    scoutDescription: "Hướng dẫn viên gốc của StoryStep, luôn sẵn sàng dạo bước",
+    pipDescription: "Chú chim cánh cụt vui vẻ không bao giờ lạc đường",
+    hootDescription: "Cú già thông thái với cái đầu đầy lịch sử",
+    gusDescription: "Tượng đá gargoyle tinh nghịch từ mái nhà xuống",
+    pipArrived: "Lạch bạch, lạch bạch… ta đến {{stop}} rồi!",
+    hootArrived: "Tuyệt vời! Đây là {{stop}}.",
+    gusArrived: "Ồ, {{stop}}! Tôi biết rõ những hòn đá cổ này.",
   },
 };
 

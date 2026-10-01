@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useLanguage } from "../i18n/LanguageContext";
 
 interface Props {
   title: string;
@@ -26,6 +27,7 @@ export default function LandmarkResultCard({
   onPickAlternative,
   hint,
 }: Props) {
+  const { t } = useLanguage();
   return (
     <View style={styles.card}>
       <View style={styles.headerRow}>
@@ -33,13 +35,13 @@ export default function LandmarkResultCard({
           {title}
         </Text>
         {speaking && (
-          <Pressable style={styles.stopButton} onPress={onStop} hitSlop={8} accessibilityLabel="Stop speaking">
+          <Pressable style={styles.stopButton} onPress={onStop} hitSlop={8} accessibilityLabel={t("arCamera.stopSpeaking")}>
             <Ionicons name="stop" size={14} color="#fff" />
-            <Text style={styles.stopText}>Stop</Text>
+            <Text style={styles.stopText}>{t("arCamera.stop")}</Text>
           </Pressable>
         )}
       </View>
-      {speaking && <Text style={styles.speaking}>Speaking — your tour is paused and resumes afterwards</Text>}
+      {speaking && <Text style={styles.speaking}>{t("arCamera.speaking")}</Text>}
       {note && <Text style={styles.note}>{note}</Text>}
       <Text style={styles.body} numberOfLines={5}>
         {body}
@@ -47,7 +49,7 @@ export default function LandmarkResultCard({
       {hint && <Text style={styles.hint}>{hint}</Text>}
       {alternatives.length > 0 && (
         <View style={styles.altSection}>
-          <Text style={styles.altLabel}>Not right? Did you mean</Text>
+          <Text style={styles.altLabel}>{t("arCamera.didYouMean")}</Text>
           <View style={styles.altRow}>
             {alternatives.map((alt) => (
               <Pressable key={alt.id} style={styles.altChip} onPress={() => onPickAlternative(alt.id)}>

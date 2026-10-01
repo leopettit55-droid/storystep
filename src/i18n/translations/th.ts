@@ -70,6 +70,7 @@ const th: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "เสร็จแล้ว",
     title: "ทัวร์",
     subtitle: "เลือกย่านที่ต้องการ ใส่หูฟัง เดิน แล้วให้แอปพาคุณไป",
     moreCitiesTitle: "เมืองอื่นๆ",
@@ -83,6 +84,15 @@ const th: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
+    errorAccountExists: "มีบัญชีที่ใช้อีเมลนี้อยู่แล้ว เข้าสู่ระบบด้านบนแทน",
+    errorLoginFillIn: "กรอกอีเมลและรหัสผ่าน",
+    errorNoAccount: "ไม่มีบัญชีที่ใช้อีเมลนี้ในอุปกรณ์นี้ สร้างบัญชีใหม่ด้านล่าง",
+    errorWrongPassword: "รหัสผ่านไม่ตรงกัน ลองอีกครั้ง",
+    logInTitle: "เข้าสู่ระบบ",
+    logInBody: "ยินดีต้อนรับกลับ เข้าสู่ระบบด้วยบัญชีที่คุณสร้างไว้",
+    logInButton: "เข้าสู่ระบบ",
+    toursCompleted: "ทัวร์ที่ทำเสร็จ: {{count}}",
     title: "บัญชี",
     darkMode: "โหมดมืด",
     unlimitedTours: "ทัวร์ไม่จำกัด",
@@ -112,6 +122,8 @@ const th: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "ทำต่อจากจุดที่ {{number}}",
+    startAgain: "เริ่มใหม่",
     useScanner: "ใช้เครื่องสแกนสถานที่สำคัญของเรา",
     scannerFree: "หันกล้องไปที่อาคารเพื่อฟังเรื่องราวของมัน",
     getMeToStart: "พาฉันไปยังจุดเริ่มต้น",
@@ -134,6 +146,21 @@ const th: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "มาฟังเรื่องนี้อีกครั้งกัน!",
+    guideLater: "เราจะได้ฟังเรื่องนี้เมื่อมาถึงที่นี่!",
+    backToMap: "แผนที่",
+    introSubtitle: "ยินดีต้อนรับสู่ทัวร์พร้อมไกด์",
+    introGreeting: "สวัสดี! ยินดีต้อนรับสู่ {{area}} ฉันคือไกด์ของคุณ",
+    introHeadphones: "แนะนำให้ใช้หูฟังสำหรับทัวร์นี้",
+    startTour: "เริ่มทัวร์",
+    distanceToStart: "คุณอยู่ห่างจากจุดเริ่มต้นประมาณ {{distance}} ม.",
+    directions: "เส้นทาง",
+    guideGreeting: "สวัสดี! ฉันคือไกด์ของคุณ ยินดีต้อนรับสู่ {{area}}!",
+    guideArrived: "เรามาถึง {{stop}} แล้ว!",
+    guideHeadTo: "ไปที่ {{stop}} กันเลย!",
+    proceedSpoken: "ต่อไปไปที่จุดที่ {{number}} {{stop}} ไปกันเลย!",
+    nextStopLabel: "ถัดไป: จุดที่ {{number}}",
+    distanceAway: "อีก {{distance}} ม.",
     stopOf: "จุดแวะที่ {{current}} จาก {{total}}",
     walkingToFirst: "กำลังเดินไปยังจุดแวะแรก…",
     back: "ย้อนกลับ",
@@ -230,6 +257,46 @@ const th: PartialTranslationDict = {
     subscriptionActiveTitle: "การสมัครสมาชิกใช้งานอยู่",
     weeklyActiveBody: "ทัวร์ไม่จำกัดเป็นเวลา 7 วันข้างหน้า",
     monthlyActiveBody: "ทัวร์ไม่จำกัดเป็นเวลา 30 วันข้างหน้า",
+  },
+
+  pageTitle: {
+    home: "StoryStep: ทัวร์เดินเท้าบรรยายโดย AI ในลอนดอน ปารีส และออกซ์ฟอร์ด",
+    tour: "{{tour}}: ทัวร์เดินเท้าพร้อมเสียงบรรยายฟรีใน{{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "หิวน้ำไหม?",
+    walk: "เดินประมาณ {{minutes}} นาที",
+    nextDoor: "ตรงที่คุณเดินจบพอดี",
+    directions: "เส้นทาง",
+  },
+
+  share: {
+    button: "แชร์การเดินของคุณ",
+    iWalked: "ฉันเดิน",
+    stops: "{{count}} จุด",
+    distance: "{{km}} กม.",
+    tagline: "ทัวร์เดินเท้าพร้อมเสียงบรรยายฟรี",
+    shareText: "ฉันเดิน {{tour}} ใน{{city}} กับ StoryStep ทัวร์เดินเท้าพร้อมเสียงบรรยายฟรี",
+    downloadedCopied: "บันทึกรูปแล้ว และคัดลอกลิงก์แล้ว",
+    downloaded: "บันทึกรูปแล้ว",
+    copied: "คัดลอกลิงก์แล้ว",
+    failed: "แชร์ไม่สำเร็จ ลองอีกครั้ง",
+  },
+
+
+  guides: {
+    chooseTitle: "เลือกไกด์ของคุณ",
+    previous: "ไกด์ก่อนหน้า",
+    next: "ไกด์ถัดไป",
+    scoutDescription: "ไกด์ต้นฉบับของ StoryStep พร้อมเดินเสมอ",
+    pipDescription: "เพนกวินร่าเริงที่ไม่เคยหลงทาง",
+    hootDescription: "นกฮูกแก่ผู้รอบรู้ หัวเต็มไปด้วยประวัติศาสตร์",
+    gusDescription: "การ์กอยล์หินจอมซนที่ลงมาจากหลังคา",
+    pipArrived: "เตาะแตะ เตาะแตะ… มาถึง {{stop}} แล้ว!",
+    hootArrived: "ยอดเยี่ยม! นี่คือ {{stop}}",
+    gusArrived: "โอ้ {{stop}}! ฉันรู้จักหินเก่าพวกนี้ดี",
   },
 };
 

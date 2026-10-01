@@ -167,7 +167,7 @@ export class ProximityTracker {
     // registry it's matched against is keyed by Expo's own separate id
     // counter. The two only coincide by chance for the very first watch
     // created anywhere on the page; every watch after that (e.g. this one,
-    // started after GetToStartScreen already created its own) gets its
+    // started after another screen already created its own) gets its
     // updates silently misrouted and the watch auto-torn-down on the very
     // first position event. Bypassing the wrapper and using the browser's
     // geolocation API directly sidesteps it entirely. Native platforms use

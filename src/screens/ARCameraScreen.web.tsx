@@ -15,6 +15,7 @@ import { notifyError, notifySuccess } from "../haptics";
 import { primeLandmarkAudio, stopLandmarkSpeech, useLandmarkSpeech } from "../landmark/landmarkSpeech";
 import { describeMatch, scanLandmark, speakMatch, type ScanOutcome } from "../landmark/scan";
 import type { LandmarkMatch } from "../landmark/recognize";
+import { useLanguage } from "../i18n/LanguageContext";
 import type { RootStackParamList } from "../navigation/types";
 import { selectCurrentWaypoint, useTourStore } from "../state/tourStore";
 import { useTheme } from "../ThemeContext";
@@ -138,6 +139,10 @@ type RouteProp = { params: RootStackParamList["ARCamera"] };
  * resumes the tour afterwards. */
 export default function ARCameraScreen() {
   const navigation = useNavigation<Nav>();
+  const { t } = useLanguage();
+  // The guide's HUD loop is set up once; it reads the latest t through this.
+  const tRef = useRef(t);
+  tRef.current = t;
   const { params } = useRoute() as unknown as RouteProp;
   const mode = params?.mode ?? "tour";
   const { colors } = useTheme();
@@ -194,7 +199,7 @@ export default function ARCameraScreen() {
       if (nav.canShare?.({ files: [file] }) && nav.share) {
         await nav.share({ files: [file], title: "StoryStep" });
         notifySuccess();
-        showPhotoMessage("Choose “Save Image” to add it to your camera roll.");
+        showPhotoMessage(t("arCamera.photoSaveHint"));
       } else {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -205,13 +210,13 @@ export default function ARCameraScreen() {
         link.remove();
         URL.revokeObjectURL(url);
         notifySuccess();
-        showPhotoMessage("Photo downloaded.");
+        showPhotoMessage(t("arCamera.photoDownloaded"));
       }
     } catch (err) {
       if ((err as any)?.name === "AbortError") return; // user dismissed the share sheet
       console.warn("[ARCameraScreen] photo capture failed:", err);
       notifyError();
-      showPhotoMessage("Couldn't save the photo.");
+      showPhotoMessage(t("arCamera.photoFailed"));
     } finally {
       setCapturing(false);
     }
@@ -248,7 +253,8 @@ export default function ARCameraScreen() {
       else notifyError();
     } catch (e) {
       notifyError();
-      setScanError(e instanceof Error ? e.message : "Couldn't identify this landmark.");
+      console.warn("[ARCameraScreen] scan failed:", e);
+      setScanError(t("arCamera.scanFailed"));
     } finally {
       setScanning(false);
     }
@@ -629,7 +635,7 @@ export default function ARCameraScreen() {
           if (!userCoords) {
             cachedWalkBearing = null;
             targetAhead = null;
-            setHud({ distanceText: "Getting your location…", turnText: null, turnAngle: 0 });
+            setHud({ distanceText: tRef.current("arCamera.gettingLocation"), turnText: null, turnAngle: 0 });
             return;
           }
 
@@ -671,19 +677,22 @@ export default function ARCameraScreen() {
           if (offPath) {
             // Further from the route than GPS error explains: lead them back
             // to it first, rather than calling turns on a path they're not on.
-            turnText = abs < 18 ? "Back to the route" : rel > 0 ? "Turn right to rejoin" : "Turn left to rejoin";
+            turnText = tRef.current(abs < 18 ? "arCamera.backToRoute" : rel > 0 ? "arCamera.turnRightRejoin" : "arCamera.turnLeftRejoin");
             turnAngle = abs < 18 ? 0 : Math.min(abs, 90) * Math.sign(rel);
           } else if (turn && turn.distanceMeters <= 15) {
-            const dir = turn.turnAngleDeg > 0 ? "right" : "left";
-            turnText = turn.distanceMeters <= 4 ? `Turn ${dir} now` : `Turn ${dir} in ${Math.round(turn.distanceMeters)}m`;
+            const right = turn.turnAngleDeg > 0;
+            turnText =
+              turn.distanceMeters <= 4
+                ? tRef.current(right ? "arCamera.turnRightNow" : "arCamera.turnLeftNow")
+                : tRef.current(right ? "arCamera.turnRightIn" : "arCamera.turnLeftIn", { distance: Math.round(turn.distanceMeters) });
             turnAngle = Math.sign(turn.turnAngleDeg) * 60;
           } else {
-            turnText = abs < 18 ? "Straight ahead" : rel > 0 ? "Turn right" : "Turn left";
+            turnText = tRef.current(abs < 18 ? "arCamera.straightAhead" : rel > 0 ? "arCamera.turnRight" : "arCamera.turnLeft");
             turnAngle = abs < 18 ? 0 : Math.min(abs, 90) * Math.sign(rel);
           }
 
           setHud({
-            distanceText: `${Math.round(distance)}m to ${target.name}`,
+            distanceText: tRef.current("arCamera.distanceTo", { distance: Math.round(distance), stop: target.name }),
             turnText,
             turnAngle,
           });
@@ -695,8 +704,8 @@ export default function ARCameraScreen() {
         const denied = message.includes("denied") || (err as any)?.name === "NotAllowedError";
         setErrorText(
           denied
-            ? "Camera access was denied — you can still follow the narration without the camera view."
-            : "Couldn't open the camera on this device."
+            ? tRef.current("arCamera.cameraDenied")
+            : tRef.current("arCamera.cameraFailed")
         );
       }
     })();
@@ -711,11 +720,11 @@ export default function ARCameraScreen() {
   const rec = outcome?.recognition;
   const hint = outcome
     ? outcome.visionError
-      ? "Couldn't read the picture, so this is based on where you're standing."
+      ? t("arCamera.hintVisionError")
       : !rec?.usedPosition
-        ? "No GPS fix yet — with location on, this gets more accurate."
+        ? t("arCamera.hintNoGps")
         : rec?.best && rec.best.score < 0.45
-          ? "Best guess — try standing a little closer and centring it."
+          ? t("arCamera.hintBestGuess")
           : undefined
     : undefined;
 
@@ -799,7 +808,7 @@ export default function ARCameraScreen() {
               ) : (
                 <>
                   <Ionicons name="camera" size={16} color="#fff" />
-                  <Text style={styles.scanButtonText}>Scan landmark</Text>
+                  <Text style={styles.scanButtonText}>{t("arCamera.scanLandmark")}</Text>
                 </>
               )}
             </PressScale>
@@ -820,7 +829,7 @@ export default function ARCameraScreen() {
         <View style={styles.errorOverlay}>
           <Text style={styles.errorTitle}>{errorText}</Text>
           <Pressable style={styles.errorBackButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.errorBackButtonText}>Back</Text>
+            <Text style={styles.errorBackButtonText}>{t("arCamera.back")}</Text>
           </Pressable>
         </View>
       )}

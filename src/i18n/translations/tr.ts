@@ -70,6 +70,7 @@ const tr: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Tamamlandı",
     title: "Turlar",
     subtitle: "Bir semt seçin. Kulaklığı takın, yürüyün ve size rehberlik etsin.",
     moreCitiesTitle: "Daha fazla şehir",
@@ -83,6 +84,15 @@ const tr: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Şifren en az 6 karakter olmalı.",
+    errorAccountExists: "Bu e-postayla zaten bir hesap var. Yukarıdan giriş yap.",
+    errorLoginFillIn: "E-postanı ve şifreni gir.",
+    errorNoAccount: "Bu cihazda bu e-postayla bir hesap yok. Aşağıdan bir tane oluştur.",
+    errorWrongPassword: "Şifre eşleşmiyor. Lütfen tekrar dene.",
+    logInTitle: "Giriş yap",
+    logInBody: "Tekrar hoş geldin. Oluşturduğun hesapla giriş yap.",
+    logInButton: "Giriş yap",
+    toursCompleted: "Tamamlanan turlar: {{count}}",
     title: "Hesap",
     darkMode: "Karanlık mod",
     unlimitedTours: "Sınırsız tur",
@@ -112,6 +122,8 @@ const tr: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "{{number}}. duraktan devam et",
+    startAgain: "Baştan başla",
     useScanner: "Yapı tarayıcımızı kullan",
     scannerFree: "Hikâyesini dinlemek için kamerayı bir binaya doğrultun",
     getMeToStart: "Beni başlangıca götür",
@@ -134,6 +146,21 @@ const tr: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "Bunu bir daha dinleyelim!",
+    guideLater: "Bu hikâyeyi buraya gelince dinleyeceğiz!",
+    backToMap: "Harita",
+    introSubtitle: "Rehberli turuna hoş geldin",
+    introGreeting: "Merhaba! {{area}}'e hoş geldin. Ben tur rehberinim.",
+    introHeadphones: "Bu tur için kulaklık kullanmanı öneririz.",
+    startTour: "Turu başlat",
+    distanceToStart: "Başlangıç noktasına yaklaşık {{distance}} m uzaktasın",
+    directions: "Yol tarifi",
+    guideGreeting: "Merhaba! Ben rehberinim. {{area}}'e hoş geldin!",
+    guideArrived: "{{stop}} noktasına vardık!",
+    guideHeadTo: "Haydi {{stop}} noktasına!",
+    proceedSpoken: "Şimdi {{number}}. durağa, {{stop}} noktasına ilerle. Haydi!",
+    nextStopLabel: "Sıradaki: {{number}}. durak",
+    distanceAway: "{{distance}} m uzakta",
     stopOf: "Durak {{current}} / {{total}}",
     walkingToFirst: "İlk durağa doğru yürünüyor…",
     back: "Geri",
@@ -230,6 +257,46 @@ const tr: PartialTranslationDict = {
     subscriptionActiveTitle: "Abonelik aktif",
     weeklyActiveBody: "Önümüzdeki 7 gün boyunca sınırsız tur.",
     monthlyActiveBody: "Önümüzdeki 30 gün boyunca sınırsız tur.",
+  },
+
+  pageTitle: {
+    home: "StoryStep: Londra, Paris ve Oxford'da yapay zekâ anlatımlı yürüyüş turları",
+    tour: "{{tour}}: {{city}} ücretsiz sesli yürüyüş turu | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Susadın mı?",
+    walk: "Yaklaşık {{minutes}} dk yürüme",
+    nextDoor: "Tam bitirdiğin yerde",
+    directions: "Yol tarifi",
+  },
+
+  share: {
+    button: "Yürüyüşünü paylaş",
+    iWalked: "Yürüdüm",
+    stops: "{{count}} durak",
+    distance: "{{km}} km",
+    tagline: "Ücretsiz sesli yürüyüş turları",
+    shareText: "StoryStep ile {{city}} şehrinde {{tour}} turunu yürüdüm; ücretsiz bir sesli yürüyüş turu.",
+    downloadedCopied: "Görsel kaydedildi ve bağlantı kopyalandı.",
+    downloaded: "Görsel kaydedildi.",
+    copied: "Bağlantı kopyalandı.",
+    failed: "Paylaşılamadı. Lütfen tekrar dene.",
+  },
+
+
+  guides: {
+    chooseTitle: "Rehberini seç",
+    previous: "Önceki rehber",
+    next: "Sonraki rehber",
+    scoutDescription: "StoryStep'in orijinali, yürüyüşe her zaman hazır",
+    pipDescription: "Asla kaybolmayan neşeli bir penguen",
+    hootDescription: "Tarih dolu, bilge yaşlı bir baykuş",
+    gusDescription: "Çatılardan inmiş yaramaz bir taş gargoyl",
+    pipArrived: "Paytak paytak… {{stop}} noktasındayız!",
+    hootArrived: "Harika! Burası {{stop}}.",
+    gusArrived: "Oo, {{stop}}! Bu eski taşları iyi bilirim.",
   },
 };
 

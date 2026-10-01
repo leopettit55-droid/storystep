@@ -70,6 +70,7 @@ const it: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Completato",
     title: "Tour",
     subtitle: "Scegli un quartiere. Metti le cuffie, cammina e lasciati guidare.",
     moreCitiesTitle: "Altre città",
@@ -83,6 +84,15 @@ const it: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Usa almeno 6 caratteri per la password.",
+    errorAccountExists: "Esiste già un account con questa email. Accedi qui sopra.",
+    errorLoginFillIn: "Inserisci email e password.",
+    errorNoAccount: "Nessun account con questa email su questo dispositivo. Creane uno qui sotto.",
+    errorWrongPassword: "La password non corrisponde. Riprova.",
+    logInTitle: "Accedi",
+    logInBody: "Bentornato. Accedi con l'account che hai creato.",
+    logInButton: "Accedi",
+    toursCompleted: "Tour completati: {{count}}",
     title: "Account",
     darkMode: "Modalità scura",
     unlimitedTours: "Tour illimitati",
@@ -112,6 +122,8 @@ const it: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "Continua dalla tappa {{number}}",
+    startAgain: "Ricomincia",
     useScanner: "Usa il nostro scanner di monumenti",
     scannerFree: "Inquadra un edificio con la fotocamera per ascoltarne la storia",
     getMeToStart: "Portami alla partenza",
@@ -134,6 +146,21 @@ const it: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "Riascoltiamola!",
+    guideLater: "Sentiremo questa storia quando arriveremo qui!",
+    backToMap: "Mappa",
+    introSubtitle: "Benvenuto nella tua visita guidata",
+    introGreeting: "Ciao! Benvenuto a {{area}}. Sono la tua guida.",
+    introHeadphones: "Ti consigliamo di usare le cuffie per questa visita.",
+    startTour: "Inizia la visita",
+    distanceToStart: "Sei a circa {{distance}} m dalla partenza",
+    directions: "Indicazioni",
+    guideGreeting: "Ciao! Sono la tua guida. Benvenuto a {{area}}!",
+    guideArrived: "Siamo arrivati a {{stop}}!",
+    guideHeadTo: "Andiamo a {{stop}}!",
+    proceedSpoken: "Ora prosegui verso la tappa {{number}}, {{stop}}. Andiamo!",
+    nextStopLabel: "Prossima: tappa {{number}}",
+    distanceAway: "a {{distance}} m",
     stopOf: "Tappa {{current}} di {{total}}",
     walkingToFirst: "In cammino verso la prima tappa…",
     back: "Indietro",
@@ -230,6 +257,46 @@ const it: PartialTranslationDict = {
     subscriptionActiveTitle: "Abbonamento attivo",
     weeklyActiveBody: "Tour illimitati per i prossimi 7 giorni.",
     monthlyActiveBody: "Tour illimitati per i prossimi 30 giorni.",
+  },
+
+  pageTitle: {
+    home: "StoryStep: tour a piedi narrati dall'IA a Londra, Parigi e Oxford",
+    tour: "{{tour}}: tour audio a piedi gratuito di {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Hai sete?",
+    walk: "Circa {{minutes}} min a piedi",
+    nextDoor: "Proprio dove hai finito",
+    directions: "Indicazioni",
+  },
+
+  share: {
+    button: "Condividi la tua passeggiata",
+    iWalked: "Ho percorso",
+    stops: "{{count}} tappe",
+    distance: "{{km}} km",
+    tagline: "Tour audio a piedi gratuiti",
+    shareText: "Ho percorso {{tour}} a {{city}} con StoryStep, un tour audio a piedi gratuito.",
+    downloadedCopied: "Immagine salvata e link copiato.",
+    downloaded: "Immagine salvata.",
+    copied: "Link copiato.",
+    failed: "Impossibile condividere. Riprova.",
+  },
+
+
+  guides: {
+    chooseTitle: "Scegli la tua guida",
+    previous: "Guida precedente",
+    next: "Guida successiva",
+    scoutDescription: "L'originale di StoryStep, sempre pronto a camminare",
+    pipDescription: "Un pinguino allegro che non si perde mai",
+    hootDescription: "Un vecchio gufo saggio con la testa piena di storia",
+    gusDescription: "Un gargoyle di pietra birichino sceso dai tetti",
+    pipArrived: "Dondola, dondola… siamo a {{stop}}!",
+    hootArrived: "Splendido! Questo è {{stop}}.",
+    gusArrived: "Oh, {{stop}}! Conosco bene queste vecchie pietre.",
   },
 };
 

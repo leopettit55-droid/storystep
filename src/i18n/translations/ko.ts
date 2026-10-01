@@ -70,6 +70,7 @@ const ko: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "완료",
     title: "투어",
     subtitle: "동네를 선택하고, 헤드폰을 끼고 걸으며 안내를 따라가세요.",
     moreCitiesTitle: "더 많은 도시",
@@ -83,6 +84,15 @@ const ko: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "비밀번호는 6자 이상으로 해 주세요.",
+    errorAccountExists: "이 이메일로 된 계정이 이미 있어요. 위에서 로그인하세요.",
+    errorLoginFillIn: "이메일과 비밀번호를 입력하세요.",
+    errorNoAccount: "이 기기에는 이 이메일로 된 계정이 없어요. 아래에서 만드세요.",
+    errorWrongPassword: "비밀번호가 맞지 않아요. 다시 시도해 주세요.",
+    logInTitle: "로그인",
+    logInBody: "다시 오신 걸 환영해요. 만든 계정으로 로그인하세요.",
+    logInButton: "로그인",
+    toursCompleted: "완료한 투어: {{count}}",
     title: "계정",
     darkMode: "다크 모드",
     unlimitedTours: "투어 무제한 이용",
@@ -112,6 +122,8 @@ const ko: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "{{number}}번 정류장부터 계속하기",
+    startAgain: "처음부터 다시",
     useScanner: "랜드마크 스캐너 사용하기",
     scannerFree: "카메라를 건물에 비추면 그 이야기를 들을 수 있어요",
     getMeToStart: "출발 지점으로 안내",
@@ -134,6 +146,21 @@ const ko: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "이 이야기를 다시 들어 봐요!",
+    guideLater: "여기에 도착하면 이 이야기를 들을 거예요!",
+    backToMap: "지도",
+    introSubtitle: "가이드 투어에 오신 것을 환영해요",
+    introGreeting: "안녕하세요! {{area}}에 오신 걸 환영해요. 저는 투어 가이드예요.",
+    introHeadphones: "이 투어에는 헤드폰 사용을 권장해요.",
+    startTour: "투어 시작",
+    distanceToStart: "출발 지점까지 약 {{distance}}m",
+    directions: "길찾기",
+    guideGreeting: "안녕하세요! 저는 여러분의 가이드예요. {{area}}에 오신 걸 환영해요!",
+    guideArrived: "{{stop}}에 도착했어요!",
+    guideHeadTo: "{{stop}}(으)로 가요!",
+    proceedSpoken: "이제 {{number}}번 정류장, {{stop}}(으)로 이동하세요. 출발!",
+    nextStopLabel: "다음: {{number}}번 정류장",
+    distanceAway: "{{distance}}m 남음",
     stopOf: "{{total}}개 중 {{current}}번째 정류장",
     walkingToFirst: "첫 번째 정류장으로 이동 중…",
     back: "이전",
@@ -230,6 +257,46 @@ const ko: PartialTranslationDict = {
     subscriptionActiveTitle: "구독 활성화됨",
     weeklyActiveBody: "앞으로 7일간 투어를 무제한으로 이용할 수 있습니다.",
     monthlyActiveBody: "앞으로 30일간 투어를 무제한으로 이용할 수 있습니다.",
+  },
+
+  pageTitle: {
+    home: "StoryStep: AI가 들려주는 런던·파리·옥스퍼드 도보 투어",
+    tour: "{{tour}}: {{city}} 무료 오디오 도보 투어 | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "목마르세요?",
+    walk: "도보 약 {{minutes}}분",
+    nextDoor: "투어를 마친 바로 그곳",
+    directions: "길찾기",
+  },
+
+  share: {
+    button: "산책 공유하기",
+    iWalked: "걸었어요",
+    stops: "정류장 {{count}}곳",
+    distance: "{{km}} km",
+    tagline: "무료 오디오 도보 투어",
+    shareText: "StoryStep으로 {{city}}의 {{tour}}을(를) 걸었어요. 무료 오디오 도보 투어예요.",
+    downloadedCopied: "이미지를 저장하고 링크를 복사했어요.",
+    downloaded: "이미지를 저장했어요.",
+    copied: "링크를 복사했어요.",
+    failed: "공유하지 못했어요. 다시 시도해 주세요.",
+  },
+
+
+  guides: {
+    chooseTitle: "가이드를 골라요",
+    previous: "이전 가이드",
+    next: "다음 가이드",
+    scoutDescription: "언제나 산책 준비가 된 StoryStep 오리지널",
+    pipDescription: "절대 길을 잃지 않는 명랑한 펭귄",
+    hootDescription: "역사로 가득한 지혜로운 늙은 부엉이",
+    gusDescription: "지붕에서 내려온 장난꾸러기 돌 가고일",
+    pipArrived: "뒤뚱뒤뚱… {{stop}}에 도착했어요!",
+    hootArrived: "훌륭해요! 여기가 {{stop}}이에요.",
+    gusArrived: "오, {{stop}}! 이 오래된 돌들은 내가 잘 알지.",
   },
 };
 

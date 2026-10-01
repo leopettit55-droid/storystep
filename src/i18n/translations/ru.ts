@@ -70,6 +70,7 @@ const ru: PartialTranslationDict = {
   },
 
   tours: {
+    completed: "Пройдено",
     title: "Туры",
     subtitle: "Выберите район. Наденьте наушники, идите — и следуйте за подсказками.",
     moreCitiesTitle: "Другие города",
@@ -83,6 +84,15 @@ const ru: PartialTranslationDict = {
   },
 
   account: {
+    errorPasswordTooShort: "Пароль должен содержать не менее 6 символов.",
+    errorAccountExists: "Аккаунт с этим адресом уже есть. Войдите выше.",
+    errorLoginFillIn: "Введите e-mail и пароль.",
+    errorNoAccount: "На этом устройстве нет аккаунта с этим адресом. Создайте его ниже.",
+    errorWrongPassword: "Пароль не подходит. Попробуйте ещё раз.",
+    logInTitle: "Войти",
+    logInBody: "С возвращением! Войдите в созданный аккаунт.",
+    logInButton: "Войти",
+    toursCompleted: "Пройдено экскурсий: {{count}}",
     title: "Аккаунт",
     darkMode: "Тёмная тема",
     unlimitedTours: "Безлимитные туры",
@@ -112,6 +122,8 @@ const ru: PartialTranslationDict = {
   },
 
   tourPreview: {
+    continueFromStop: "Продолжить с остановки {{number}}",
+    startAgain: "Начать заново",
     useScanner: "Использовать наш сканер достопримечательностей",
     scannerFree: "Наведите камеру на здание, чтобы услышать его историю",
     getMeToStart: "Проводить к старту",
@@ -134,6 +146,21 @@ const ru: PartialTranslationDict = {
   },
 
   activeTour: {
+    guideReplay: "Давай послушаем ещё раз!",
+    guideLater: "Эту историю мы услышим, когда придём сюда!",
+    backToMap: "Карта",
+    introSubtitle: "Добро пожаловать на экскурсию",
+    introGreeting: "Привет! Добро пожаловать в {{area}}. Я твой гид.",
+    introHeadphones: "Для этой экскурсии рекомендуем наушники.",
+    startTour: "Начать экскурсию",
+    distanceToStart: "До старта около {{distance}} м",
+    directions: "Маршрут",
+    guideGreeting: "Привет! Я твой гид. Добро пожаловать в {{area}}!",
+    guideArrived: "Мы пришли: {{stop}}!",
+    guideHeadTo: "Идём к {{stop}}!",
+    proceedSpoken: "Теперь направляйся к остановке {{number}}, {{stop}}. Вперёд!",
+    nextStopLabel: "Далее: остановка {{number}}",
+    distanceAway: "{{distance}} м",
     stopOf: "Остановка {{current}} из {{total}}",
     walkingToFirst: "Идём к первой остановке…",
     back: "Назад",
@@ -230,6 +257,46 @@ const ru: PartialTranslationDict = {
     subscriptionActiveTitle: "Подписка активна",
     weeklyActiveBody: "Безлимитные туры на ближайшие 7 дней.",
     monthlyActiveBody: "Безлимитные туры на ближайшие 30 дней.",
+  },
+
+  pageTitle: {
+    home: "StoryStep: пешие экскурсии с ИИ-рассказчиком по Лондону, Парижу и Оксфорду",
+    tour: "{{tour}}: бесплатная аудиоэкскурсия по городу {{city}} | StoryStep",
+    section: "{{section}} | StoryStep",
+  },
+
+  pub: {
+    title: "Хочется пить?",
+    walk: "Около {{minutes}} мин пешком",
+    nextDoor: "Прямо там, где вы закончили",
+    directions: "Маршрут",
+  },
+
+  share: {
+    button: "Поделиться прогулкой",
+    iWalked: "Я прошёл",
+    stops: "Остановок: {{count}}",
+    distance: "{{km}} км",
+    tagline: "Бесплатные пешие аудиоэкскурсии",
+    shareText: "Я прошёл «{{tour}}» ({{city}}) со StoryStep — бесплатной пешей аудиоэкскурсией.",
+    downloadedCopied: "Изображение сохранено, ссылка скопирована.",
+    downloaded: "Изображение сохранено.",
+    copied: "Ссылка скопирована.",
+    failed: "Не удалось поделиться. Попробуйте ещё раз.",
+  },
+
+
+  guides: {
+    chooseTitle: "Выбери гида",
+    previous: "Предыдущий гид",
+    next: "Следующий гид",
+    scoutDescription: "Оригинальный гид StoryStep, всегда готов к прогулке",
+    pipDescription: "Весёлый пингвин, который никогда не теряется",
+    hootDescription: "Мудрая старая сова, полная истории",
+    gusDescription: "Озорная каменная горгулья прямо с крыш",
+    pipArrived: "Топ-топ… мы у {{stop}}!",
+    hootArrived: "Великолепно! Это {{stop}}.",
+    gusArrived: "О, {{stop}}! Эти старые камни я хорошо знаю.",
   },
 };
 

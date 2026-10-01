@@ -15,7 +15,6 @@ import { LanguageProvider, useLanguage } from "./src/i18n/LanguageContext";
 import { ThemeProvider, useTheme } from "./src/ThemeContext";
 import MainTabNavigator from "./src/navigation/MainTabNavigator";
 import TourPreviewScreen from "./src/screens/TourPreviewScreen";
-import GetToStartScreen from "./src/screens/GetToStartScreen";
 import ActiveTourScreen from "./src/screens/ActiveTourScreen";
 import CameraTourScreen from "./src/screens/CameraTourScreen";
 import ARCameraScreen from "./src/screens/ARCameraScreen";
@@ -135,7 +134,6 @@ function AppInner() {
         >
           <Stack.Screen name="MainTabs" component={MainTabNavigator} />
           <Stack.Screen name="TourPreview" component={TourPreviewScreen} />
-          <Stack.Screen name="GetToStart" component={GetToStartScreen} />
           <Stack.Screen name="ActiveTour" component={ActiveTourScreen} />
           <Stack.Screen
             name="CameraTour"

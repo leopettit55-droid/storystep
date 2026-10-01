@@ -18,6 +18,7 @@ import { clearTourProgress, loadTourProgress, type SavedProgress } from "../stat
 import { useTourStore } from "../state/tourStore";
 import { useTheme } from "../ThemeContext";
 import { CONTENT_MAX_WIDTH, type ThemeColors } from "../theme";
+import { unlockSpeech } from "../audio/speakPrompt";
 
 type Nav = NativeStackNavigationProp<RootStackParamList, "TourPreview">;
 type RouteProp = { params: { areaId: string } };
@@ -63,15 +64,16 @@ export default function TourPreviewScreen() {
   const text = localizedAreaText(area.id, language, area);
   const scannerOnly = !!area.scannerOnly;
 
-  const handleGetToStart = () => {
+  const handleStartTour = () => {
     selectArea(area.id);
-    navigation.navigate("GetToStart", { areaId: area.id });
+    navigation.navigate("ActiveTour", { areaId: area.id });
   };
 
   // Straight back into the tour at the saved stop — no "Get to the start",
   // and stop 1 doesn't replay.
   const handleContinue = () => {
     if (!saved) return;
+    unlockSpeech();
     selectArea(area.id);
     useTourStore.getState().resumeAt(saved.currentIndex, saved.visitedIds);
     navigation.navigate("ActiveTour", { areaId: area.id, resume: true });
@@ -80,7 +82,7 @@ export default function TourPreviewScreen() {
   const handleStartAgain = () => {
     setSaved(null);
     void clearTourProgress(area.id);
-    handleGetToStart();
+    handleStartTour();
   };
 
   // Free for everyone, no purchase needed. On the web it opens the camera
@@ -198,8 +200,8 @@ export default function TourPreviewScreen() {
               </PressScale>
             </>
           ) : owned ? (
-            <PressScale style={styles.cta} scaleTo={0.96} onPress={handleGetToStart}>
-              <Text style={styles.ctaText}>{t("tourPreview.getMeToStart")}</Text>
+            <PressScale style={styles.cta} scaleTo={0.96} onPress={handleStartTour}>
+              <Text style={styles.ctaText}>{t("activeTour.startTour")}</Text>
             </PressScale>
           ) : (
             <PressScale style={styles.cta} scaleTo={0.96} onPress={handleBuy}>
