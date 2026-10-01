@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { useAccountStore, type AccountError } from "../account/accountStore";
+import DownloadedToursCard from "../components/DownloadedToursCard";
 import LanguagePicker from "../components/LanguagePicker";
 import PressScale from "../components/PressScale";
 import Skeleton from "../components/Skeleton";
@@ -166,10 +167,6 @@ export default function AccountScreen() {
               </PressScale>
             </View>
 
-            <View style={styles.card}>
-              <Text style={styles.rowTitle}>{t("account.downloadedTours")}</Text>
-              <Text style={styles.rowBody}>{t("account.downloadedToursBody")}</Text>
-            </View>
           </>
         ) : (
           <>
@@ -246,6 +243,8 @@ export default function AccountScreen() {
           </View>
           </>
         )}
+
+        <DownloadedToursCard />
 
         <View style={styles.card}>
           <Text style={styles.rowTitle}>{t("account.aboutTitle")}</Text>

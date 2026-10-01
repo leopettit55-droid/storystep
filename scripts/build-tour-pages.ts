@@ -147,6 +147,18 @@ function sitemap(tours: Area[]): string {
   ].join("\n");
 }
 
+/** Serves the map engine from the site itself (see TourMap.web.tsx), so it can
+ * be saved for offline tours. Copied from the installed package so the
+ * version always matches the map code in the bundle. */
+function copyMapWorker() {
+  const from = path.join(ROOT, "node_modules", "maplibre-gl", "dist");
+  const to = path.join(DIST, "vendor", "maplibre");
+  fs.mkdirSync(to, { recursive: true });
+  for (const file of ["maplibre-gl-worker.mjs", "maplibre-gl-shared.mjs"]) {
+    fs.copyFileSync(path.join(from, file), path.join(to, file));
+  }
+}
+
 function main() {
   const templatePath = path.join(DIST, "index.html");
   if (!fs.existsSync(templatePath)) {
@@ -162,6 +174,7 @@ function main() {
     fs.writeFileSync(path.join(dir, "index.html"), tourPage(template, area));
   }
   fs.writeFileSync(path.join(DIST, "sitemap.xml"), sitemap(tours));
+  copyMapWorker();
   console.log(`Wrote ${tours.length} tour pages and sitemap.xml (${tours.length + 2} URLs).`);
 }
 

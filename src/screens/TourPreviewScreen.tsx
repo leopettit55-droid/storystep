@@ -14,6 +14,10 @@ import { useLanguage } from "../i18n/LanguageContext";
 import type { RootStackParamList } from "../navigation/types";
 import { hasTourAccess } from "../purchases/entitlements";
 import { openTourCheckout, stripeIsConfigured } from "../purchases/stripeConfig";
+import OfflineTourCard from "../components/OfflineTourCard";
+import { useOnline } from "../offline/connectivity";
+import { useOfflineStore } from "../offline/offlineStore";
+import { isBundledTour, offlineDownloadsSupported } from "../offline/tourFiles";
 import { clearTourProgress, loadTourProgress, type SavedProgress } from "../state/tourProgress";
 import { useTourStore } from "../state/tourStore";
 import { useTheme } from "../ThemeContext";
@@ -31,6 +35,10 @@ export default function TourPreviewScreen() {
   const [owned, setOwned] = useState<boolean | null>(null);
   /** Unfinished progress on this device (under 7 days old), offered as "Continue". */
   const [saved, setSaved] = useState<SavedProgress | null>(null);
+  /** Set while "Download before you go?" is showing: what to do once answered. */
+  const [downloadOffer, setDownloadOffer] = useState<{ go: () => void } | null>(null);
+  const online = useOnline();
+  const offlineStatus = useOfflineStore((s) => (area ? s.tours[area.id]?.status : undefined));
   const { language, t } = useLanguage();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -63,6 +71,28 @@ export default function TourPreviewScreen() {
 
   const text = localizedAreaText(area.id, language, area);
   const scannerOnly = !!area.scannerOnly;
+
+  // Before walking off, offer to save a tour that isn't downloaded yet, so a
+  // lost signal on the way doesn't stop the narration. Only while online.
+  const offerDownloadFirst = (go: () => void) => () => {
+    const worthOffering =
+      offlineDownloadsSupported() && !isBundledTour(area) && offlineStatus !== "ready" && online;
+    if (worthOffering) setDownloadOffer({ go });
+    else go();
+  };
+
+  const handleDownloadThenStart = async () => {
+    const go = downloadOffer?.go;
+    setDownloadOffer(null);
+    await useOfflineStore.getState().download(area.id);
+    go?.();
+  };
+
+  const handleStartWithoutDownload = () => {
+    const go = downloadOffer?.go;
+    setDownloadOffer(null);
+    go?.();
+  };
 
   const handleStartTour = () => {
     selectArea(area.id);
@@ -185,12 +215,25 @@ export default function TourPreviewScreen() {
 
         {area.accessNote && <Text style={styles.accessNote}>{area.accessNote}</Text>}
 
-        {!scannerOnly &&
+        {!scannerOnly && downloadOffer ? (
+          <View style={styles.offer}>
+            <Text style={styles.offerTitle}>{t("offline.offerTitle")}</Text>
+            <Text style={styles.offerBody}>{t("offline.offerBody")}</Text>
+            <PressScale style={styles.cta} scaleTo={0.96} onPress={handleDownloadThenStart}>
+              <Text style={styles.ctaText}>{t("offline.offerDownload")}</Text>
+            </PressScale>
+            <PressScale style={styles.startAgain} scaleTo={0.96} onPress={handleStartWithoutDownload}>
+              <Text style={styles.startAgainText}>{t("offline.offerSkip")}</Text>
+            </PressScale>
+          </View>
+        ) : null}
+
+        {!scannerOnly && !downloadOffer &&
           (owned === null ? (
             <Skeleton style={[styles.cta, styles.ctaSkeleton]} borderRadius={14} />
           ) : owned && saved ? (
             <>
-              <PressScale style={styles.cta} scaleTo={0.96} onPress={handleContinue}>
+              <PressScale style={styles.cta} scaleTo={0.96} onPress={offerDownloadFirst(handleContinue)}>
                 <Text style={styles.ctaText}>
                   {t("tourPreview.continueFromStop", { number: saved.currentIndex + 1 })}
                 </Text>
@@ -200,7 +243,7 @@ export default function TourPreviewScreen() {
               </PressScale>
             </>
           ) : owned ? (
-            <PressScale style={styles.cta} scaleTo={0.96} onPress={handleStartTour}>
+            <PressScale style={styles.cta} scaleTo={0.96} onPress={offerDownloadFirst(handleStartTour)}>
               <Text style={styles.ctaText}>{t("activeTour.startTour")}</Text>
             </PressScale>
           ) : (
@@ -210,6 +253,8 @@ export default function TourPreviewScreen() {
               </Text>
             </PressScale>
           ))}
+
+        {!scannerOnly && <OfflineTourCard area={area} />}
 
         {area.freeLandmarkScanner && (
           <PressScale style={styles.scannerButton} scaleTo={0.96} onPress={handleOpenScanner}>
@@ -272,6 +317,15 @@ function createStyles(colors: ThemeColors) {
   },
   ctaText: { color: colors.onPrimary, fontSize: 16, fontWeight: "600" },
   ctaSkeleton: { height: 52 },
+  offer: {
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 14,
+    padding: 14,
+  },
+  offerTitle: { color: colors.text, fontSize: 16, fontWeight: "700" },
+  offerBody: { color: colors.textMid, fontSize: 13, lineHeight: 19, marginTop: 4 },
   startAgain: { marginTop: 8, paddingVertical: 10, alignItems: "center" },
   startAgainText: { color: colors.textMid, fontSize: 14, fontWeight: "600", textDecorationLine: "underline" },
   accessNote: {

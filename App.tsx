@@ -25,6 +25,10 @@ import ContactUsScreen from "./src/screens/ContactUsScreen";
 import type { RootStackParamList } from "./src/navigation/types";
 import { getAreaById } from "./src/content";
 import { useAccountStore } from "./src/account/accountStore";
+import { isOnline } from "./src/offline/connectivity";
+import { isTourOffline, useOfflineStore } from "./src/offline/offlineStore";
+import { saveAppShell } from "./src/offline/tourFiles";
+import { useTourStore } from "./src/state/tourStore";
 import { localizedAreaText } from "./src/i18n/areaTranslations";
 import { localizedCityName } from "./src/i18n/cityNames";
 import { notifySuccess } from "./src/haptics";
@@ -62,6 +66,19 @@ async function handlePurchaseReturn(t: (key: string, vars?: Record<string, strin
   );
 }
 
+/** Offline tours: the service worker (live web build only, so the dev server
+ * never serves stale files), the downloads list, and, when any tour is
+ * downloaded and there's a connection, a fresh saved copy of the app so an
+ * offline visit always opens the current version. */
+async function startOffline() {
+  if (Platform.OS === "web" && !__DEV__ && typeof navigator !== "undefined" && "serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js").catch((e) => console.warn("[offline] service worker:", e));
+  }
+  await useOfflineStore.getState().load();
+  const anyDownloaded = Object.values(useOfflineStore.getState().tours).some((t) => isTourOffline(t) && !t.bundled);
+  if (anyDownloaded && isOnline()) void saveAppShell();
+}
+
 type Translate = ReturnType<typeof useLanguage>["t"];
 
 const SECTION_TITLE_KEYS: Record<string, string> = {
@@ -93,6 +110,8 @@ function AppInner() {
   const { language, t } = useLanguage();
   useEffect(() => {
     void useAccountStore.getState().load();
+    void useTourStore.getState().restoreLastLocation();
+    void startOffline();
   }, []);
   const { colors, isDark } = useTheme();
   const navTheme = isDark ? NavDarkTheme : NavDefaultTheme;

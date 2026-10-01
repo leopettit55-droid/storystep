@@ -24,7 +24,10 @@ import type { ThemeColors } from "../theme";
 // Metro (the RN bundler) can't route MapLibre's dynamically-constructed
 // module-worker request, so point it at a CDN copy of the exact same
 // version's worker bundle instead of letting it resolve locally.
-setWorkerUrl("https://unpkg.com/maplibre-gl@6.4.1/dist/maplibre-gl-worker.mjs");
+// The live site serves the map engine itself (copied in by
+// scripts/build-tour-pages.ts), so it's saved with downloaded tours and works
+// offline; the dev server uses the CDN copy of the same version.
+setWorkerUrl(__DEV__ ? "https://unpkg.com/maplibre-gl@6.4.1/dist/maplibre-gl-worker.mjs" : "/vendor/maplibre/maplibre-gl-worker.mjs");
 
 // OpenFreeMap serves its vector data as one PMTiles archive rather than
 // individual {z}/{x}/{y} tile URLs, so MapLibre needs this protocol

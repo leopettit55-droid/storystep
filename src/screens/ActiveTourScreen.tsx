@@ -15,7 +15,12 @@ import {
   setNarrationEndedHandler,
   setupAudioPlayback,
   stopNarration,
+  subscribeNarrationErrors,
+  type NarrationProblem,
 } from "../audio/narrationPlayer";
+import { useOnline } from "../offline/connectivity";
+import { useOfflineStore } from "../offline/offlineStore";
+import { isBundledTour } from "../offline/tourFiles";
 import { speakPrompt, stopSpeaking, unlockSpeech } from "../audio/speakPrompt";
 import { getAreaById } from "../content";
 import {
@@ -71,6 +76,23 @@ export default function ActiveTourScreen() {
 
   const status = useTourStore((s) => s.status);
   const isOffRoute = useTourStore((s) => s.isOffRoute);
+  const online = useOnline();
+  const savedOffline = useOfflineStore((s) => (area ? s.tours[area.id]?.status === "ready" : false));
+  const worksOffline = !!area && (savedOffline || isBundledTour(area));
+  /** A stop whose narration couldn't play: shown briefly while the tour carries on. */
+  const [narrationIssue, setNarrationIssue] = useState<{ stop: string; problem: NarrationProblem } | null>(null);
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const unsubscribe = subscribeNarrationErrors((waypoint, problem) => {
+      setNarrationIssue({ stop: waypoint.name, problem });
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => setNarrationIssue(null), 7000);
+    });
+    return () => {
+      unsubscribe();
+      if (timer) clearTimeout(timer);
+    };
+  }, []);
   const currentWaypoint = useTourStore(selectCurrentWaypoint);
   const nextWaypoint = useTourStore(selectNextWaypoint);
   const progress = useTourStore(selectProgress);
@@ -509,11 +531,21 @@ export default function ActiveTourScreen() {
               <Text style={styles.hudLabel}>
                 {t("activeTour.stopOf", { current: currentWaypoint?.order ?? 0, total: area.route.length })}
               </Text>
+              <View style={styles.hudChips}>
+              <View
+                style={[styles.connectionChip, !online && styles.connectionChipOffline]}
+                role="status"
+                aria-label={t(online ? "offline.online" : "offline.offline")}
+              >
+                <View style={[styles.connectionDot, { backgroundColor: online ? colors.success : "#FFB020" }]} />
+                <Text style={styles.connectionText}>{t(online ? "offline.online" : "offline.offline")}</Text>
+              </View>
               {isDemoWalk() && (
                 <Text style={styles.demoChip}>
                   DEMO{demoSpeed() !== 1 ? ` ${demoSpeed()}×` : ""}
                 </Text>
               )}
+              </View>
             </View>
             <Text style={styles.hudName} numberOfLines={1}>
               {currentWaypoint?.name ?? t("activeTour.walkingToFirst")}
@@ -523,6 +555,22 @@ export default function ActiveTourScreen() {
             </View>
           </View>
         </View>
+
+        {!online && !worksOffline && (
+          <View style={styles.offRouteBanner}>
+            <Text style={styles.offRouteText}>{t("offline.notDownloadedBanner")}</Text>
+          </View>
+        )}
+
+        {narrationIssue && (
+          <View style={styles.offRouteBanner} role="alert">
+            <Text style={styles.offRouteText}>
+              {t(narrationIssue.problem === "offline" ? "offline.narrationOffline" : "offline.narrationBroken", {
+                stop: narrationIssue.stop,
+              })}
+            </Text>
+          </View>
+        )}
 
         {isOffRoute && (
           <View style={styles.offRouteBanner}>
@@ -638,6 +686,19 @@ function createStyles(colors: ThemeColors) {
   hudTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   hudLabel: { color: "#FFFFFF", fontSize: 13, opacity: 0.85 },
   hudName: { color: "#FFFFFF", fontSize: 18, fontWeight: "700" },
+  hudChips: { flexDirection: "row", alignItems: "center", gap: 6 },
+  connectionChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "rgba(255,255,255,0.18)",
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  connectionChipOffline: { backgroundColor: "rgba(255,176,32,0.25)" },
+  connectionDot: { width: 7, height: 7, borderRadius: 4 },
+  connectionText: { color: "#FFFFFF", fontSize: 10, fontWeight: "800", letterSpacing: 0.5 },
   demoChip: {
     color: "#FFFFFF",
     fontSize: 10,
