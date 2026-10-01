@@ -287,16 +287,17 @@ const sv: PartialTranslationDict = {
 
 
   guides: {
+    scoutArrived: "Välkommen! Låt mig visa dig något speciellt.",
     chooseTitle: "Välj din guide",
     previous: "Föregående guide",
     next: "Nästa guide",
     scoutDescription: "StoryStep-originalet, alltid redo för en promenad",
     pipDescription: "En glad pingvin som aldrig går vilse",
     hootDescription: "En klok gammal uggla full av historia",
-    gusDescription: "En busig stengargoyl nere från taken",
-    pipArrived: "Vagga, vagga… vi är vid {{stop}}!",
-    hootArrived: "Utmärkt! Det här är {{stop}}.",
-    gusArrived: "Oj, {{stop}}! De här gamla stenarna känner jag väl.",
+    ollieDescription: "En fräck ung äventyrare som kan varenda genväg",
+    pipArrived: "Så kul att vara här! Titta på det här stället!",
+    hootArrived: "Ah, en högst fascinerande plats, minsann.",
+    ollieArrived: "Så, här är vi! Den här kände du väl inte till?",
   },
 };
 

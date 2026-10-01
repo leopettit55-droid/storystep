@@ -287,16 +287,17 @@ const pl: PartialTranslationDict = {
 
 
   guides: {
+    scoutArrived: "Witaj! Pokażę ci coś wyjątkowego.",
     chooseTitle: "Wybierz przewodnika",
     previous: "Poprzedni przewodnik",
     next: "Następny przewodnik",
     scoutDescription: "Oryginał StoryStep, zawsze chętny na spacer",
     pipDescription: "Wesoły pingwin, który nigdy się nie gubi",
     hootDescription: "Mądra stara sowa z głową pełną historii",
-    gusDescription: "Psotny kamienny gargulec prosto z dachów",
-    pipArrived: "Kolebu, kolebu… jesteśmy przy {{stop}}!",
-    hootArrived: "Wspaniale! To jest {{stop}}.",
-    gusArrived: "Och, {{stop}}! Dobrze znam te stare kamienie.",
+    ollieDescription: "Bezczelny młody odkrywca, który zna każdy skrót",
+    pipArrived: "Ale się cieszę, że tu jestem! Spójrz na to miejsce!",
+    hootArrived: "Ach, doprawdy fascynujące miejsce.",
+    ollieArrived: "No to jesteśmy! Założę się, że tego nie znałeś.",
   },
 };
 

@@ -322,16 +322,17 @@ const en = {
 
 
   guides: {
+    scoutArrived: "Welcome! Let me show you something special.",
     chooseTitle: "Choose your tour guide",
     previous: "Previous guide",
     next: "Next guide",
     scoutDescription: "The StoryStep original, always up for a walk",
     pipDescription: "A cheerful penguin who never gets lost",
     hootDescription: "A wise old owl with a head full of history",
-    gusDescription: "A cheeky stone gargoyle down from the rooftops",
-    pipArrived: "Waddle, waddle… we're at {{stop}}!",
-    hootArrived: "Splendid! This is {{stop}}.",
-    gusArrived: "Ooh, {{stop}}! I know these old stones well.",
+    ollieDescription: "A cheeky young explorer who knows every shortcut",
+    pipArrived: "Excited to be here! Look at this place!",
+    hootArrived: "Ah, a most fascinating location indeed.",
+    ollieArrived: "Right then, here we are! Bet you didn't know this one.",
   },
 };
 

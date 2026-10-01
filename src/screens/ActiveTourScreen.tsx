@@ -13,6 +13,7 @@ import {
   playWaypointNarration,
   resumeNarration,
   setNarrationEndedHandler,
+  setNarrationGuide,
   setupAudioPlayback,
   stopNarration,
 } from "../audio/narrationPlayer";
@@ -109,6 +110,8 @@ export default function ActiveTourScreen() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [area?.id]);
+  // Stops the guide has recorded play in their own voice.
+  useEffect(() => setNarrationGuide(guide), [guide]);
   const handleGuideChange = (next: GuideId) => {
     setGuide(next);
     if (area) saveGuide(area.id, next);

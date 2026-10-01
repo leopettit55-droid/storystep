@@ -287,16 +287,17 @@ const ko: PartialTranslationDict = {
 
 
   guides: {
+    scoutArrived: "환영해요! 특별한 걸 보여 줄게요.",
     chooseTitle: "가이드를 골라요",
     previous: "이전 가이드",
     next: "다음 가이드",
     scoutDescription: "언제나 산책 준비가 된 StoryStep 오리지널",
     pipDescription: "절대 길을 잃지 않는 명랑한 펭귄",
     hootDescription: "역사로 가득한 지혜로운 늙은 부엉이",
-    gusDescription: "지붕에서 내려온 장난꾸러기 돌 가고일",
-    pipArrived: "뒤뚱뒤뚱… {{stop}}에 도착했어요!",
-    hootArrived: "훌륭해요! 여기가 {{stop}}이에요.",
-    gusArrived: "오, {{stop}}! 이 오래된 돌들은 내가 잘 알지.",
+    ollieDescription: "모든 지름길을 아는 능청스러운 젊은 탐험가",
+    pipArrived: "여기 오다니 신나요! 이곳 좀 보세요!",
+    hootArrived: "아, 참으로 흥미로운 장소로군요.",
+    ollieArrived: "자, 도착! 여긴 몰랐죠?",
   },
 };
 

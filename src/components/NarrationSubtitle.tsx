@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Platform, StyleSheet, Text } from "react-native";
 import { subscribeNarrationProgress } from "../audio/narrationPlayer";
 import type { Area } from "../content";
-import { subtitleIndexAt, subtitleTrack } from "../content/narration";
+import { subtitleIndexAt, subtitleTrack, type SubtitleTrack } from "../content/narration";
 import { useLanguage } from "../i18n/LanguageContext";
 
 export interface NarrationSubtitleProps {
@@ -19,23 +19,34 @@ export interface NarrationSubtitleProps {
  */
 export default function NarrationSubtitle({ area, bottom, paused }: NarrationSubtitleProps) {
   const { language } = useLanguage();
-  const tracks = useMemo(
-    () => new Map(area.route.map((w) => [w.id, subtitleTrack(w, language)])),
-    [area, language]
-  );
-  const [line, setLine] = useState<{ waypointId: string; index: number } | null>(null);
+  // Tracks per recording (a stop's standard one, or a guide's own), built as they play.
+  const tracks = useMemo(() => {
+    const cache = new Map<string, SubtitleTrack | null>();
+    return (waypointId: string, recording: string) => {
+      if (!cache.has(recording)) {
+        const waypoint = area.route.find((w) => w.id === waypointId);
+        cache.set(recording, waypoint ? subtitleTrack(waypoint, language, recording) : null);
+      }
+      return cache.get(recording) ?? null;
+    };
+  }, [area, language]);
+  const [line, setLine] = useState<{ recording: string; track: SubtitleTrack; index: number } | null>(null);
   const fade = useRef(new Animated.Value(0)).current;
 
   useEffect(
     () =>
-      subscribeNarrationProgress((waypointId, seconds) => {
-        const track = waypointId ? tracks.get(waypointId) : null;
-        if (!waypointId || !track) {
+      subscribeNarrationProgress((playing, seconds) => {
+        const track = playing ? tracks(playing.waypointId, playing.recording) : null;
+        if (!playing || !track) {
           setLine(null);
           return;
         }
         const index = subtitleIndexAt(track, seconds);
-        setLine((prev) => (prev?.waypointId === waypointId && prev.index === index ? prev : { waypointId, index }));
+        setLine((prev) =>
+          prev?.recording === playing.recording && prev.track === track && prev.index === index
+            ? prev
+            : { recording: playing.recording, track, index }
+        );
       }),
     [tracks]
   );
@@ -46,7 +57,7 @@ export default function NarrationSubtitle({ area, bottom, paused }: NarrationSub
     Animated.timing(fade, { toValue: 1, duration: 250, useNativeDriver: true }).start();
   }, [line, fade]);
 
-  const text = line ? tracks.get(line.waypointId)?.lines[line.index] : null;
+  const text = line?.track.lines[line.index];
   if (!text) return null;
 
   return (
