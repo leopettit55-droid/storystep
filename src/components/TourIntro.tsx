@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useRef, useState } from "react";
-import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Animated, Easing, PanResponder, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { getGuide, GUIDES, type GuideId } from "../guides/guides";
 import { useLanguage } from "../i18n/LanguageContext";
 import Mascot from "./Mascot";
 import PressScale from "./PressScale";
@@ -15,6 +16,9 @@ export interface TourIntroProps {
   onStart: () => void;
   /** Called once the exit animation has finished. */
   onDone: () => void;
+  /** The chosen tour guide, picked here by swiping once the Start button is up. */
+  guide: GuideId;
+  onGuideChange: (guide: GuideId) => void;
 }
 
 /** Timeline (ms from mount). The map's fly-in runs underneath for the first ~3s. */
@@ -33,10 +37,19 @@ const TEAL = "#3FBFB6";
 
 /**
  * The tour's cinematic entry: while the map flies in from above, a panel
- * rises with the mascot, who greets the walker and suggests headphones, then
- * the Start button appears. Tapping the panel early skips straight to Start.
+ * rises with the guide, who greets the walker and suggests headphones, then
+ * the Start button appears — and the walker can swipe through the other
+ * guides to choose who leads the tour. Tapping the panel early skips ahead.
  */
-export default function TourIntro({ title, distanceToStart, onDirections, onStart, onDone }: TourIntroProps) {
+export default function TourIntro({
+  title,
+  distanceToStart,
+  onDirections,
+  onStart,
+  onDone,
+  guide,
+  onGuideChange,
+}: TourIntroProps) {
   const { t } = useLanguage();
   const insets = useSafeAreaInsets();
 
@@ -105,6 +118,33 @@ export default function TourIntro({ title, distanceToStart, onDirections, onStar
     revealButton();
   };
 
+  // Choosing a guide: swipe the character, or tap the arrows/dots.
+  const index = Math.max(0, GUIDES.findIndex((g) => g.id === guide));
+  const choose = (next: number) => {
+    const wrapped = (next + GUIDES.length) % GUIDES.length;
+    if (wrapped === index) return;
+    onGuideChange(GUIDES[wrapped].id);
+    // Each new guide pops in.
+    mascot.setValue(0.55);
+    Animated.spring(mascot, { toValue: 1, friction: 5, tension: 90, useNativeDriver: true }).start();
+  };
+  const chooseRef = useRef(choose);
+  chooseRef.current = choose;
+  const indexRef = useRef(index);
+  indexRef.current = index;
+  const swipe = useMemo(
+    () =>
+      PanResponder.create({
+        onMoveShouldSetPanResponder: (_e, g) => Math.abs(g.dx) > 12 && Math.abs(g.dx) > Math.abs(g.dy),
+        onPanResponderRelease: (_e, g) => {
+          if (g.dx <= -40) chooseRef.current(indexRef.current + 1);
+          else if (g.dx >= 40) chooseRef.current(indexRef.current - 1);
+        },
+      }),
+    []
+  );
+  const current = getGuide(guide);
+
   const handleStart = () => {
     onStart();
     Animated.timing(exit, { toValue: 1, duration: 600, easing: Easing.in(Easing.cubic), useNativeDriver: true }).start(onDone);
@@ -148,11 +188,44 @@ export default function TourIntro({ title, distanceToStart, onDirections, onStar
               </Animated.View>
             )}
           </View>
-          <Animated.View style={mascotStyle}>
-            <Mascot size={120} />
-          </Animated.View>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{t("activeTour.introSubtitle")}</Text>
+          <View style={styles.stage} {...(buttonShown ? swipe.panHandlers : {})}>
+            {buttonShown && (
+              <Pressable style={styles.arrow} onPress={() => choose(index - 1)} aria-label={t("guides.previous")} hitSlop={8}>
+                <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
+              </Pressable>
+            )}
+            <Animated.View style={mascotStyle}>
+              <Mascot size={120} guide={guide} />
+            </Animated.View>
+            {buttonShown && (
+              <Pressable style={styles.arrow} onPress={() => choose(index + 1)} aria-label={t("guides.next")} hitSlop={8}>
+                <Ionicons name="chevron-forward" size={22} color="#FFFFFF" />
+              </Pressable>
+            )}
+          </View>
+          {buttonShown ? (
+            <Animated.View style={[styles.guideInfo, buttonStyle]}>
+              <Text style={styles.chooseLabel}>{t("guides.chooseTitle")}</Text>
+              <Text style={styles.guideName}>{current.name}</Text>
+              <Text style={styles.guideDescription}>{t(current.descriptionKey)}</Text>
+              <View style={styles.dots}>
+                {GUIDES.map((g, i) => (
+                  <Pressable
+                    key={g.id}
+                    onPress={() => choose(i)}
+                    style={[styles.dot, i === index && styles.dotActive]}
+                    aria-label={g.name}
+                    hitSlop={6}
+                  />
+                ))}
+              </View>
+            </Animated.View>
+          ) : (
+            <>
+              <Text style={styles.title}>{title}</Text>
+              <Text style={styles.subtitle}>{t("activeTour.introSubtitle")}</Text>
+            </>
+          )}
 
           <Animated.View style={[styles.buttonArea, buttonStyle]} pointerEvents={buttonShown ? "auto" : "none"}>
             <PressScale style={styles.startButton} scaleTo={0.96} onPress={handleStart}>
@@ -223,7 +296,31 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 2 },
   },
   subtitle: { marginTop: 6, color: "#FFFFFF", fontSize: 17, opacity: 0.95, textAlign: "center" },
-  buttonArea: { alignItems: "center", marginTop: 26, gap: 14, minHeight: 90 },
+  buttonArea: { alignItems: "center", marginTop: 20, gap: 14, minHeight: 90 },
+  stage: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 18, alignSelf: "stretch" },
+  arrow: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.25)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  guideInfo: { alignItems: "center", marginTop: 10 },
+  chooseLabel: { color: "#FFFFFF", fontSize: 13, fontWeight: "700", opacity: 0.85, textTransform: "uppercase", letterSpacing: 0.6 },
+  guideName: {
+    marginTop: 4,
+    color: "#FFFFFF",
+    fontSize: 30,
+    fontWeight: "800",
+    textShadowColor: "rgba(0,0,0,0.2)",
+    textShadowRadius: 8,
+    textShadowOffset: { width: 0, height: 2 },
+  },
+  guideDescription: { marginTop: 4, color: "#FFFFFF", fontSize: 15, opacity: 0.95, textAlign: "center", maxWidth: 300 },
+  dots: { flexDirection: "row", gap: 8, marginTop: 14 },
+  dot: { width: 9, height: 9, borderRadius: 5, backgroundColor: "rgba(255,255,255,0.45)" },
+  dotActive: { width: 26, backgroundColor: "#FFFFFF" },
   startButton: {
     backgroundColor: "#FFFFFF",
     borderRadius: 50,

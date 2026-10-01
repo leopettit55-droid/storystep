@@ -285,6 +285,19 @@ const sv: PartialTranslationDict = {
     failed: "Det gick inte att dela. Försök igen.",
   },
 
+
+  guides: {
+    chooseTitle: "Välj din guide",
+    previous: "Föregående guide",
+    next: "Nästa guide",
+    scoutDescription: "StoryStep-originalet, alltid redo för en promenad",
+    pipDescription: "En glad pingvin som aldrig går vilse",
+    hootDescription: "En klok gammal uggla full av historia",
+    gusDescription: "En busig stengargoyl nere från taken",
+    pipArrived: "Vagga, vagga… vi är vid {{stop}}!",
+    hootArrived: "Utmärkt! Det här är {{stop}}.",
+    gusArrived: "Oj, {{stop}}! De här gamla stenarna känner jag väl.",
+  },
 };
 
 export default sv;

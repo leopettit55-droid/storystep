@@ -285,6 +285,19 @@ const th: PartialTranslationDict = {
     failed: "แชร์ไม่สำเร็จ ลองอีกครั้ง",
   },
 
+
+  guides: {
+    chooseTitle: "เลือกไกด์ของคุณ",
+    previous: "ไกด์ก่อนหน้า",
+    next: "ไกด์ถัดไป",
+    scoutDescription: "ไกด์ต้นฉบับของ StoryStep พร้อมเดินเสมอ",
+    pipDescription: "เพนกวินร่าเริงที่ไม่เคยหลงทาง",
+    hootDescription: "นกฮูกแก่ผู้รอบรู้ หัวเต็มไปด้วยประวัติศาสตร์",
+    gusDescription: "การ์กอยล์หินจอมซนที่ลงมาจากหลังคา",
+    pipArrived: "เตาะแตะ เตาะแตะ… มาถึง {{stop}} แล้ว!",
+    hootArrived: "ยอดเยี่ยม! นี่คือ {{stop}}",
+    gusArrived: "โอ้ {{stop}}! ฉันรู้จักหินเก่าพวกนี้ดี",
+  },
 };
 
 export default th;

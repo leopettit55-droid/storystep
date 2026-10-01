@@ -284,6 +284,19 @@ const zh: PartialTranslationDict = {
     failed: "分享失败，请重试。",
   },
 
+
+  guides: {
+    chooseTitle: "选择你的导游",
+    previous: "上一位导游",
+    next: "下一位导游",
+    scoutDescription: "StoryStep的原创导游，随时准备出发",
+    pipDescription: "一只从不迷路的快乐企鹅",
+    hootDescription: "一只满腹历史的睿智老猫头鹰",
+    gusDescription: "一只从屋顶下来的调皮石像鬼",
+    pipArrived: "摇摇摆摆……我们到{{stop}}啦！",
+    hootArrived: "太棒了！这里就是{{stop}}。",
+    gusArrived: "哦，{{stop}}！这些老石头我可熟悉了。",
+  },
 };
 
 export default zh;

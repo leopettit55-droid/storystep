@@ -1,7 +1,9 @@
 import { Image } from "react-native";
+import type { GuideId } from "../guides/guides";
 
-/** The StoryStep mascot. Native uses the illustrated PNG; web draws the SVG (Mascot.web.tsx). */
-export default function Mascot({ size }: { size: number }) {
+/** A tour guide character. Native has no SVG renderer yet, so every guide
+ * shows the illustrated StoryStep mascot; web draws each guide (Mascot.web.tsx). */
+export default function Mascot({ size }: { size: number; guide?: GuideId }) {
   return (
     <Image
       source={require("../../assets/character/guide-idle.png")}

@@ -285,6 +285,19 @@ const tr: PartialTranslationDict = {
     failed: "Paylaşılamadı. Lütfen tekrar dene.",
   },
 
+
+  guides: {
+    chooseTitle: "Rehberini seç",
+    previous: "Önceki rehber",
+    next: "Sonraki rehber",
+    scoutDescription: "StoryStep'in orijinali, yürüyüşe her zaman hazır",
+    pipDescription: "Asla kaybolmayan neşeli bir penguen",
+    hootDescription: "Tarih dolu, bilge yaşlı bir baykuş",
+    gusDescription: "Çatılardan inmiş yaramaz bir taş gargoyl",
+    pipArrived: "Paytak paytak… {{stop}} noktasındayız!",
+    hootArrived: "Harika! Burası {{stop}}.",
+    gusArrived: "Oo, {{stop}}! Bu eski taşları iyi bilirim.",
+  },
 };
 
 export default tr;

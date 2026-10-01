@@ -46,6 +46,8 @@ import NarrationSubtitle from "../components/NarrationSubtitle";
 import StopDetail, { type StopDetailMode } from "../components/StopDetail";
 import TourIntro from "../components/TourIntro";
 import TourMap, { type AvatarLine } from "../components/TourMap";
+import { DEFAULT_GUIDE, type GuideId } from "../guides/guides";
+import { loadGuide, saveGuide } from "../guides/guidePreference";
 import type { Waypoint } from "../content";
 
 type Nav = NativeStackNavigationProp<RootStackParamList, "ActiveTour">;
@@ -93,6 +95,24 @@ export default function ActiveTourScreen() {
   const [distanceToStart, setDistanceToStart] = useState<number | null>(null);
   /** 0 → 1 as the in-tour controls slide in. */
   const chrome = useRef(new Animated.Value(resuming ? 1 : 0)).current;
+
+  // The walker's tour guide: chosen in the intro, remembered per tour.
+  const [guide, setGuide] = useState<GuideId>(DEFAULT_GUIDE);
+  useEffect(() => {
+    if (!area) return;
+    let cancelled = false;
+    void loadGuide(area.id).then((saved) => {
+      if (saved && !cancelled) setGuide(saved);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [area?.id]);
+  const handleGuideChange = (next: GuideId) => {
+    setGuide(next);
+    if (area) saveGuide(area.id, next);
+  };
 
   // The street-level stop view: open on arrival, or when a stop marker is tapped.
   const [detail, setDetail] = useState<{ waypoint: Waypoint; mode: StopDetailMode } | null>(null);
@@ -455,6 +475,7 @@ export default function ActiveTourScreen() {
         faceBearing={faceBearing}
         flyIn={!resuming}
         focusStop={detail?.waypoint ?? null}
+        guide={guide}
       />
 
       {introShowing && (
@@ -464,6 +485,8 @@ export default function ActiveTourScreen() {
           onDirections={handleDirections}
           onStart={handleStart}
           onDone={() => setIntroShowing(false)}
+          guide={guide}
+          onGuideChange={handleGuideChange}
         />
       )}
 
@@ -534,6 +557,7 @@ export default function ActiveTourScreen() {
           onExit={() => setDetail(null)}
           topInset={insets.top}
           bottomClearance={insets.bottom + CONTROLS_BOTTOM + 70 + 16 + SUBTITLE_SPACE}
+          guide={guide}
         />
       )}
 

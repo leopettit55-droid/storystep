@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, Platform, StyleSheet, Text, View } from "react-native";
 import type { Waypoint } from "../content";
+import { getGuide, type GuideId } from "../guides/guides";
 import { useLanguage } from "../i18n/LanguageContext";
 import Mascot from "./Mascot";
 import PressScale from "./PressScale";
@@ -19,6 +20,8 @@ export interface StopDetailProps {
   topInset: number;
   /** Space kept clear at the bottom for the tour's play controls. */
   bottomClearance: number;
+  /** The walker's chosen tour guide, who stands centre stage. */
+  guide: GuideId;
 }
 
 const BUBBLE_MS = 3200;
@@ -28,9 +31,9 @@ function gradient(css: string): object {
 }
 
 /**
- * The immersive stop view, layered over the tour map while the map dives to
- * street level and circles the stop (TourMap's `focusStop`). A dark flash
- * sells the "drop in"; the mascot stands centre stage and speaks; the stop's
+ * The immersive stop view, layered over the tour map while the map crossfades
+ * to a street-level view of the stop (TourMap's `focusStop`). The view fades
+ * and settles in; the chosen guide pops in centre stage and speaks; the stop's
  * name sits in a panel at the bottom, above the tour's play controls.
  */
 export default function StopDetail({
@@ -41,35 +44,31 @@ export default function StopDetail({
   onExit,
   topInset,
   bottomClearance,
+  guide: guideId,
 }: StopDetailProps) {
   const { t } = useLanguage();
+  const guide = getGuide(guideId);
   const enter = useRef(new Animated.Value(0)).current;
-  const flash = useRef(new Animated.Value(0)).current;
   const mascot = useRef(new Animated.Value(0)).current;
   const bob = useRef(new Animated.Value(0)).current;
   const bubbleAnim = useRef(new Animated.Value(0)).current;
   const [bubble, setBubble] = useState<string | null>(null);
 
-  // Fade the frame in once; each new stop replays the drop-in flash and mascot entrance.
+  // Fade and settle the view in once (like a card); each new stop replays the guide's entrance.
   useEffect(() => {
-    Animated.timing(enter, { toValue: 1, duration: 500, useNativeDriver: true }).start();
+    Animated.timing(enter, { toValue: 1, duration: 450, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
   }, [enter]);
 
   useEffect(() => {
-    flash.setValue(0);
     mascot.setValue(0);
     Animated.sequence([
-      Animated.timing(flash, { toValue: 0.85, duration: 250, easing: Easing.in(Easing.quad), useNativeDriver: true }),
-      Animated.timing(flash, { toValue: 0, duration: 650, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-    ]).start();
-    Animated.sequence([
-      Animated.delay(700),
+      Animated.delay(450),
       Animated.spring(mascot, { toValue: 1, friction: 5, tension: 70, useNativeDriver: true }),
     ]).start();
 
     const line =
       mode === "arrival"
-        ? t("activeTour.guideArrived", { stop: waypoint.name })
+        ? t(guide.arrivalKey, { stop: waypoint.name })
         : mode === "replay"
           ? t("activeTour.guideReplay")
           : t("activeTour.guideLater");
@@ -123,7 +122,13 @@ export default function StopDetail({
   };
 
   return (
-    <Animated.View style={[StyleSheet.absoluteFill, { opacity: enter }]} pointerEvents="box-none">
+    <Animated.View
+      style={[
+        StyleSheet.absoluteFill,
+        { opacity: enter, transform: [{ scale: enter.interpolate({ inputRange: [0, 1], outputRange: [0.92, 1] }) }] },
+      ]}
+      pointerEvents="box-none"
+    >
       <View style={[styles.topShade, gradient("linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 100%)")]} pointerEvents="none" />
 
       <PressScale
@@ -154,9 +159,10 @@ export default function StopDetail({
           )}
         </View>
         <Animated.View style={mascotStyle} pointerEvents="none">
-          <Mascot size={130} />
+          <Mascot size={130} guide={guide.id} />
         </Animated.View>
         <View style={styles.groundShadow} pointerEvents="none" />
+        <Text style={styles.guideName}>{guide.name}</Text>
 
         <Animated.View
           style={[styles.panel, gradient("linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0) 100%)"), { paddingBottom: bottomClearance }, panelStyle]}
@@ -167,7 +173,6 @@ export default function StopDetail({
         </Animated.View>
       </View>
 
-      <Animated.View style={[StyleSheet.absoluteFill, styles.flash, { opacity: flash }]} pointerEvents="none" />
     </Animated.View>
   );
 }
@@ -232,5 +237,13 @@ const styles = StyleSheet.create({
   },
   stopNumber: { color: "#FFFFFF", fontSize: 14, opacity: 0.8 },
   title: { color: "#FFFFFF", fontSize: 28, fontWeight: "800", textAlign: "center", marginTop: 4 },
-  flash: { backgroundColor: "#000000" },
+  guideName: {
+    marginTop: 6,
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
+    textShadowColor: "rgba(0,0,0,0.45)",
+    textShadowRadius: 4,
+    textShadowOffset: { width: 0, height: 1 },
+  },
 });

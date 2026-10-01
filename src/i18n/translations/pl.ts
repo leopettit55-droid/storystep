@@ -285,6 +285,19 @@ const pl: PartialTranslationDict = {
     failed: "Nie udało się udostępnić. Spróbuj ponownie.",
   },
 
+
+  guides: {
+    chooseTitle: "Wybierz przewodnika",
+    previous: "Poprzedni przewodnik",
+    next: "Następny przewodnik",
+    scoutDescription: "Oryginał StoryStep, zawsze chętny na spacer",
+    pipDescription: "Wesoły pingwin, który nigdy się nie gubi",
+    hootDescription: "Mądra stara sowa z głową pełną historii",
+    gusDescription: "Psotny kamienny gargulec prosto z dachów",
+    pipArrived: "Kolebu, kolebu… jesteśmy przy {{stop}}!",
+    hootArrived: "Wspaniale! To jest {{stop}}.",
+    gusArrived: "Och, {{stop}}! Dobrze znam te stare kamienie.",
+  },
 };
 
 export default pl;

@@ -285,6 +285,19 @@ const pt: PartialTranslationDict = {
     failed: "Não foi possível partilhar. Tenta novamente.",
   },
 
+
+  guides: {
+    chooseTitle: "Escolhe o teu guia",
+    previous: "Guia anterior",
+    next: "Guia seguinte",
+    scoutDescription: "O original da StoryStep, sempre pronto para caminhar",
+    pipDescription: "Um pinguim alegre que nunca se perde",
+    hootDescription: "Uma velha coruja sábia, cheia de história",
+    gusDescription: "Uma gárgula de pedra marota descida dos telhados",
+    pipArrived: "Bamboleia, bamboleia… estamos em {{stop}}!",
+    hootArrived: "Esplêndido! Isto é {{stop}}.",
+    gusArrived: "Oh, {{stop}}! Conheço bem estas velhas pedras.",
+  },
 };
 
 export default pt;

@@ -285,6 +285,19 @@ const id: PartialTranslationDict = {
     failed: "Gagal membagikan. Coba lagi.",
   },
 
+
+  guides: {
+    chooseTitle: "Pilih pemandumu",
+    previous: "Pemandu sebelumnya",
+    next: "Pemandu berikutnya",
+    scoutDescription: "Pemandu asli StoryStep, selalu siap berjalan",
+    pipDescription: "Penguin ceria yang tak pernah tersesat",
+    hootDescription: "Burung hantu tua yang bijak, penuh sejarah",
+    gusDescription: "Gargoyle batu jahil yang turun dari atap",
+    pipArrived: "Megal-megol… kita sampai di {{stop}}!",
+    hootArrived: "Luar biasa! Ini {{stop}}.",
+    gusArrived: "Wah, {{stop}}! Aku kenal baik batu-batu tua ini.",
+  },
 };
 
 export default id;

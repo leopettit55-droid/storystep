@@ -285,6 +285,19 @@ const ru: PartialTranslationDict = {
     failed: "Не удалось поделиться. Попробуйте ещё раз.",
   },
 
+
+  guides: {
+    chooseTitle: "Выбери гида",
+    previous: "Предыдущий гид",
+    next: "Следующий гид",
+    scoutDescription: "Оригинальный гид StoryStep, всегда готов к прогулке",
+    pipDescription: "Весёлый пингвин, который никогда не теряется",
+    hootDescription: "Мудрая старая сова, полная истории",
+    gusDescription: "Озорная каменная горгулья прямо с крыш",
+    pipArrived: "Топ-топ… мы у {{stop}}!",
+    hootArrived: "Великолепно! Это {{stop}}.",
+    gusArrived: "О, {{stop}}! Эти старые камни я хорошо знаю.",
+  },
 };
 
 export default ru;

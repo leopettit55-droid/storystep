@@ -285,6 +285,19 @@ const it: PartialTranslationDict = {
     failed: "Impossibile condividere. Riprova.",
   },
 
+
+  guides: {
+    chooseTitle: "Scegli la tua guida",
+    previous: "Guida precedente",
+    next: "Guida successiva",
+    scoutDescription: "L'originale di StoryStep, sempre pronto a camminare",
+    pipDescription: "Un pinguino allegro che non si perde mai",
+    hootDescription: "Un vecchio gufo saggio con la testa piena di storia",
+    gusDescription: "Un gargoyle di pietra birichino sceso dai tetti",
+    pipArrived: "Dondola, dondola… siamo a {{stop}}!",
+    hootArrived: "Splendido! Questo è {{stop}}.",
+    gusArrived: "Oh, {{stop}}! Conosco bene queste vecchie pietre.",
+  },
 };
 
 export default it;

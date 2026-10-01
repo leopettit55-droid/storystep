@@ -14,7 +14,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import type { Coordinates, Waypoint } from "../content";
 import { useLanguage } from "../i18n/LanguageContext";
 import { bearingDegrees, distanceMeters } from "../geofencing/proximityTracker";
-import { mascotSvg } from "./mascotSvg";
+import { DEFAULT_GUIDE, guideSvg } from "../guides/guides";
 import type { TourMapProps } from "./TourMap";
 
 // Same worker setup as the Explore map (see ExploreMapScreen.web.tsx).
@@ -48,11 +48,13 @@ const MAX_PITCH = 65;
 /** The intro swoop: from a flat, high view of the city down to street level. */
 const FLY_IN_FROM_ZOOM = 13;
 const FLY_IN_MS = 3200;
-/** Street-level view of a focused stop: low and close, slowly circling. */
+/** Street-level view of a focused stop: low and close. */
 const DETAIL_ZOOM = 18.6;
 const DETAIL_PITCH = 74;
 const DETAIL_MAX_PITCH = 78;
-const DETAIL_ORBIT_DEG_PER_S = 3;
+/** Switching between the map and a stop view: fade out, cut the camera, fade in. */
+const FADE_OUT_MS = 300;
+const FADE_IN_MS = 400;
 /** Buildings rise out of the ground between these zooms, then keep growing
  * (x1.3 per zoom level past 16) so close-up views feel dramatically 3D. */
 const BUILDINGS_APPEAR_ZOOM = 15;
@@ -278,7 +280,6 @@ function injectCss() {
   document.head.appendChild(el);
 }
 
-const AVATAR_SVG = mascotSvg(56);
 
 /** The ground ring under the avatar; the arrow points the way the walker is heading. */
 const RING_SVG = `
@@ -341,6 +342,7 @@ export default function TourMap({
   faceBearing,
   flyIn,
   focusStop,
+  guide = DEFAULT_GUIDE,
   style,
 }: TourMapProps) {
   const { t } = useLanguage();
@@ -353,7 +355,7 @@ export default function TourMap({
   const followRef = useRef(true);
   /** True while a stop is focused: the camera belongs to the stop view, not the walker. */
   const focusRef = useRef(false);
-  const orbitRef = useRef(0);
+  const fadeTimer = useRef(0);
   const [following, setFollowing] = useState(true);
   const [mapReady, setMapReady] = useState(false);
 
@@ -403,7 +405,6 @@ export default function TourMap({
       // Any manual pan/rotate hands the camera to the walker until they tap re-centre.
       const stopFollowing = (e: { originalEvent?: unknown }) => {
         if (!e.originalEvent) return;
-        cancelAnimationFrame(orbitRef.current);
         if (focusRef.current) return;
         followRef.current = false;
         setFollowing(false);
@@ -487,6 +488,7 @@ export default function TourMap({
 
     return () => {
       cancelAnimationFrame(glide.current.frame);
+      window.clearTimeout(fadeTimer.current);
       mapRef.current?.remove();
       mapRef.current = null;
       avatarRef.current = null;
@@ -523,7 +525,7 @@ export default function TourMap({
       ringEl.innerHTML = RING_SVG;
       const figureEl = document.createElement("div");
       figureEl.className = "ss-avatar idle";
-      figureEl.innerHTML = AVATAR_SVG;
+      figureEl.innerHTML = guideSvg(guide, 56);
       const at: [number, number] = [userLocation.lng, userLocation.lat];
       avatarRef.current = {
         // Lies flat on the ground and turns with the map, like a compass on the floor.
@@ -619,60 +621,64 @@ export default function TourMap({
     if (followRef.current && !focusRef.current) map.easeTo({ bearing: faceBearing, duration: 1200 });
   }, [faceBearing]);
 
-  // Stop view: dive to street level at the stop, then circle it slowly.
-  // Clearing it flies back up to the walker and resumes following.
+  // Stop view: a quick crossfade (no camera fly or spin) to a street-level
+  // view of the stop, and the same back to the walker when it's cleared.
   useEffect(() => {
     const map = mapRef.current;
     const root = containerRef.current;
     if (!mapReady || !map || !root) return;
 
+    const crossfade = (cut: () => void) => {
+      window.clearTimeout(fadeTimer.current);
+      root.style.transition = `opacity ${FADE_OUT_MS}ms ease, transform ${FADE_OUT_MS}ms ease`;
+      root.style.opacity = "0";
+      root.style.transform = "scale(0.95)";
+      fadeTimer.current = window.setTimeout(() => {
+        cut();
+        root.style.transition = `opacity ${FADE_IN_MS}ms ease, transform ${FADE_IN_MS}ms ease`;
+        root.style.opacity = "1";
+        root.style.transform = "scale(1)";
+      }, FADE_OUT_MS);
+    };
+
     if (focusStop) {
       focusRef.current = true;
-      root.classList.add("ss-detail");
-      map.setMaxPitch(DETAIL_MAX_PITCH);
       const { lat, lng } = focusStop.coordinates;
-      map.flyTo({
-        center: [lng, lat],
-        zoom: DETAIL_ZOOM,
-        pitch: DETAIL_PITCH,
-        bearing: map.getBearing() + 40,
-        duration: 1800,
-        curve: 1.6,
-        essential: true,
+      crossfade(() => {
+        root.classList.add("ss-detail");
+        map.setMaxPitch(DETAIL_MAX_PITCH);
+        map.jumpTo({ center: [lng, lat], zoom: DETAIL_ZOOM, pitch: DETAIL_PITCH });
       });
-      map.once("moveend", () => {
-        if (!focusRef.current) return;
-        let last = performance.now();
-        const orbit = (now: number) => {
-          map.setBearing(map.getBearing() + ((now - last) / 1000) * DETAIL_ORBIT_DEG_PER_S);
-          last = now;
-          orbitRef.current = requestAnimationFrame(orbit);
-        };
-        orbitRef.current = requestAnimationFrame(orbit);
-      });
-      return () => cancelAnimationFrame(orbitRef.current);
+      return;
     }
 
     if (focusRef.current) {
       focusRef.current = false;
-      root.classList.remove("ss-detail");
       followRef.current = true;
       setFollowing(true);
       const at = glide.current.shown ?? userLocation;
-      map.easeTo({
-        ...(at ? { center: [at.lng, at.lat] as [number, number] } : {}),
-        zoom: FOLLOW_ZOOM,
-        pitch: FOLLOW_PITCH,
-        bearing: glide.current.heading,
-        duration: 1400,
-      });
-      map.once("moveend", () => {
-        if (!focusRef.current) map.setMaxPitch(MAX_PITCH);
+      crossfade(() => {
+        root.classList.remove("ss-detail");
+        map.jumpTo({
+          ...(at ? { center: [at.lng, at.lat] as [number, number] } : {}),
+          zoom: FOLLOW_ZOOM,
+          pitch: FOLLOW_PITCH,
+          bearing: glide.current.heading,
+        });
+        map.setMaxPitch(MAX_PITCH);
       });
     }
-    // Keyed on the stop, not the object, so re-renders don't restart the dive.
+    // Keyed on the stop, not the object, so re-renders don't restart it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapReady, focusStop?.id]);
+
+  // A different guide chosen (or loaded) after the avatar was drawn.
+  useEffect(() => {
+    const avatar = avatarRef.current;
+    const drawing = avatar?.el.querySelector("svg");
+    // Replace only the drawing, so a speech bubble showing stays put.
+    if (drawing) drawing.outerHTML = guideSvg(guide, 56);
+  }, [guide]);
 
   const recentre = () => {
     const map = mapRef.current;

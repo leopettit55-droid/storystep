@@ -1,6 +1,7 @@
 import type { StyleProp, ViewStyle } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import type { Area, Coordinates, Waypoint } from "../content";
+import type { GuideId } from "../guides/guides";
 
 export interface TourMapProps {
   area: Area;
@@ -18,6 +19,8 @@ export interface TourMapProps {
   flyIn?: boolean;
   /** A stop to dive down to at street level and slowly circle (web); null returns to the walker. */
   focusStop?: Waypoint | null;
+  /** Which tour guide walks on the map (web). */
+  guide?: GuideId;
   style?: StyleProp<ViewStyle>;
 }
 

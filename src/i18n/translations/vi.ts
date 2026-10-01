@@ -285,6 +285,19 @@ const vi: PartialTranslationDict = {
     failed: "Không chia sẻ được. Vui lòng thử lại.",
   },
 
+
+  guides: {
+    chooseTitle: "Chọn hướng dẫn viên",
+    previous: "Hướng dẫn viên trước",
+    next: "Hướng dẫn viên tiếp theo",
+    scoutDescription: "Hướng dẫn viên gốc của StoryStep, luôn sẵn sàng dạo bước",
+    pipDescription: "Chú chim cánh cụt vui vẻ không bao giờ lạc đường",
+    hootDescription: "Cú già thông thái với cái đầu đầy lịch sử",
+    gusDescription: "Tượng đá gargoyle tinh nghịch từ mái nhà xuống",
+    pipArrived: "Lạch bạch, lạch bạch… ta đến {{stop}} rồi!",
+    hootArrived: "Tuyệt vời! Đây là {{stop}}.",
+    gusArrived: "Ồ, {{stop}}! Tôi biết rõ những hòn đá cổ này.",
+  },
 };
 
 export default vi;

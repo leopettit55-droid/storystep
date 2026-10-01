@@ -322,6 +322,19 @@ const es: PartialTranslationDict = {
     didYouMean: "¿No es correcto? ¿Querías decir",
   },
 
+
+  guides: {
+    chooseTitle: "Elige a tu guía",
+    previous: "Guía anterior",
+    next: "Guía siguiente",
+    scoutDescription: "El original de StoryStep, siempre listo para pasear",
+    pipDescription: "Un pingüino alegre que nunca se pierde",
+    hootDescription: "Un búho sabio con la cabeza llena de historia",
+    gusDescription: "Una gárgola de piedra traviesa bajada de los tejados",
+    pipArrived: "Paso a pasito… ¡estamos en {{stop}}!",
+    hootArrived: "¡Espléndido! Esto es {{stop}}.",
+    gusArrived: "¡Oh, {{stop}}! Conozco bien estas viejas piedras.",
+  },
 };
 
 export default es;

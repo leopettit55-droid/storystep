@@ -285,6 +285,19 @@ const fr: PartialTranslationDict = {
     failed: "Impossible de partager. Réessaie.",
   },
 
+
+  guides: {
+    chooseTitle: "Choisis ton guide",
+    previous: "Guide précédent",
+    next: "Guide suivant",
+    scoutDescription: "L'original de StoryStep, toujours partant pour marcher",
+    pipDescription: "Un pingouin joyeux qui ne se perd jamais",
+    hootDescription: "Une vieille chouette sage, la tête pleine d'histoire",
+    gusDescription: "Une gargouille de pierre espiègle descendue des toits",
+    pipArrived: "Dandine, dandine… on est à {{stop}} !",
+    hootArrived: "Splendide ! Voici {{stop}}.",
+    gusArrived: "Oh, {{stop}} ! Je connais bien ces vieilles pierres.",
+  },
 };
 
 export default fr;

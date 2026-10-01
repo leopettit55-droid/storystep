@@ -285,6 +285,19 @@ const ko: PartialTranslationDict = {
     failed: "공유하지 못했어요. 다시 시도해 주세요.",
   },
 
+
+  guides: {
+    chooseTitle: "가이드를 골라요",
+    previous: "이전 가이드",
+    next: "다음 가이드",
+    scoutDescription: "언제나 산책 준비가 된 StoryStep 오리지널",
+    pipDescription: "절대 길을 잃지 않는 명랑한 펭귄",
+    hootDescription: "역사로 가득한 지혜로운 늙은 부엉이",
+    gusDescription: "지붕에서 내려온 장난꾸러기 돌 가고일",
+    pipArrived: "뒤뚱뒤뚱… {{stop}}에 도착했어요!",
+    hootArrived: "훌륭해요! 여기가 {{stop}}이에요.",
+    gusArrived: "오, {{stop}}! 이 오래된 돌들은 내가 잘 알지.",
+  },
 };
 
 export default ko;

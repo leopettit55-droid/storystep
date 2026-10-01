@@ -285,6 +285,19 @@ const ar: PartialTranslationDict = {
     failed: "تعذّرت المشاركة. حاول مرة أخرى.",
   },
 
+
+  guides: {
+    chooseTitle: "اختر مرشدك",
+    previous: "المرشد السابق",
+    next: "المرشد التالي",
+    scoutDescription: "مرشد StoryStep الأصلي، مستعد دائمًا للمشي",
+    pipDescription: "بطريق مرح لا يضل طريقه أبدًا",
+    hootDescription: "بومة حكيمة عجوز رأسها مليء بالتاريخ",
+    gusDescription: "تمثال حجري شقي نزل من فوق الأسطح",
+    pipArrived: "خطوة خطوة… وصلنا إلى {{stop}}!",
+    hootArrived: "رائع! هذا {{stop}}.",
+    gusArrived: "آه، {{stop}}! أعرف هذه الحجارة القديمة جيدًا.",
+  },
 };
 
 export default ar;

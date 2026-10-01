@@ -285,6 +285,19 @@ const ja: PartialTranslationDict = {
     failed: "共有できませんでした。もう一度お試しください。",
   },
 
+
+  guides: {
+    chooseTitle: "ガイドを選ぼう",
+    previous: "前のガイド",
+    next: "次のガイド",
+    scoutDescription: "StoryStepのオリジナル。いつでも散歩にぴったり",
+    pipDescription: "決して迷わない陽気なペンギン",
+    hootDescription: "歴史に詳しい賢い老フクロウ",
+    gusDescription: "屋根から下りてきたいたずら好きな石のガーゴイル",
+    pipArrived: "よちよち…{{stop}}に着いたよ！",
+    hootArrived: "すばらしい！ここが{{stop}}です。",
+    gusArrived: "おお、{{stop}}！この古い石はよく知ってるぞ。",
+  },
 };
 
 export default ja;

@@ -320,6 +320,19 @@ const en = {
     didYouMean: "Not right? Did you mean",
   },
 
+
+  guides: {
+    chooseTitle: "Choose your tour guide",
+    previous: "Previous guide",
+    next: "Next guide",
+    scoutDescription: "The StoryStep original, always up for a walk",
+    pipDescription: "A cheerful penguin who never gets lost",
+    hootDescription: "A wise old owl with a head full of history",
+    gusDescription: "A cheeky stone gargoyle down from the rooftops",
+    pipArrived: "Waddle, waddle… we're at {{stop}}!",
+    hootArrived: "Splendid! This is {{stop}}.",
+    gusArrived: "Ooh, {{stop}}! I know these old stones well.",
+  },
 };
 
 export default en;
