@@ -287,16 +287,17 @@ const nl: PartialTranslationDict = {
 
 
   guides: {
+    scoutArrived: "Welkom! Ik laat je iets bijzonders zien.",
     chooseTitle: "Kies je gids",
     previous: "Vorige gids",
     next: "Volgende gids",
     scoutDescription: "Het StoryStep-origineel, altijd zin in een wandeling",
     pipDescription: "Een vrolijke pinguïn die nooit verdwaalt",
     hootDescription: "Een wijze oude uil vol geschiedenis",
-    gusDescription: "Een ondeugende stenen waterspuwer, zo van het dak",
-    pipArrived: "Waggel, waggel… we zijn bij {{stop}}!",
-    hootArrived: "Prachtig! Dit is {{stop}}.",
-    gusArrived: "O, {{stop}}! Deze oude stenen ken ik goed.",
+    ollieDescription: "Een brutale jonge ontdekkingsreiziger die elke kortere weg kent",
+    pipArrived: "Wat leuk om hier te zijn! Kijk eens naar deze plek!",
+    hootArrived: "Ah, een hoogst fascinerende plek, inderdaad.",
+    ollieArrived: "Zo, daar zijn we! Wedden dat je deze nog niet kende?",
   },
 };
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Pip — StoryStep tour guide. Generated from src/guides/guides.ts. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="200" height="240">
+  <g class="ss-leg ss-leg-l"><rect x="37" y="96" width="8" height="10" rx="3" fill="#F39C34"/><ellipse cx="38" cy="110" rx="10" ry="4.5" fill="#F7A440" stroke="#9A5512" stroke-width="2.5"/></g>
+  <g class="ss-leg ss-leg-r"><rect x="55" y="96" width="8" height="10" rx="3" fill="#F39C34"/><ellipse cx="62" cy="110" rx="10" ry="4.5" fill="#F7A440" stroke="#9A5512" stroke-width="2.5"/></g>
+  <g class="ss-body">
+    <ellipse cx="17" cy="66" rx="7" ry="18" transform="rotate(22 17 66)" fill="#24324A" stroke="#111827" stroke-width="3"/>
+    <ellipse cx="83" cy="62" rx="7" ry="17" transform="rotate(-40 83 62)" fill="#24324A" stroke="#111827" stroke-width="3"/>
+    <ellipse cx="50" cy="60" rx="32" ry="40" fill="#2B3A55" stroke="#111827" stroke-width="3"/>
+    <ellipse cx="50" cy="73" rx="21" ry="25" fill="#FFFFFF"/>
+    <path d="M28 43 Q30 25 50 25 Q70 25 72 43 Q72 57 50 59 Q28 57 28 43 Z" fill="#FFFFFF"/>
+    <ellipse cx="38" cy="27" rx="6" ry="3" transform="rotate(-25 38 27)" fill="#FFFFFF" opacity="0.35"/>
+    <circle cx="41" cy="41" r="4.5" fill="#111827"/><circle cx="42.4" cy="39.6" r="1.5" fill="#FFFFFF"/>
+    <circle cx="59" cy="41" r="4.5" fill="#111827"/><circle cx="60.4" cy="39.6" r="1.5" fill="#FFFFFF"/>
+    <ellipse cx="34" cy="50" rx="4" ry="2.5" fill="#FF9AA2" opacity="0.7"/>
+    <ellipse cx="66" cy="50" rx="4" ry="2.5" fill="#FF9AA2" opacity="0.7"/>
+    <path d="M44 47 L56 47 L50 55 Z" fill="#F7A440" stroke="#9A5512" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M33 54 Q41 66 43 68 M67 54 Q59 66 57 68" stroke="#1F2933" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <rect x="39" y="66" width="22" height="15" rx="3.5" fill="#3A3F47" stroke="#111827" stroke-width="2"/>
+    <rect x="42" y="63.5" width="7" height="4" rx="1.5" fill="#3A3F47" stroke="#111827" stroke-width="1.6"/>
+    <circle cx="50" cy="73.5" r="5" fill="#8FD3FF" stroke="#111827" stroke-width="2"/>
+    <circle cx="48.5" cy="72" r="1.4" fill="#FFFFFF"/>
+    <circle cx="57" cy="69.5" r="1.3" fill="#F4C430"/>
+    <path d="M89 26 L89 86" stroke="#6B4A22" stroke-width="3" stroke-linecap="round"/>
+    <path d="M89 25 L100 30.5 L89 36 Z" fill="#2E9E8F" stroke="#14524A" stroke-width="1.8" stroke-linejoin="round"/>
+    <circle cx="93" cy="30.5" r="1.6" fill="#FFFFFF"/>
+  </g>
+</svg>

@@ -287,16 +287,17 @@ const hi: PartialTranslationDict = {
 
 
   guides: {
+    scoutArrived: "स्वागत है! चलिए आपको कुछ खास दिखाता हूँ।",
     chooseTitle: "अपना गाइड चुनें",
     previous: "पिछला गाइड",
     next: "अगला गाइड",
     scoutDescription: "StoryStep का अपना गाइड, सैर के लिए हमेशा तैयार",
     pipDescription: "एक खुशमिज़ाज पेंगुइन जो कभी रास्ता नहीं भूलता",
     hootDescription: "इतिहास से भरा एक समझदार बूढ़ा उल्लू",
-    gusDescription: "छतों से उतरा एक शरारती पत्थर का गार्गॉयल",
-    pipArrived: "डगमग डगमग… हम {{stop}} पहुँच गए!",
-    hootArrived: "बढ़िया! यह है {{stop}}।",
-    gusArrived: "अरे, {{stop}}! इन पुराने पत्थरों को मैं अच्छी तरह जानता हूँ।",
+    ollieDescription: "हर शॉर्टकट जानने वाला एक शरारती युवा खोजी",
+    pipArrived: "यहाँ आकर बहुत उत्साहित हूँ! इस जगह को देखिए!",
+    hootArrived: "आह, सचमुच एक बेहद दिलचस्प जगह।",
+    ollieArrived: "लो, हम पहुँच गए! शर्त लगा लो, ये आपको नहीं पता था।",
   },
 };
 

@@ -1,6 +1,7 @@
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer, type AudioStatus } from "expo-audio";
 import type { Waypoint } from "../content";
 import { Platform } from "react-native";
+import { GUIDE_RECORDINGS } from "../content/narration/cues";
 import { isOnline } from "../offline/connectivity";
 import { savedAudioUrl } from "../offline/tourFiles";
 import { resolveAudioSource } from "./audioCache";
@@ -8,11 +9,24 @@ import { resolveAudioSource } from "./audioCache";
 let player: AudioPlayer | null = null;
 let endedHandler: (() => void) | null = null;
 
-/** Which stop's recording is loaded, for subtitles (null once it has finished or stopped). */
-let currentWaypointId: string | null = null;
-/** The stop whose recording is in the player, so a replay after it ends gets its subtitles back. */
-let loadedWaypointId: string | null = null;
-type ProgressListener = (waypointId: string | null, seconds: number) => void;
+/** The walker's tour guide: a stop the guide has recorded plays in their voice (web). */
+let narrationGuide: string | null = null;
+export function setNarrationGuide(guide: string): void {
+  narrationGuide = guide;
+}
+
+/** What's playing: which stop, and which recording of it — the waypoint id for
+ * the standard one, or "<waypoint id>@<guide>" for a guide's own (matching the
+ * keys in content/narration/cues). */
+export interface NarrationPlaying {
+  waypointId: string;
+  recording: string;
+}
+/** The recording loaded, for subtitles (null once it has finished or stopped). */
+let current: NarrationPlaying | null = null;
+/** Kept after it ends, so a replay gets its subtitles back. */
+let loaded: NarrationPlaying | null = null;
+type ProgressListener = (playing: NarrationPlaying | null, seconds: number, duration: number) => void;
 
 /** Why a stop's narration couldn't play: not saved and no connection, or the file wouldn't load. */
 export type NarrationProblem = "offline" | "unplayable";
@@ -41,7 +55,7 @@ function clearWatchdog() {
 function narrationFailed(waypoint: Waypoint, problem: NarrationProblem) {
   clearWatchdog();
   console.warn(`[narrationPlayer] couldn't play "${waypoint.id}" (${problem})`);
-  currentWaypointId = null;
+  current = null;
   emitProgress(0);
   errorListeners.forEach((l) => l(waypoint, problem));
   endedHandler?.();
@@ -50,9 +64,25 @@ function narrationFailed(waypoint: Waypoint, problem: NarrationProblem) {
 /**
  * Where to play a stop's narration from: on the web, a saved (downloaded)
  * copy if there is one, so tours work offline and keep working if the
- * signal drops; otherwise the bundled or online file as before.
+ * signal drops; otherwise the bundled or online file as before. The chosen
+ * guide's own recording comes first when it's saved or there's a connection;
+ * otherwise the standard narrator plays, so offline tours never break.
  */
-async function narrationSource(waypoint: Waypoint): Promise<number | string | null> {
+async function narrationSource(waypoint: Waypoint): Promise<{ source: number | string | null; guideVoice: boolean }> {
+  const guideFile = narrationGuide && Platform.OS === "web" ? GUIDE_RECORDINGS[waypoint.id]?.[narrationGuide] : undefined;
+  if (guideFile) {
+    const saved = await savedAudioUrl(guideFile);
+    if (saved) {
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+      blobUrl = saved;
+      return { source: saved, guideVoice: true };
+    }
+    if (isOnline()) return { source: guideFile, guideVoice: true };
+  }
+  return { source: await standardSource(waypoint), guideVoice: false };
+}
+
+async function standardSource(waypoint: Waypoint): Promise<number | string | null> {
   const original = waypoint.narration.audioSource;
   if (Platform.OS === "web" && typeof original === "string") {
     const saved = await savedAudioUrl(original);
@@ -67,14 +97,14 @@ async function narrationSource(waypoint: Waypoint): Promise<number | string | nu
 }
 const progressListeners = new Set<ProgressListener>();
 
-/** Follows the narration's position — which stop, and how far in — to time its subtitles. */
+/** Follows the narration's position — which recording, how far in, how long — for subtitles and progress. */
 export function subscribeNarrationProgress(listener: ProgressListener): () => void {
   progressListeners.add(listener);
   return () => progressListeners.delete(listener);
 }
 
-function emitProgress(seconds: number): void {
-  progressListeners.forEach((listener) => listener(currentWaypointId, seconds));
+function emitProgress(seconds: number, duration = 0): void {
+  progressListeners.forEach((listener) => listener(current, seconds, duration));
 }
 
 // While the landmark scanner is speaking, tour narration must not start over
@@ -118,8 +148,9 @@ export async function playWaypointNarration(waypoint: Waypoint): Promise<void> {
     return;
   }
   let source: number | string | null;
+  let guideVoice = false;
   try {
-    source = await narrationSource(waypoint);
+    ({ source, guideVoice } = await narrationSource(waypoint));
   } catch {
     source = null;
   }
@@ -138,17 +169,20 @@ export async function playWaypointNarration(waypoint: Waypoint): Promise<void> {
     player.addListener("playbackStatusUpdate", (status: AudioStatus) => {
       if (status.isLoaded && status.duration > 0) clearWatchdog();
       if (status.didJustFinish) {
-        currentWaypointId = null;
+        current = null;
         emitProgress(0);
         endedHandler?.();
         return;
       }
-      emitProgress(status.currentTime);
+      emitProgress(status.currentTime, status.duration);
     });
   } else {
     player.replace(source);
   }
-  currentWaypointId = loadedWaypointId = waypoint.id;
+  current = loaded = {
+    waypointId: waypoint.id,
+    recording: guideVoice ? `${waypoint.id}@${narrationGuide}` : waypoint.id,
+  };
   emitProgress(0);
 
   // Only one player can hold the lock screen at a time; doNotMix (set in
@@ -163,7 +197,7 @@ export async function playWaypointNarration(waypoint: Waypoint): Promise<void> {
   // say so and move on rather than waiting forever.
   clearWatchdog();
   loadWatchdog = setTimeout(() => {
-    if (currentWaypointId === waypoint.id && !(player?.isLoaded && (player?.duration ?? 0) > 0)) {
+    if (current?.waypointId === waypoint.id && !(player?.isLoaded && (player?.duration ?? 0) > 0)) {
       player?.pause();
       narrationFailed(waypoint, isOnline() ? "unplayable" : "offline");
     }
@@ -180,14 +214,14 @@ export function resumeNarration(): void {
 
 export function replayCurrentNarration(): void {
   if (!player) return;
-  currentWaypointId = loadedWaypointId;
+  current = loaded;
   void player.seekTo(0);
   player.play();
 }
 
 export function stopNarration(): void {
   clearWatchdog();
-  currentWaypointId = null;
+  current = null;
   emitProgress(0);
   if (!player) return;
   player.pause();

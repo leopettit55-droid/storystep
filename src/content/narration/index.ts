@@ -19,8 +19,9 @@ export interface SubtitleTrack {
   lines: string[];
 }
 
-export function subtitleTrack(waypoint: Waypoint, language: string): SubtitleTrack | null {
-  const starts = NARRATION_CUES[waypoint.id];
+/** `recording` is the cue key of what's playing: the waypoint id, or "<waypoint id>@<guide>". */
+export function subtitleTrack(waypoint: Waypoint, language: string, recording: string = waypoint.id): SubtitleTrack | null {
+  const starts = NARRATION_CUES[recording];
   if (!starts) return null;
   const english = splitSentences(waypoint.narration.scriptText);
   const translated = SUBTITLE_TRANSLATIONS[language]?.[waypoint.id];
