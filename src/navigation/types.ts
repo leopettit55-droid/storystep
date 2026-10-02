@@ -21,6 +21,12 @@ export type RootStackParamList = {
   TermsOfService: undefined;
   ComingSoon: { cityName: string };
   ContactUs: undefined;
+  /** Account tab → Leaderboards. */
+  Leaderboards: undefined;
+  /** Tours tab → Tour photos: your own shared photos. */
+  MyPhotos: undefined;
+  /** A tour's public photo gallery. */
+  TourGallery: { areaId: string };
 };
 
 /** Navigation prop for a screen living inside a MainTabs tab that also needs

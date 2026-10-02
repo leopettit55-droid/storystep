@@ -42,3 +42,6 @@ yarn-error.*
 
 # Netlify CLI local state
 .netlify
+
+# Written by scripts/build-tour-pages.ts on every build
+netlify/lib/tours.generated.json
