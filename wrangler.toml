@@ -1,0 +1,16 @@
+# Cloudflare Pages: the website (dist/) plus the social server in functions/.
+# Deploy with `npm run deploy` (builds, updates the database tables, uploads).
+name = "storystep"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-09-01"
+
+# Users, finished tours, photo details and reports. Tables: migrations/.
+[[d1_databases]]
+binding = "DB"
+database_name = "storystep"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+# The photo files.
+[[kv_namespaces]]
+binding = "PHOTOS"
+id = "00000000000000000000000000000000"

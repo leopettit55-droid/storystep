@@ -1,11 +1,9 @@
 /**
- * Leaderboard data and rankings. Every finished tour is one entry in a single
- * shared record; boards are worked out from it on request (and cached briefly
- * by Netlify's CDN), so new finishes show up within seconds.
+ * Leaderboard rankings, worked out on request from the finished tours in the
+ * chosen period (and cached for 15 seconds), so new finishes show up within
+ * seconds.
  */
-import { TOURS, tourById } from "./social.mts";
-
-export const LEADERBOARD_KEY = "leaderboard";
+import { TOURS, tourById } from "./social";
 
 export interface Completion {
   uid: string;
@@ -14,10 +12,6 @@ export interface Completion {
   /** Start-to-finish seconds, or null when the run doesn't count for speed. */
   sec: number | null;
   at: number;
-}
-
-export interface Leaderboard {
-  completions: Completion[];
 }
 
 export type Board = "overall" | "tour" | "most";
@@ -38,6 +32,9 @@ export interface Row {
 
 const PERIOD_MS: Record<Period, number> = { week: 7 * 24 * 3600_000, month: 30 * 24 * 3600_000, all: Infinity };
 
+/** The earliest finish that counts for a period. */
+export const periodStart = (period: Period) => (period === "all" ? 0 : Date.now() - PERIOD_MS[period]);
+
 /** Shared places for equal values (1, 2, 2, 4). */
 function rankRows(rows: Omit<Row, "rank">[], better: (a: Omit<Row, "rank">, b: Omit<Row, "rank">) => number): Row[] {
   const sorted = [...rows].sort(better);
@@ -48,10 +45,8 @@ function rankRows(rows: Omit<Row, "rank">[], better: (a: Omit<Row, "rank">, b: O
   });
 }
 
-export function computeBoard(board: Board, period: Period, tourId: string | null, data: Leaderboard): Row[] {
-  const since = Date.now() - PERIOD_MS[period];
-  const recent = data.completions.filter((c) => c.at >= since);
-
+/** `recent` is the period's finishes (just one tour's for the "tour" board). */
+export function computeBoard(board: Board, recent: Completion[]): Row[] {
   if (board === "most") {
     const byUser = new Map<string, { name: string; tours: Set<string>; at: number }>();
     for (const c of recent) {
@@ -67,20 +62,20 @@ export function computeBoard(board: Board, period: Period, tourId: string | null
     );
   }
 
-  const timed = recent.filter((c) => c.sec !== null && (board === "overall" || c.tour === tourId));
   const best = new Map<string, Omit<Row, "rank">>();
-  for (const c of timed) {
+  for (const c of recent) {
+    if (c.sec === null) continue;
     const tour = tourById(c.tour);
     if (!tour) continue;
-    const secondsPerKm = (c.sec as number) / tour.distanceKm;
-    const score = board === "overall" ? secondsPerKm : (c.sec as number);
+    const secondsPerKm = c.sec / tour.distanceKm;
+    const score = board === "overall" ? secondsPerKm : c.sec;
     const current = best.get(c.uid);
     const currentScore = current ? (board === "overall" ? current.secondsPerKm! : current.value) : Infinity;
     if (score < currentScore) {
       best.set(c.uid, {
         uid: c.uid,
         name: c.name,
-        value: c.sec as number,
+        value: c.sec,
         tour: c.tour,
         tourName: tour.name,
         secondsPerKm: Math.round(secondsPerKm),

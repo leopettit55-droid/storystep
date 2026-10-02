@@ -3,7 +3,7 @@ import { Platform } from "react-native";
 import { useAccountStore } from "../account/accountStore";
 
 /**
- * Talks to StoryStep's social server (netlify/functions): leaderboards and
+ * Talks to StoryStep's social server (functions/ and server/, on Cloudflare Pages): leaderboards and
  * tour photos. The live website calls its own /api; the dev server and the
  * phone apps call storystep.site.
  */

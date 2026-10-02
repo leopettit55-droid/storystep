@@ -63,8 +63,8 @@ export const PRIVACY_POLICY_SECTIONS: PolicySection[] = [
       "to render the map. Governed by Google's Privacy Policy: policies.google.com/privacy\n\n" +
       "Stripe — processes all payments via its own hosted checkout page. Stripe receives your payment details " +
       "directly; we do not. Governed by Stripe's Privacy Policy: stripe.com/privacy\n\n" +
-      "Netlify — hosts the StoryStep website and stores the leaderboard and tour photo data described above. " +
-      "Governed by Netlify's Privacy Policy: netlify.com/privacy\n\n" +
+      "Cloudflare — hosts the StoryStep website and stores the leaderboard and tour photo data described above. " +
+      "Governed by Cloudflare's Privacy Policy: cloudflare.com/privacypolicy\n\n" +
       "Other StoryStep users — the leaderboards show your account name and your tour times and counts, and public " +
       "photos show your name, the tour, the stop and the date. Private photos are visible only to you.\n\n" +
       "We do not share your information with anyone else, and we do not sell it.",
@@ -75,7 +75,7 @@ export const PRIVACY_POLICY_SECTIONS: PolicySection[] = [
       "Your account details (name, email, password hash), tour progress, downloaded tours, purchase records and " +
       "subscription status are stored only on your device. Uninstalling the app, or clearing the website's data " +
       "in your browser, deletes them.\n\n" +
-      "Leaderboard entries and shared photos are stored on our server, hosted by Netlify. They stay there until you " +
+      "Leaderboard entries and shared photos are stored on our server, hosted by Cloudflare. They stay there until you " +
       "delete them (photos) or ask us to remove them (see below).",
   },
   {
@@ -112,7 +112,7 @@ export const PRIVACY_POLICY_SECTIONS: PolicySection[] = [
   {
     heading: "International data transfers",
     body:
-      "Google, Stripe and Netlify are US-headquartered companies that may process data outside your country. They maintain " +
+      "Google, Stripe and Cloudflare are US-headquartered companies that may process data outside your country. They maintain " +
       "their own safeguards for international transfers (including standard contractual clauses where applicable) " +
       "— see their respective privacy policies linked above for details.",
   },

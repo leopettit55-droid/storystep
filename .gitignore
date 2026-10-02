@@ -44,4 +44,7 @@ yarn-error.*
 .netlify
 
 # Written by scripts/build-tour-pages.ts on every build
-netlify/lib/tours.generated.json
+server/tours.generated.json
+
+# Wrangler (Cloudflare) local state: the local test database and photo store
+.wrangler
