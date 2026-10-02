@@ -8,9 +8,9 @@ compatibility_date = "2026-09-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "storystep"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "3cf24593-f89c-4077-abe8-eb3765276217"
 
 # The photo files.
 [[kv_namespaces]]
 binding = "PHOTOS"
-id = "00000000000000000000000000000000"
+id = "221415be59a34d7a933a696f569e6aaf"
