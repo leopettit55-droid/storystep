@@ -5,6 +5,11 @@
   command = "npm run build:web"
   publish = "dist"
 
+# Leaderboards and tour photos (Netlify Functions + Netlify Blobs).
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 [build.environment]
   NODE_VERSION = "24"
 

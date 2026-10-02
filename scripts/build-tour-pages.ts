@@ -159,6 +159,19 @@ function copyMapWorker() {
   }
 }
 
+/** The tour list the social server trusts (netlify/lib/social.mts): ids,
+ * names, distances and stop locations, so a phone can't invent any of them. */
+function writeServerTourList(tours: Area[]) {
+  const list = tours.map((a) => ({
+    id: a.id,
+    name: a.name,
+    city: a.city,
+    distanceKm: a.estimatedDistanceKm,
+    stops: a.route.map((w) => ({ id: w.id, name: w.name, lat: w.coordinates.lat, lng: w.coordinates.lng })),
+  }));
+  fs.writeFileSync(path.join(ROOT, "netlify", "lib", "tours.generated.json"), JSON.stringify(list, null, 2) + "\n");
+}
+
 function main() {
   const templatePath = path.join(DIST, "index.html");
   if (!fs.existsSync(templatePath)) {
@@ -175,6 +188,7 @@ function main() {
   }
   fs.writeFileSync(path.join(DIST, "sitemap.xml"), sitemap(tours));
   copyMapWorker();
+  writeServerTourList(tours);
   console.log(`Wrote ${tours.length} tour pages and sitemap.xml (${tours.length + 2} URLs).`);
 }
 

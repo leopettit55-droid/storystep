@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../navigation/types";
+import { flushCompletions } from "../social/completions";
 import {
   Alert,
   SafeAreaView,
@@ -35,6 +39,7 @@ export default function AccountScreen() {
   const { t } = useLanguage();
   const { colors, isDark, toggleMode } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const ready = useAccountStore((s) => s.ready);
   const account = useAccountStore((s) => s.account);
   const completedCount = useAccountStore((s) => s.completedTourIds.length);
@@ -82,6 +87,7 @@ export default function AccountScreen() {
       return;
     }
     notifySuccess();
+    void flushCompletions();
     setName("");
     setEmail("");
     setPassword("");
@@ -96,6 +102,7 @@ export default function AccountScreen() {
       return;
     }
     notifySuccess();
+    void flushCompletions();
     setLoginEmail("");
     setLoginPassword("");
   };
@@ -244,6 +251,15 @@ export default function AccountScreen() {
           </>
         )}
 
+        <PressScale style={styles.leaderboardsButton} scaleTo={0.97} onPress={() => navigation.navigate("Leaderboards")}>
+          <Ionicons name="trophy-outline" size={22} color={colors.primary} />
+          <View style={styles.leaderboardsText}>
+            <Text style={styles.rowTitle}>{t("leaderboards.title")}</Text>
+            <Text style={styles.rowBody}>{t("leaderboards.buttonBody")}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.textDim} />
+        </PressScale>
+
         <DownloadedToursCard />
 
         <View style={styles.card}>
@@ -290,6 +306,17 @@ function createStyles(colors: ThemeColors) {
     avatarText: { fontSize: 22, fontWeight: "700", color: colors.primary },
     name: { fontSize: 17, fontWeight: "700", color: colors.text },
     body: { fontSize: 14, color: colors.textMid, marginTop: 6, lineHeight: 20 },
+    leaderboardsButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    leaderboardsText: { flex: 1 },
     completedCount: { fontSize: 13, color: colors.primary, fontWeight: "600", marginTop: 8 },
     rowTitle: { fontSize: 15, fontWeight: "700", color: colors.text },
     rowBody: { fontSize: 13, color: colors.textMid, marginTop: 4 },

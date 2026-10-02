@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { useAccountStore } from "../account/accountStore";
+import PressScale from "../components/PressScale";
 import { useOfflineStore } from "../offline/offlineStore";
 import { areas } from "../content";
 import type { Area } from "../content";
@@ -140,7 +141,13 @@ export default function AreaSelectScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t("tours.title")}</Text>
+        <View style={styles.titleRow}>
+          <Text style={styles.title}>{t("tours.title")}</Text>
+          <PressScale style={styles.photosButton} scaleTo={0.95} onPress={() => navigation.navigate("MyPhotos")}>
+            <Ionicons name="images-outline" size={16} color={colors.primary} />
+            <Text style={styles.photosButtonText}>{t("photos.myTitle")}</Text>
+          </PressScale>
+        </View>
         <Text style={styles.subtitle}>{t("tours.subtitle")}</Text>
       </View>
       <SectionList
@@ -211,6 +218,18 @@ function createStyles(colors: ThemeColors) {
     },
     cardTitle: { fontSize: 17, fontWeight: "700", color: colors.text, flexShrink: 1 },
     completedBadge: { marginLeft: 8 },
+    titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
+    photosButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      borderRadius: 20,
+      paddingVertical: 7,
+      paddingHorizontal: 12,
+    },
+    photosButtonText: { color: colors.primary, fontSize: 13, fontWeight: "700" },
     badge: {
       fontSize: 10,
       color: colors.primary,
