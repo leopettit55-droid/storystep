@@ -256,6 +256,17 @@ export default function TourPreviewScreen() {
 
         {!scannerOnly && <OfflineTourCard area={area} />}
 
+        {!scannerOnly && (
+          <PressScale
+            style={styles.galleryLink}
+            scaleTo={0.97}
+            onPress={() => navigation.navigate("TourGallery", { areaId: area.id })}
+          >
+            <Ionicons name="images-outline" size={17} color={colors.primary} />
+            <Text style={styles.galleryLinkText}>{t("photos.galleryLink")}</Text>
+          </PressScale>
+        )}
+
         {area.freeLandmarkScanner && (
           <PressScale style={styles.scannerButton} scaleTo={0.96} onPress={handleOpenScanner}>
             <Ionicons name="scan" size={18} color={colors.primary} />
@@ -317,6 +328,8 @@ function createStyles(colors: ThemeColors) {
   },
   ctaText: { color: colors.onPrimary, fontSize: 16, fontWeight: "600" },
   ctaSkeleton: { height: 52 },
+  galleryLink: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 10, paddingVertical: 10 },
+  galleryLinkText: { color: colors.primary, fontSize: 14, fontWeight: "600" },
   offer: {
     marginTop: 12,
     borderWidth: 1,

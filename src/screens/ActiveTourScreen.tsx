@@ -3,7 +3,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as Location from "expo-location";
-import { Animated, Easing, Linking, Platform, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Animated, Easing, Linking, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import PressScale from "../components/PressScale";
 import { notifySuccess, tapMedium } from "../haptics";
@@ -37,6 +37,7 @@ import { useLanguage } from "../i18n/LanguageContext";
 import type { RootStackParamList } from "../navigation/types";
 import { clearTourProgress, saveTourProgress } from "../state/tourProgress";
 import { useAccountStore } from "../account/accountStore";
+import { finishRun, markRunResumed, markRunSkipped, startRun, submitCompletion } from "../social/completions";
 import {
   selectCurrentWaypoint,
   selectNextWaypoint,
@@ -47,6 +48,7 @@ import { useTheme } from "../ThemeContext";
 import type { ThemeColors } from "../theme";
 import ShareWalkButton from "../components/ShareWalkButton";
 import PubSuggestion from "../components/PubSuggestion";
+import SharePhotoCard from "../components/SharePhotoCard";
 import NarrationSubtitle from "../components/NarrationSubtitle";
 import StopDetail, { type StopDetailMode } from "../components/StopDetail";
 import TourIntro from "../components/TourIntro";
@@ -70,6 +72,10 @@ export default function ActiveTourScreen() {
   const { params } = useRoute() as unknown as RouteProp;
   const area = getAreaById(params.areaId);
   const resuming = params.resume === true;
+  // A continued walk's clock kept running while away: not a fair time.
+  useEffect(() => {
+    if (resuming && area) void markRunResumed(area.id);
+  }, [resuming, area]);
   const { language, t } = useLanguage();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -210,6 +216,8 @@ export default function ActiveTourScreen() {
     if (area && status === "complete") {
       void clearTourProgress(area.id);
       void useAccountStore.getState().markTourCompleted(area.id);
+      // Leaderboards: this walk's time (if it counts) and the finish itself.
+      void finishRun(area.id).then(({ seconds, completedAt }) => submitCompletion(area.id, seconds, completedAt));
     }
   }, [area, status]);
 
@@ -378,12 +386,14 @@ export default function ActiveTourScreen() {
   if (status === "complete") {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.centered}>
+        {/* Scrolls: with the share, photo and pub cards it can be taller than a phone. */}
+        <ScrollView contentContainerStyle={[styles.centered, styles.completeScroll]}>
           <Text style={styles.completeTitle}>{t("activeTour.tourComplete")}</Text>
           <Text style={styles.completeSubtitle}>
             {t("activeTour.tourCompleteBody", { area: areaText.name })}
           </Text>
           <ShareWalkButton area={area} />
+          <SharePhotoCard area={area} />
           <PubSuggestion area={area} />
           <Pressable
             style={styles.cta}
@@ -392,7 +402,7 @@ export default function ActiveTourScreen() {
           >
             <Text style={styles.ctaText}>{t("activeTour.backToAreas")}</Text>
           </Pressable>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -410,6 +420,7 @@ export default function ActiveTourScreen() {
   };
 
   const handleSkipNext = () => {
+    void markRunSkipped(area.id);
     if (!nextWaypoint) return;
     visitedRef.current.delete(nextWaypoint.id);
     skipToNext();
@@ -419,6 +430,7 @@ export default function ActiveTourScreen() {
   };
 
   const handleSkipPrevious = () => {
+    void markRunSkipped(area.id);
     skipToPrevious();
     persistProgress();
     const wp = useTourStore.getState().area
@@ -467,6 +479,7 @@ export default function ActiveTourScreen() {
       console.warn("[ActiveTourScreen] background location not granted; foreground tracking only");
     }
     useTourStore.getState().arrivedAtStart();
+    startRun(area.id);
     setStarted(true);
   };
 
@@ -782,6 +795,7 @@ function createStyles(colors: ThemeColors) {
   playIconNudge: { marginLeft: 3 },
   centered: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24, gap: 16 },
   waypointName: { color: colors.text, fontSize: 32, fontWeight: "700", textAlign: "center" },
+  completeScroll: { flexGrow: 1, paddingVertical: 32 },
   completeTitle: { color: colors.text, fontSize: 28, fontWeight: "700" },
   completeSubtitle: { color: colors.textMid, fontSize: 15, marginTop: 8, textAlign: "center" },
   cta: {
