@@ -141,8 +141,100 @@ export function setNarrationEndedHandler(handler: (() => void) | null): void {
   endedHandler = handler;
 }
 
-/** Resolves the waypoint's narration (bundled or cached-remote) and starts playback. */
-export async function playWaypointNarration(waypoint: Waypoint): Promise<void> {
+/**
+ * Walk with a friend: a start that's been scheduled for an exact moment. Each
+ * new play/pause/sync bumps the token, so an older scheduled start never fires.
+ */
+let syncToken = 0;
+let syncTimer: ReturnType<typeof setTimeout> | null = null;
+
+function cancelScheduledStart() {
+  syncToken++;
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = null;
+}
+
+/** iPhone and iPad browsers only load audio once it has been played. */
+const PLAY_TO_LOAD =
+  Platform.OS === "web" &&
+  typeof navigator !== "undefined" &&
+  (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+
+/** Off by more than this (seconds) just after starting: seek again. */
+const START_TOLERANCE_S = 0.2;
+
+/**
+ * Plays the loaded narration so that second 0 is at `startAt` (local clock,
+ * ms): waits if that's still to come, or jumps ahead if it has passed. Some
+ * browsers (iPhone Safari) won't load audio until it's played, so a file that
+ * hasn't started loading is nudged with a play and an immediate pause. Seeking
+ * can land a little late, so the position is checked once more just after.
+ */
+async function startInSync(startAt: number): Promise<void> {
+  if (!player) return;
+  const token = ++syncToken;
+  if (syncTimer) clearTimeout(syncTimer);
+  const p = player;
+  if (p.playing) p.pause();
+  if (PLAY_TO_LOAD && !p.isLoaded) {
+    p.play();
+    p.pause();
+  }
+  const giveUpAt = Date.now() + LOAD_TIMEOUT_MS;
+  while (token === syncToken && !(p.isLoaded && p.duration > 0) && Date.now() < giveUpAt) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  if (token !== syncToken) return;
+  const expected = () => (Date.now() - startAt) / 1000;
+  const begin = async () => {
+    if (token !== syncToken) return;
+    const position = Math.max(0, expected());
+    if (p.duration > 0 && position >= p.duration - 0.25) {
+      // That part's already over for the friend: finish it here too.
+      current = null;
+      emitProgress(0);
+      endedHandler?.();
+      return;
+    }
+    await p.seekTo(position);
+    if (token !== syncToken) return;
+    p.play();
+    syncTimer = setTimeout(() => {
+      if (token !== syncToken || !p.playing) return;
+      const off = p.currentTime - expected();
+      if (Math.abs(off) > START_TOLERANCE_S) void p.seekTo(Math.max(0, expected()));
+    }, 1_500);
+  };
+  const wait = startAt - Date.now();
+  if (wait > 30) {
+    await p.seekTo(0);
+    syncTimer = setTimeout(() => void begin(), wait);
+  } else {
+    await begin();
+  }
+}
+
+/** Walk with a friend: line the loaded narration up with `startAt` again (resume, re-sync). */
+export function syncNarration(startAt: number): void {
+  void startInSync(startAt);
+}
+
+/** Where the narration is (seconds), and how long it is. */
+export function narrationPosition(): { seconds: number; duration: number; loaded: boolean } {
+  return { seconds: player?.currentTime ?? 0, duration: player?.duration ?? 0, loaded: !!player?.isLoaded };
+}
+
+/** Which stop's narration is loaded (playing or not). */
+export function loadedNarration(): NarrationPlaying | null {
+  return loaded;
+}
+
+/**
+ * Resolves the waypoint's narration (bundled or cached-remote) and starts
+ * playback, now or (Walk with a friend) so that it starts at `startAt`.
+ */
+export async function playWaypointNarration(waypoint: Waypoint, options: { startAt?: number } = {}): Promise<void> {
+  cancelScheduledStart();
   if (held) {
     pendingWaypoint = waypoint;
     return;
@@ -177,6 +269,8 @@ export async function playWaypointNarration(waypoint: Waypoint): Promise<void> {
       emitProgress(status.currentTime, status.duration);
     });
   } else {
+    // A synced start pauses first, so the new file doesn't start by itself (replace resumes a playing player).
+    if (options.startAt != null) player.pause();
     player.replace(source);
   }
   current = loaded = {
@@ -191,7 +285,8 @@ export async function playWaypointNarration(waypoint: Waypoint): Promise<void> {
     title: waypoint.name,
     artist: "StoryStep",
   });
-  player.play();
+  if (options.startAt == null) player.play();
+  else void startInSync(options.startAt);
 
   // If the file never loads (damaged, or the connection dropped mid-fetch),
   // say so and move on rather than waiting forever.
@@ -205,6 +300,7 @@ export async function playWaypointNarration(waypoint: Waypoint): Promise<void> {
 }
 
 export function pauseNarration(): void {
+  cancelScheduledStart();
   player?.pause();
 }
 
@@ -220,6 +316,7 @@ export function replayCurrentNarration(): void {
 }
 
 export function stopNarration(): void {
+  cancelScheduledStart();
   clearWatchdog();
   current = null;
   emitProgress(0);

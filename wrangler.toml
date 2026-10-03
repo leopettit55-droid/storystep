@@ -14,3 +14,9 @@ database_id = "3cf24593-f89c-4077-abe8-eb3765276217"
 [[kv_namespaces]]
 binding = "PHOTOS"
 id = "221415be59a34d7a933a696f569e6aaf"
+
+# "Walk with a friend" rooms, hosted by the storystep-duo Worker (duo/).
+[[durable_objects.bindings]]
+name = "DUO"
+class_name = "DuoRoom"
+script_name = "storystep-duo"

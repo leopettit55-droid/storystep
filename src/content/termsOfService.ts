@@ -1,6 +1,6 @@
 import type { PolicySection } from "./privacyPolicy";
 
-export const TERMS_EFFECTIVE_DATE = "2 October 2026";
+export const TERMS_EFFECTIVE_DATE = "3 October 2026";
 
 export const TERMS_INTRO =
   "These terms govern your use of the StoryStep app and website. By creating an account, buying a tour, " +
@@ -63,6 +63,14 @@ export const TERMS_SECTIONS: PolicySection[] = [
       "sharing one publicly you let StoryStep show it in that tour's gallery until you delete it. Photos that " +
       "other users report may be hidden while we review them, and we may remove photos, leaderboard entries or " +
       "accounts that break these rules or that record tours that weren't really walked.",
+  },
+  {
+    heading: "Walking with a friend",
+    body:
+      "Only share your invite code with people you know. Be kind in chat: no harassment, threats, or explicit or " +
+      "illegal content. Your friend sees where you are while you walk together unless you switch to \"distance only\", " +
+      "so switch that on, or leave the walk, whenever you'd rather not share your position. Keep your eyes on the road, " +
+      "not the chat, while you're walking.",
   },
   {
     heading: "Intellectual property",

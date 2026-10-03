@@ -3,7 +3,7 @@ export interface PolicySection {
   body: string;
 }
 
-export const PRIVACY_POLICY_EFFECTIVE_DATE = "2 October 2026";
+export const PRIVACY_POLICY_EFFECTIVE_DATE = "3 October 2026";
 
 export const PRIVACY_POLICY_INTRO =
   "This policy explains what information StoryStep collects, why, and what control you have over it. " +
@@ -29,6 +29,14 @@ export const PRIVACY_POLICY_SECTIONS: PolicySection[] = [
       "tag them to (the stop's location, not your own GPS position), the date, and whether they're public or " +
       "private; and any reports you make about other people's photos. Photos are shrunk before upload, which also " +
       "removes the location and camera details stored inside the original picture file.\n\n" +
+      "Walk with a friend (only if you use it): while you walk a tour with a friend, your position is sent every few " +
+      "seconds through our server to your friend, and only to them, so it shows on their map. In \"distance only\" mode " +
+      "they see how far apart you are, not where you are. Positions are passed on, never stored. Chat messages and " +
+      "emoji reactions are kept only while the walk is going, so a phone that loses signal can catch up, and are " +
+      "deleted when the walk ends. When you finish, the tour, both names, your time and any star rating are kept for " +
+      "the duo leaderboard. The rest of the walk's record, including its summary (for example how far apart you were " +
+      "on average), is deleted 24 hours after the walk ends; a walk that's never finished closes 4 hours after the " +
+      "invite was made.\n\n" +
       "Location data: while you're on an active tour, StoryStep reads your GPS position to detect when you've " +
       "reached a waypoint and trigger the next narration segment automatically. This runs on your device. If you " +
       "grant \"Always\" location access, this continues while the app is backgrounded so narration still triggers " +
@@ -66,7 +74,9 @@ export const PRIVACY_POLICY_SECTIONS: PolicySection[] = [
       "Cloudflare — hosts the StoryStep website and stores the leaderboard and tour photo data described above. " +
       "Governed by Cloudflare's Privacy Policy: cloudflare.com/privacypolicy\n\n" +
       "Other StoryStep users — the leaderboards show your account name and your tour times and counts, and public " +
-      "photos show your name, the tour, the stop and the date. Private photos are visible only to you.\n\n" +
+      "photos show your name, the tour, the stop and the date. Private photos are visible only to you. When you walk " +
+      "with a friend, they see your name, your live position (or only the distance between you), your messages and " +
+      "reactions, and the duo leaderboard shows your two names together.\n\n" +
       "We do not share your information with anyone else, and we do not sell it.",
   },
   {

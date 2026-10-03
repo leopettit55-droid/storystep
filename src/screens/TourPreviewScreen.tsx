@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Platform, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import BackButton from "../components/BackButton";
 import PressScale from "../components/PressScale";
@@ -23,6 +23,7 @@ import { useTourStore } from "../state/tourStore";
 import { useTheme } from "../ThemeContext";
 import { CONTENT_MAX_WIDTH, type ThemeColors } from "../theme";
 import { unlockSpeech } from "../audio/speakPrompt";
+import { duoCount } from "../duo/duoApi";
 
 type Nav = NativeStackNavigationProp<RootStackParamList, "TourPreview">;
 type RouteProp = { params: { areaId: string } };
@@ -37,6 +38,18 @@ export default function TourPreviewScreen() {
   const [saved, setSaved] = useState<SavedProgress | null>(null);
   /** Set while "Download before you go?" is showing: what to do once answered. */
   const [downloadOffer, setDownloadOffer] = useState<{ go: () => void } | null>(null);
+  /** How many pairs have walked this tour together (shown once there are some). */
+  const [duos, setDuos] = useState(0);
+  useEffect(() => {
+    if (!area || area.scannerOnly) return;
+    let cancelled = false;
+    duoCount(area.id)
+      .then((n) => !cancelled && setDuos(n))
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [area]);
   const online = useOnline();
   const offlineStatus = useOfflineStore((s) => (area ? s.tours[area.id]?.status : undefined));
   const { language, t } = useLanguage();
@@ -254,6 +267,25 @@ export default function TourPreviewScreen() {
             </PressScale>
           ))}
 
+        {!scannerOnly && !downloadOffer && owned && (
+          <PressScale
+            style={styles.duoButton}
+            scaleTo={0.97}
+            onPress={() => navigation.navigate("DuoLobby", { areaId: area.id })}
+          >
+            <View style={styles.duoIcon}>
+              <Ionicons name="people" size={20} color={colors.onPrimary} />
+            </View>
+            <View style={styles.duoText}>
+              <Text style={styles.duoTitle}>{t("duo.walkWithFriend")}</Text>
+              <Text style={styles.duoBody}>
+                {duos > 0 ? (duos === 1 ? t("duo.duosCountOne") : t("duo.duosCount", { count: duos })) : t("duo.walkWithFriendBody")}
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={colors.textDim} />
+          </PressScale>
+        )}
+
         {!scannerOnly && <OfflineTourCard area={area} />}
 
         {!scannerOnly && (
@@ -328,6 +360,21 @@ function createStyles(colors: ThemeColors) {
   },
   ctaText: { color: colors.onPrimary, fontSize: 16, fontWeight: "600" },
   ctaSkeleton: { height: 52 },
+  duoButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginTop: 12,
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  duoIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" },
+  duoText: { flex: 1, gap: 2 },
+  duoTitle: { color: colors.text, fontSize: 16, fontWeight: "700" },
+  duoBody: { color: colors.textMid, fontSize: 13, lineHeight: 18 },
   galleryLink: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 10, paddingVertical: 10 },
   galleryLinkText: { color: colors.primary, fontSize: 14, fontWeight: "600" },
   offer: {

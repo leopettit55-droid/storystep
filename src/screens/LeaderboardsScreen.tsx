@@ -17,6 +17,7 @@ const BOARDS: { id: Board; key: string }[] = [
   { id: "overall", key: "leaderboards.overall" },
   { id: "tour", key: "leaderboards.perTour" },
   { id: "most", key: "leaderboards.most" },
+  { id: "duo", key: "leaderboards.duos" },
 ];
 const PERIODS: { id: Period; key: string }[] = [
   { id: "week", key: "leaderboards.week" },
@@ -80,7 +81,7 @@ export default function LeaderboardsScreen() {
     return formatDuration(row.value);
   };
   const detailText = (row: BoardRow) => {
-    if (board !== "overall" || !row.tour || row.secondsPerKm == null) return null;
+    if ((board !== "overall" && board !== "duo") || !row.tour || row.secondsPerKm == null) return null;
     const area = areas.find((a) => a.id === row.tour);
     const name = area ? localizedAreaText(area.id, language, area).name : row.tourName;
     return t("leaderboards.paceOn", { pace: formatDuration(row.secondsPerKm), tour: name ?? "" });
@@ -101,7 +102,8 @@ export default function LeaderboardsScreen() {
   );
 
   const myId = shown?.myId;
-  const meInList = !!shown?.rows.some((r) => r.uid === myId);
+  const isMe = (row: BoardRow) => !!myId && (row.uid === myId || !!row.uids?.includes(myId));
+  const meInList = !!shown?.rows.some(isMe);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -172,7 +174,7 @@ export default function LeaderboardsScreen() {
           ) : shown && shown.rows.length === 0 ? (
             <Text style={styles.empty}>{t("leaderboards.empty")}</Text>
           ) : (
-            shown?.rows.map((row) => renderRow(row, row.uid === myId))
+            shown?.rows.map((row) => renderRow(row, isMe(row)))
           )}
           {shown?.me && !meInList && (
             <>

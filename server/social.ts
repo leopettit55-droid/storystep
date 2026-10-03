@@ -11,6 +11,8 @@ export interface Env {
   DB: D1Database;
   /** The photo files themselves, keyed by photo id. */
   PHOTOS: KVNamespace;
+  /** "Walk with a friend" rooms (duo/room.ts, deployed as the storystep-duo Worker). */
+  DUO: DurableObjectNamespace;
 }
 
 export interface TourMeta {

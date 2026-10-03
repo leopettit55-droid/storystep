@@ -1,14 +1,14 @@
 /**
- * GET /api/leaderboard?board=overall|tour|most&period=week|month|all&tour=<id>&me=<userId>
+ * GET /api/leaderboard?board=overall|tour|most|duo&period=week|month|all&tour=<id>&me=<userId>
  *
  * The top 100, plus the asking user's own row if they're further down. The
  * full ranking is kept in Cloudflare's cache for 15 seconds, so opening the
  * board doesn't read the database every time yet new finishes appear quickly.
  */
-import { computeBoard, knownTour, periodStart, type Board, type Completion, type Period, type Row } from "./ranking";
+import { computeBoard, computeDuoBoard, knownTour, periodStart, type Board, type Completion, type DuoCompletion, type Period, type Row } from "./ranking";
 import { error, json, type Env } from "./social";
 
-const BOARDS: Board[] = ["overall", "tour", "most"];
+const BOARDS: Board[] = ["overall", "tour", "most", "duo"];
 const PERIODS: Period[] = ["week", "month", "all"];
 const LIMIT = 100;
 const CACHE_SECONDS = 15;
@@ -20,6 +20,14 @@ interface Ranking {
 
 async function ranking(env: Env, board: Board, period: Period, tour: string | null): Promise<Ranking> {
   const since = periodStart(period);
+  if (board === "duo") {
+    const { results } = await env.DB.prepare(
+      "SELECT tour, uid_a, name_a, uid_b, name_b, sec, at FROM duo_completions WHERE at >= ? AND sec IS NOT NULL"
+    )
+      .bind(since)
+      .all<DuoCompletion>();
+    return { rows: computeDuoBoard(results), updatedAt: Date.now() };
+  }
   const query =
     board === "tour"
       ? env.DB.prepare("SELECT uid, name, tour, sec, at FROM completions WHERE at >= ? AND tour = ?").bind(since, tour)
@@ -49,7 +57,7 @@ export async function getLeaderboard(env: Env, req: Request, waitUntil: (p: Prom
     waitUntil(cache.put(cacheKey, copy));
   }
 
-  const mine = me ? data.rows.find((r) => r.uid === me) ?? null : null;
+  const mine = me ? data.rows.find((r) => r.uid === me || r.uids?.includes(me)) ?? null : null;
   return json(
     { board, period, tour, total: data.rows.length, rows: data.rows.slice(0, LIMIT), me: mine, updatedAt: data.updatedAt },
     200,
