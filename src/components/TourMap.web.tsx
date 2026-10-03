@@ -16,6 +16,7 @@ import { useLanguage } from "../i18n/LanguageContext";
 import { bearingDegrees, distanceMeters } from "../geofencing/proximityTracker";
 import { DEFAULT_GUIDE, guideSvg } from "../guides/guides";
 import type { TourMapProps } from "./TourMap";
+import { DUO_COLORS } from "../duo/colors";
 
 // Same worker setup as the Explore map (see ExploreMapScreen.web.tsx).
 // The live site serves the map engine itself (copied in by
@@ -346,6 +347,7 @@ export default function TourMap({
   flyIn,
   focusStop,
   guide = DEFAULT_GUIDE,
+  friend,
   style,
 }: TourMapProps) {
   const { t } = useLanguage();
@@ -605,6 +607,37 @@ export default function TourMap({
     const idleTimer = window.setTimeout(() => avatar.el.classList.replace("walking", "idle"), WALK_IDLE_MS);
     return () => window.clearTimeout(idleTimer);
   }, [mapReady, userLocation]);
+
+  // Walk with a friend: an orange dot with their name, eased to each new position.
+  const friendRef = useRef<{ marker: Marker; label: HTMLDivElement } | null>(null);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || !map) return;
+    if (!friend) {
+      friendRef.current?.marker.remove();
+      friendRef.current = null;
+      return;
+    }
+    if (!friendRef.current) {
+      const el = document.createElement("div");
+      el.style.cssText = "display:flex;flex-direction:column;align-items:center;pointer-events:none;";
+      const label = document.createElement("div");
+      label.style.cssText =
+        "background:#fff;color:#201613;font:700 12px system-ui,sans-serif;padding:2px 8px;border-radius:10px;margin-bottom:4px;box-shadow:0 1px 4px rgba(0,0,0,.25);white-space:nowrap;";
+      const dot = document.createElement("div");
+      dot.style.cssText = `width:18px;height:18px;border-radius:50%;background:${DUO_COLORS.friend};border:3px solid #fff;box-shadow:0 0 0 6px ${DUO_COLORS.friend}44,0 2px 6px rgba(0,0,0,.3);`;
+      el.append(label, dot);
+      friendRef.current = { marker: new Marker({ element: el, anchor: "bottom" }).setLngLat([friend.location.lng, friend.location.lat]).addTo(map), label };
+    }
+    friendRef.current.label.textContent = friend.name;
+    friendRef.current.marker.setLngLat([friend.location.lng, friend.location.lat]);
+  }, [mapReady, friend]);
+  useEffect(
+    () => () => {
+      friendRef.current?.marker.remove();
+    },
+    []
+  );
 
   // Speech bubble above the avatar: each new line replaces the one showing.
   useEffect(() => {

@@ -3,12 +3,14 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as Location from "expo-location";
-import { Animated, Easing, Linking, Platform, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Animated, Easing, Linking, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import PressScale from "../components/PressScale";
 import { notifySuccess, tapMedium } from "../haptics";
 import {
   isNarrationPlaying,
+  loadedNarration,
+  narrationPosition,
   pauseNarration,
   playWaypointNarration,
   resumeNarration,
@@ -17,8 +19,13 @@ import {
   setupAudioPlayback,
   stopNarration,
   subscribeNarrationErrors,
+  syncNarration,
   type NarrationProblem,
 } from "../audio/narrationPlayer";
+import DuoChat from "../components/duo/DuoChat";
+import DuoStatusBar, { DuoPill, type SyncState } from "../components/duo/DuoStatusBar";
+import DuoSummaryCard from "../components/duo/DuoSummaryCard";
+import { duoPeople, FRIEND_SILENT_MS, serverNow, toLocal, useDuoStore } from "../duo/duoStore";
 import { useOnline } from "../offline/connectivity";
 import { useOfflineStore } from "../offline/offlineStore";
 import { isBundledTour } from "../offline/tourFiles";
@@ -38,6 +45,7 @@ import { useLanguage } from "../i18n/LanguageContext";
 import type { RootStackParamList } from "../navigation/types";
 import { clearTourProgress, saveTourProgress } from "../state/tourProgress";
 import { useAccountStore } from "../account/accountStore";
+import { finishRun, markRunResumed, markRunSkipped, startRun, submitCompletion } from "../social/completions";
 import {
   selectCurrentWaypoint,
   selectNextWaypoint,
@@ -48,6 +56,7 @@ import { useTheme } from "../ThemeContext";
 import type { ThemeColors } from "../theme";
 import ShareWalkButton from "../components/ShareWalkButton";
 import PubSuggestion from "../components/PubSuggestion";
+import SharePhotoCard from "../components/SharePhotoCard";
 import NarrationSubtitle from "../components/NarrationSubtitle";
 import StopDetail, { type StopDetailMode } from "../components/StopDetail";
 import TourIntro from "../components/TourIntro";
@@ -71,6 +80,24 @@ export default function ActiveTourScreen() {
   const { params } = useRoute() as unknown as RouteProp;
   const area = getAreaById(params.areaId);
   const resuming = params.resume === true;
+  // Walk with a friend: the walk's code, until it ends and this phone carries on solo.
+  const [duoSolo, setDuoSolo] = useState(false);
+  const duoCode = params.duo && !duoSolo ? params.duo : null;
+  const duoRef = useRef(duoCode);
+  duoRef.current = duoCode;
+  const duoState = useDuoStore((s) => (params.duo ? s.state : null));
+  const duoConnected = useDuoStore((s) => s.connected);
+  const duoMyId = useDuoStore((s) => s.myId);
+  const duoFriendPos = useDuoStore((s) => s.friend);
+  const duoAnon = useDuoStore((s) => s.anon);
+  const duoSend = useDuoStore((s) => s.send);
+  const { friend: duoFriend } = duoPeople(duoState, duoMyId);
+  /** Something to tell the walker when the duo walk ends early (the friend left, or time ran out). */
+  const [duoNotice, setDuoNotice] = useState<string | null>(null);
+  // A continued walk's clock kept running while away: not a fair time.
+  useEffect(() => {
+    if (resuming && area) void markRunResumed(area.id);
+  }, [resuming, area]);
   const { language, t } = useLanguage();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -113,11 +140,12 @@ export default function ActiveTourScreen() {
 
   // A fresh tour opens on the cinematic intro; the tour itself (GPS,
   // narration) only starts once Start is tapped. Continuing skips the intro.
-  const [started, setStarted] = useState(resuming);
-  const [introShowing, setIntroShowing] = useState(!resuming);
+  // A duo walk skips the intro: both pressed Ready in the lobby, and the countdown is shared.
+  const [started, setStarted] = useState(resuming || !!params.duo);
+  const [introShowing, setIntroShowing] = useState(!resuming && !params.duo);
   const [distanceToStart, setDistanceToStart] = useState<number | null>(null);
   /** 0 → 1 as the in-tour controls slide in. */
-  const chrome = useRef(new Animated.Value(resuming ? 1 : 0)).current;
+  const chrome = useRef(new Animated.Value(resuming || params.duo ? 1 : 0)).current;
 
   // The walker's tour guide: chosen in the intro, remembered per tour.
   const [guide, setGuide] = useState<GuideId>(DEFAULT_GUIDE);
@@ -132,6 +160,10 @@ export default function ActiveTourScreen() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [area?.id]);
+  // A duo walk uses the guide the invite was made with: both phones must play the same recordings.
+  useEffect(() => {
+    if (duoState?.guide) setGuide(duoState.guide as GuideId);
+  }, [duoState?.guide]);
   // Stops the guide has recorded play in their own voice.
   useEffect(() => setNarrationGuide(guide), [guide]);
   const handleGuideChange = (next: GuideId) => {
@@ -150,6 +182,10 @@ export default function ActiveTourScreen() {
   }, [detail, detailAnim]);
 
   const trackerRef = useRef<ProximityTracker | null>(null);
+  /** Plays a stop on this phone (set while the tour is running). */
+  const playStopRef = useRef<((waypoint: Waypoint, startAt?: number) => void) | null>(null);
+  /** Narration and location are set up, so the duo room's instructions can be followed. */
+  const [audioReady, setAudioReady] = useState(false);
   const visitedRef = useRef(new Set<string>());
   /** A stop that fired while the previous narration was still playing (sequential tours only). */
   const queuedRef = useRef<string | null>(null);
@@ -213,7 +249,15 @@ export default function ActiveTourScreen() {
     if (area && status === "complete") {
       void clearTourProgress(area.id);
       void useAccountStore.getState().markTourCompleted(area.id);
+      if (duoRef.current) {
+        // Finished together: recorded by the walk's room for the duo leaderboard, not the solo ones.
+        duoSend({ t: "complete" });
+      } else {
+        // Leaderboards: this walk's time (if it counts) and the finish itself.
+        void finishRun(area.id).then(({ seconds, completedAt }) => submitCompletion(area.id, seconds, completedAt));
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [area, status]);
 
   // During the intro, one quick location check: if the walker isn't at the
@@ -287,13 +331,24 @@ export default function ActiveTourScreen() {
       }
 
       queuedRef.current = null;
-      visitedRef.current.add(waypointId);
-      enterWaypoint(waypointId);
+      // Walking with a friend: tell the room; it starts the stop on both phones together.
+      if (duoRef.current) {
+        useDuoStore.getState().send({ t: "arrive", i: area.route.indexOf(waypoint) });
+        return;
+      }
+      playStop(waypoint);
+    };
+
+    /** Plays a stop here: now, or (duo) so that it starts at `startAt` on both phones. */
+    const playStop = (waypoint: Waypoint, startAt?: number) => {
+      visitedRef.current.add(waypoint.id);
+      enterWaypoint(waypoint.id);
       setTransition(null);
       setDetail({ waypoint, mode: "arrival" });
       persistProgress();
-      void playWaypointNarration(waypoint);
+      void playWaypointNarration(waypoint, { startAt });
     };
+    playStopRef.current = playStop;
 
     const handleNarrationEnded = () => {
       if (queuedRef.current) {
@@ -354,11 +409,15 @@ export default function ActiveTourScreen() {
       // First waypoint is usually right at the starting point — trigger it
       // immediately rather than waiting for the next GPS fix. Not when
       // continuing: the walker is mid-tour, and stop 1 was heard already.
-      if (!resuming && area.route[0]) handleWaypointEnter(area.route[0].id);
+      // A duo walk's first stop comes from the room, at the shared start time.
+      if (!resuming && !duoRef.current && area.route[0]) handleWaypointEnter(area.route[0].id);
+      setAudioReady(true);
     })();
 
     return () => {
       cancelled = true;
+      playStopRef.current = null;
+      setAudioReady(false);
       setGeofenceEnterHandler(null);
       setNarrationEndedHandler(null);
       void stopWaypointGeofencing();
@@ -367,6 +426,101 @@ export default function ActiveTourScreen() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [area?.id, started]);
+
+  // --- Walk with a friend ----------------------------------------------------------
+
+  // The lobby already connected; reconnect if the page was reloaded. Leaving the tour closes it.
+  useEffect(() => {
+    if (!params.duo) return;
+    void useDuoStore.getState().connect(params.duo);
+    if (area) startRun(area.id);
+    return () => useDuoStore.getState().disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.duo]);
+
+  // Follow the room: each new play/pause instruction (seq) starts, pauses or lines up the stop.
+  const handledSeq = useRef(0);
+  const duoStop = duoCode ? duoState?.stop ?? null : null;
+  useEffect(() => {
+    if (!area || !duoStop || !audioReady || duoStop.seq === handledSeq.current) return;
+    const previous = handledSeq.current;
+    handledSeq.current = duoStop.seq;
+    const waypoint = area.route[duoStop.i];
+    if (!waypoint) return;
+    if (duoStop.paused) {
+      pauseNarration();
+      if (useTourStore.getState().status === "touring") pause();
+      return;
+    }
+    if (useTourStore.getState().status === "paused") resume();
+    const startAt = toLocal(duoStop.at);
+    const sameStop = loadedNarration()?.waypointId === waypoint.id && useTourStore.getState().currentWaypointIndex === duoStop.i;
+    // A resume (or reconnect) of the stop already loaded just lines it up; anything else plays the stop.
+    if (sameStop && previous !== 0) syncNarration(startAt);
+    else playStopRef.current?.(waypoint, startAt);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [duoStop?.seq, audioReady, area?.id]);
+
+  // My position for my friend's map, at most every 5 seconds (the store throttles).
+  useEffect(() => {
+    if (duoCode && lastKnownLocation) useDuoStore.getState().shareLocation(lastKnownLocation.lat, lastKnownLocation.lng);
+  }, [duoCode, lastKnownLocation, duoAnon]);
+
+  // The walk ended early (friend left, or the 4-hour limit): carry on solo.
+  useEffect(() => {
+    if (!duoCode || duoState?.status !== "ended") return;
+    const left = duoState.endedBy && duoState.endedBy !== duoMyId;
+    if (duoState.endedBy !== duoMyId) {
+      setDuoNotice(left ? t("duo.leftWalk", { name: duoFriend?.name ?? "" }) : t("duo.sessionEnded"));
+      setTimeout(() => setDuoNotice(null), 8000);
+    }
+    setDuoSolo(true);
+    useDuoStore.getState().disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [duoState?.status]);
+
+  // A clock for the countdown, the wait timer and how long the friend has been away.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!duoCode) return;
+    const timer = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(timer);
+  }, [duoCode]);
+
+  // Drift: compare where the narration is with where the shared clock says it should be.
+  const [drifting, setDrifting] = useState(false);
+  useEffect(() => {
+    if (!duoCode || !area) return;
+    const timer = setInterval(() => {
+      const stop = useDuoStore.getState().state?.stop;
+      const waypoint = stop ? area.route[stop.i] : null;
+      const playing = loadedNarration();
+      if (!stop || stop.paused || !waypoint || playing?.waypointId !== waypoint.id || !isNarrationPlaying()) {
+        setDrifting(false);
+        return;
+      }
+      const { seconds, duration, loaded } = narrationPosition();
+      const expected = (Date.now() - toLocal(stop.at)) / 1000;
+      if (!loaded || expected < 1 || expected > duration - 1) return;
+      setDrifting(Math.abs(seconds - expected) > DRIFT_LIMIT_S);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [duoCode, area]);
+
+  /** The friend's dot on the map (not shown in their distance-only mode). */
+  const friendOnMap = useMemo(
+    () =>
+      duoCode && duoFriend && duoFriendPos?.lat != null && duoFriendPos.lng != null
+        ? { location: { lat: duoFriendPos.lat, lng: duoFriendPos.lng }, name: duoFriend.name }
+        : null,
+    [duoCode, duoFriend?.name, duoFriendPos]
+  );
+
+  const handleResync = () => {
+    const stop = useDuoStore.getState().state?.stop;
+    if (stop && !stop.paused) syncNarration(toLocal(stop.at));
+    setDrifting(false);
+  };
 
   if (!area) {
     return (
@@ -381,12 +535,15 @@ export default function ActiveTourScreen() {
   if (status === "complete") {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.centered}>
+        {/* Scrolls: with the share, photo and pub cards it can be taller than a phone. */}
+        <ScrollView contentContainerStyle={[styles.centered, styles.completeScroll]}>
           <Text style={styles.completeTitle}>{t("activeTour.tourComplete")}</Text>
           <Text style={styles.completeSubtitle}>
             {t("activeTour.tourCompleteBody", { area: areaText.name })}
           </Text>
+          {params.duo && duoState?.summary && !duoSolo ? <DuoSummaryCard /> : null}
           <ShareWalkButton area={area} />
+          <SharePhotoCard area={area} />
           <PubSuggestion area={area} />
           <Pressable
             style={styles.cta}
@@ -395,7 +552,7 @@ export default function ActiveTourScreen() {
           >
             <Text style={styles.ctaText}>{t("activeTour.backToAreas")}</Text>
           </Pressable>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -403,6 +560,17 @@ export default function ActiveTourScreen() {
   const isPlaying = status === "touring";
 
   const handleTogglePlay = () => {
+    // Duo: pausing pauses both phones; resuming restarts both from the same second.
+    if (duoCode) {
+      if (isPlaying) {
+        pause();
+        pauseNarration();
+        duoSend({ t: "pause", pos: narrationPosition().seconds });
+      } else {
+        duoSend({ t: "resume", pos: narrationPosition().seconds });
+      }
+      return;
+    }
     if (isPlaying) {
       pause();
       pauseNarration();
@@ -413,7 +581,12 @@ export default function ActiveTourScreen() {
   };
 
   const handleSkipNext = () => {
+    void markRunSkipped(area.id);
     if (!nextWaypoint) return;
+    if (duoCode) {
+      duoSend({ t: "goto", i: area.route.indexOf(nextWaypoint), skip: true });
+      return;
+    }
     visitedRef.current.delete(nextWaypoint.id);
     skipToNext();
     persistProgress();
@@ -422,6 +595,11 @@ export default function ActiveTourScreen() {
   };
 
   const handleSkipPrevious = () => {
+    void markRunSkipped(area.id);
+    if (duoCode) {
+      duoSend({ t: "goto", i: Math.max(0, currentWaypointIndex - 1), skip: true });
+      return;
+    }
     skipToPrevious();
     persistProgress();
     const wp = useTourStore.getState().area
@@ -470,6 +648,7 @@ export default function ActiveTourScreen() {
       console.warn("[ActiveTourScreen] background location not granted; foreground tracking only");
     }
     useTourStore.getState().arrivedAtStart();
+    startRun(area.id);
     setStarted(true);
   };
 
@@ -477,6 +656,33 @@ export default function ActiveTourScreen() {
     const start = area.startingPoint;
     void Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${start.lat},${start.lng}&travelmode=walking`);
   };
+
+  // Walk with a friend: what the status bar, countdown and chat show.
+  const duoActive = !!duoCode && duoState?.status === "active" && !!duoFriend;
+  const countdown =
+    duoActive && duoState!.startAt && toLocal(duoState!.startAt) > now ? Math.ceil((toLocal(duoState!.startAt) - now) / 1000) : null;
+  const pending = duoActive ? duoState!.pending : null;
+  const waiting =
+    pending && duoFriend
+      ? {
+          mine: pending.by === duoMyId,
+          name: duoFriend.name,
+          stop: pending.i + 1,
+          minutesLeft: Math.ceil((toLocal(pending.deadline) - now) / 60_000),
+          stuck: pending.by === duoMyId && (duoFriendPos?.meters ?? 0) > STUCK_METERS,
+          canPlay: true,
+        }
+      : null;
+  // Away: the room says so, or their phone has gone quiet (a dropped signal often isn't noticed by the server for a while).
+  const friendSeenAt = useDuoStore.getState().friendSeenAt;
+  const friendAway = !duoActive || !duoFriend
+    ? null
+    : !duoFriend.online
+      ? Math.max(0, serverNow() - duoFriend.since)
+      : duoConnected && now - friendSeenAt > FRIEND_SILENT_MS
+        ? now - friendSeenAt
+        : null;
+  const sync: SyncState = !duoConnected ? "offline" : drifting ? "drift" : waiting ? "waiting" : "synced";
 
   const hudStyle = {
     opacity: Animated.multiply(chrome, detailAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0] })),
@@ -495,6 +701,7 @@ export default function ActiveTourScreen() {
         currentWaypointIndex={currentWaypointIndex}
         visitedWaypointIds={visitedWaypointIds}
         userLocation={lastKnownLocation}
+        friend={friendOnMap}
         onWaypointPress={handleMapStopPress}
         speech={speech}
         faceBearing={faceBearing}
@@ -559,6 +766,27 @@ export default function ActiveTourScreen() {
           </View>
         </View>
 
+        {duoActive && duoFriend && (
+          <DuoStatusBar
+            friendName={duoFriend.name}
+            sync={sync}
+            meters={duoFriendPos?.meters ?? null}
+            anon={duoAnon}
+            onToggleAnon={() => useDuoStore.getState().setAnon(!duoAnon)}
+            onResync={handleResync}
+            waiting={waiting}
+            onPlayNow={() => pending && duoSend({ t: "goto", i: pending.i, skip: false })}
+            friendOffline={friendAway}
+            onContinueSolo={() => duoSend({ t: "leave" })}
+          />
+        )}
+
+        {duoNotice && (
+          <View style={styles.offRouteBanner} role="alert">
+            <Text style={styles.offRouteText}>{duoNotice}</Text>
+          </View>
+        )}
+
         {!online && !worksOffline && (
           <View style={styles.offRouteBanner}>
             <Text style={styles.offRouteText}>{t("offline.notDownloadedBanner")}</Text>
@@ -612,6 +840,12 @@ export default function ActiveTourScreen() {
         />
       )}
 
+      {detail && duoActive && duoFriend && (
+        <View style={[styles.duoPill, { top: insets.top + 14 }]} pointerEvents="box-none">
+          <DuoPill friendName={duoFriend.name} sync={sync} waiting={waiting} onResync={handleResync} friendOffline={friendAway} />
+        </View>
+      )}
+
       {started && (
         <NarrationSubtitle area={area} bottom={insets.bottom + CONTROLS_BOTTOM + 70 + 14} paused={!isPlaying} />
       )}
@@ -646,11 +880,26 @@ export default function ActiveTourScreen() {
           <Ionicons name="play-skip-forward" size={18} color={PLAY_COLOR} />
         </PressScale>
       </Animated.View>
+
+      {/* After the controls, so the open chat sheet covers them. */}
+      {duoActive && duoFriend && <DuoChat friendName={duoFriend.name} bottom={insets.bottom + 4} />}
+
+      {/* Last, so it covers everything until both phones start together. */}
+      {countdown !== null && (
+        <View style={styles.countdown} role="timer" aria-label={t("duo.startingIn", { seconds: countdown })}>
+          <Text style={styles.countdownLabel}>{t("duo.getReady")}</Text>
+          <Text style={styles.countdownNumber}>{countdown}</Text>
+        </View>
+      )}
     </View>
   );
 }
 
 const PLAY_COLOR = "#2E9E6B";
+/** Walk with a friend: narration this far (seconds) from the shared clock offers a re-sync. */
+const DRIFT_LIMIT_S = 2;
+/** A friend this far away while you wait for them "seems stuck". */
+const STUCK_METERS = 500;
 /** Gap between the bottom of the screen (above the safe area) and the play controls. */
 const CONTROLS_BOTTOM = 40;
 /** Room kept above the controls for the narration subtitles (about 4 lines). */
@@ -783,8 +1032,23 @@ function createStyles(colors: ThemeColors) {
     ...floating,
   },
   playIconNudge: { marginLeft: 3 },
+  duoPill: { position: "absolute", left: 14, right: 110 },
+  countdown: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(20,14,12,0.72)",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+  countdownNumber: { color: "#FFFFFF", fontSize: 96, fontWeight: "800" },
+  countdownLabel: { color: "#FFFFFF", fontSize: 17, fontWeight: "600", opacity: 0.9 },
   centered: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24, gap: 16 },
   waypointName: { color: colors.text, fontSize: 32, fontWeight: "700", textAlign: "center" },
+  completeScroll: { flexGrow: 1, paddingVertical: 32 },
   completeTitle: { color: colors.text, fontSize: 28, fontWeight: "700" },
   completeSubtitle: { color: colors.textMid, fontSize: 15, marginTop: 8, textAlign: "center" },
   cta: {

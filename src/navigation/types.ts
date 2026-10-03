@@ -14,13 +14,21 @@ export type RootStackParamList = {
   MainTabs: undefined;
   TourPreview: { areaId: string };
   /** resume: continue from progress already loaded into the tour store. */
-  ActiveTour: { areaId: string; resume?: boolean };
+  ActiveTour: { areaId: string; resume?: boolean; duo?: string };
   CameraTour: { areaId?: string } | undefined;
   ARCamera: { areaId: string; orientationGranted: boolean; mode?: "tour" | "scanner" };
   PrivacyPolicy: undefined;
   TermsOfService: undefined;
   ComingSoon: { cityName: string };
   ContactUs: undefined;
+  /** Account tab → Leaderboards. */
+  Leaderboards: undefined;
+  /** Tours tab → Tour photos: your own shared photos. */
+  MyPhotos: undefined;
+  /** A tour's public photo gallery. */
+  TourGallery: { areaId: string };
+  /** Walk with a friend: invite (from a tour, areaId) or join (an invite link, code). */
+  DuoLobby: { areaId?: string; code?: string } | undefined;
 };
 
 /** Navigation prop for a screen living inside a MainTabs tab that also needs

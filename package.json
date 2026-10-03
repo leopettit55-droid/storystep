@@ -18,11 +18,13 @@
     "expo-file-system": "~57.0.2",
     "expo-font": "~57.0.1",
     "expo-haptics": "~57.0.2",
+    "expo-image-picker": "~57.0.20",
     "expo-location": "~57.0.9",
     "expo-status-bar": "~57.0.1",
     "expo-task-manager": "~57.0.9",
     "maplibre-gl": "^6.4.1",
     "pmtiles": "^4.5.0",
+    "qrcode-generator": "^2.0.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.2",
@@ -35,20 +37,25 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261002.1",
     "@expo/ngrok": "^4.1.3",
     "@types/node": "^26.6.3",
     "@types/react": "~19.2.2",
     "@types/three": "^0.160.0",
     "mpg123-decoder": "^1.0.3",
     "tsx": "^4.23.15",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "wrangler": "^4.147.0"
   },
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "build:web": "expo export -p web && tsx scripts/build-tour-pages.ts"
+    "build:web": "expo export -p web && tsx scripts/build-tour-pages.ts",
+    "deploy": "npm run build:web && wrangler d1 migrations apply storystep --remote && wrangler deploy -c duo/wrangler.toml && wrangler pages deploy --branch main",
+    "serve:web": "wrangler d1 migrations apply storystep --local --persist-to .wrangler/state && wrangler pages dev --persist-to .wrangler/state",
+    "serve:duo": "wrangler dev -c duo/wrangler.toml --persist-to .wrangler/state"
   },
   "private": true
 }

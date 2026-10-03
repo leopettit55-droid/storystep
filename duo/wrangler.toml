@@ -1,0 +1,22 @@
+# The "Walk with a friend" rooms (Durable Objects), deployed as their own Worker
+# because Pages Functions can't define Durable Objects. Deploy: `npm run deploy`.
+name = "storystep-duo"
+main = "index.ts"
+compatibility_date = "2026-09-01"
+workers_dev = false
+
+[[durable_objects.bindings]]
+name = "DUO"
+class_name = "DuoRoom"
+
+# SQLite-backed Durable Objects are the kind included in the free plan.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DuoRoom"]
+
+# Records finished duo walks for the leaderboard (same database as the website).
+[[d1_databases]]
+binding = "DB"
+database_name = "storystep"
+database_id = "3cf24593-f89c-4077-abe8-eb3765276217"
+migrations_dir = "../migrations"

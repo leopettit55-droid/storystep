@@ -2,6 +2,7 @@ import type { StyleProp, ViewStyle } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import type { Area, Coordinates, Waypoint } from "../content";
 import type { GuideId } from "../guides/guides";
+import { DUO_COLORS } from "../duo/colors";
 
 export interface TourMapProps {
   area: Area;
@@ -21,6 +22,8 @@ export interface TourMapProps {
   focusStop?: Waypoint | null;
   /** Which tour guide walks on the map (web). */
   guide?: GuideId;
+  /** Walk with a friend: where they are, shown in orange. */
+  friend?: { location: Coordinates; name: string } | null;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -39,6 +42,7 @@ export default function TourMap({
   visitedWaypointIds,
   userLocation,
   onWaypointPress,
+  friend,
   style,
 }: TourMapProps) {
   const center = userLocation ?? area.route[0]?.coordinates ?? area.startingPoint;
@@ -68,6 +72,13 @@ export default function TourMap({
           />
         );
       })}
+      {friend && (
+        <Marker
+          coordinate={{ latitude: friend.location.lat, longitude: friend.location.lng }}
+          title={friend.name}
+          pinColor={DUO_COLORS.friend}
+        />
+      )}
       <Polyline
         coordinates={line.map((p) => ({ latitude: p.lat, longitude: p.lng }))}
         strokeColor={STOP_COLOR}

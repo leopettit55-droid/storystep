@@ -22,10 +22,15 @@ import PrivacyPolicyScreen from "./src/screens/PrivacyPolicyScreen";
 import TermsOfServiceScreen from "./src/screens/TermsOfServiceScreen";
 import ComingSoonScreen from "./src/screens/ComingSoonScreen";
 import ContactUsScreen from "./src/screens/ContactUsScreen";
+import LeaderboardsScreen from "./src/screens/LeaderboardsScreen";
+import MyPhotosScreen from "./src/screens/MyPhotosScreen";
+import TourGalleryScreen from "./src/screens/TourGalleryScreen";
+import DuoLobbyScreen from "./src/screens/DuoLobbyScreen";
 import type { RootStackParamList } from "./src/navigation/types";
 import { getAreaById } from "./src/content";
 import { useAccountStore } from "./src/account/accountStore";
 import { isOnline } from "./src/offline/connectivity";
+import { startCompletionSync } from "./src/social/completions";
 import { isTourOffline, useOfflineStore } from "./src/offline/offlineStore";
 import { saveAppShell } from "./src/offline/tourFiles";
 import { useTourStore } from "./src/state/tourStore";
@@ -89,6 +94,9 @@ const SECTION_TITLE_KEYS: Record<string, string> = {
   PrivacyPolicy: "home.footerPrivacy",
   TermsOfService: "home.footerTerms",
   ContactUs: "help.contactUs",
+  Leaderboards: "leaderboards.title",
+  MyPhotos: "photos.myTitle",
+  DuoLobby: "duo.title",
 };
 
 /** The browser tab title for a screen (web only). Tour screens match the
@@ -112,6 +120,8 @@ function AppInner() {
     void useAccountStore.getState().load();
     void useTourStore.getState().restoreLastLocation();
     void startOffline();
+    // Finished tours made offline or before signing in get sent when possible.
+    startCompletionSync();
   }, []);
   const { colors, isDark } = useTheme();
   const navTheme = isDark ? NavDarkTheme : NavDefaultTheme;
@@ -138,6 +148,11 @@ function AppInner() {
                 screens: { Home: "", Map: "map", Tours: "tours", Account: "account", Help: "help" },
               },
               TourPreview: "tour/:areaId",
+              TourGallery: "tour/:areaId/gallery",
+              Leaderboards: "leaderboards",
+              MyPhotos: "tour-photos",
+              // An invite link: storystep.site/walk-together/ABC123 (also what the QR code holds).
+              DuoLobby: "walk-together/:code?",
             },
           },
         }}
@@ -168,6 +183,10 @@ function AppInner() {
           <Stack.Screen name="TermsOfService" component={TermsOfServiceScreen} />
           <Stack.Screen name="ComingSoon" component={ComingSoonScreen} />
           <Stack.Screen name="ContactUs" component={ContactUsScreen} />
+          <Stack.Screen name="Leaderboards" component={LeaderboardsScreen} />
+          <Stack.Screen name="MyPhotos" component={MyPhotosScreen} />
+          <Stack.Screen name="TourGallery" component={TourGalleryScreen} />
+          <Stack.Screen name="DuoLobby" component={DuoLobbyScreen} />
         </Stack.Navigator>
       </NavigationContainer>
       <LanguageGate />
