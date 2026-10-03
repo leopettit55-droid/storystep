@@ -52,7 +52,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "build:web": "expo export -p web && tsx scripts/build-tour-pages.ts",
+    "build:web": "expo export -p web && tsx scripts/move-vendor-assets.ts && tsx scripts/build-tour-pages.ts",
     "deploy": "npm run build:web && wrangler d1 migrations apply storystep --remote && wrangler deploy -c duo/wrangler.toml && wrangler pages deploy --branch main",
     "serve:web": "wrangler d1 migrations apply storystep --local --persist-to .wrangler/state && wrangler pages dev --persist-to .wrangler/state",
     "serve:duo": "wrangler dev -c duo/wrangler.toml --persist-to .wrangler/state"
