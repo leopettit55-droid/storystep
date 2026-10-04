@@ -144,6 +144,9 @@ const en = {
   },
 
   activeTour: {
+    walked: "walked",
+    stepsHealth: "steps (Apple Health)",
+    stepsEstimated: "steps (estimated)",
     openArGuide: "Open AR camera guide",
     pauseNarration: "Pause narration",
     playNarration: "Play narration",
@@ -299,6 +302,14 @@ const en = {
     offline: "Photos need an internet connection.",
   },
 
+  health: {
+    title: "Apple Health",
+    body: "Connect to count your tour steps and distance with Apple Health, and save each walk there as a workout.",
+    connectedBody: "Your tour steps and distance come from Apple Health, and each walk is saved there.",
+    connect: "Connect Apple Health",
+    notNow: "Not now",
+  },
+
   leaderboards: {
     title: "Leaderboards",
     buttonBody: "Fastest walks and most tours, worldwide",
@@ -322,6 +333,10 @@ const en = {
     offline: "Leaderboards need an internet connection.",
     topOf: "Showing the top {{shown}} of {{total}}",
     duos: "Duos",
+    distance: "Distance",
+    steps: "Steps",
+    distanceExplain: "Most distance walked on StoryStep tours, solo and with friends.",
+    stepsExplain: "Most steps taken on StoryStep tours. Counted by Apple Health on iPhone, otherwise estimated from the distance walked.",
     duoExplain: "Fastest pairs who walked a tour together, by pace. Walks with a skipped stop count as finished, but not for speed.",
   },
 

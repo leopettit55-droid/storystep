@@ -1,6 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
 import {
-  addProtocol,
   LngLatBounds,
   Map as MapLibreMap,
   Marker,
@@ -8,7 +7,6 @@ import {
   type StyleSpecification,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Protocol as PMTilesProtocol } from "pmtiles";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Skeleton from "../components/Skeleton";
@@ -28,11 +26,6 @@ import type { ThemeColors } from "../theme";
 // scripts/build-tour-pages.ts), so it's saved with downloaded tours and works
 // offline; the dev server uses the CDN copy of the same version.
 setWorkerUrl(__DEV__ ? "https://unpkg.com/maplibre-gl@6.4.1/dist/maplibre-gl-worker.mjs" : "/vendor/maplibre/maplibre-gl-worker.mjs");
-
-// OpenFreeMap serves its vector data as one PMTiles archive rather than
-// individual {z}/{x}/{y} tile URLs, so MapLibre needs this protocol
-// registered before it can decode tiles out of it.
-addProtocol("pmtiles", new PMTilesProtocol().tile);
 
 type Nav = TabScreenNav<"Map">;
 type City = "London" | "Paris" | "Oxford";
@@ -65,10 +58,10 @@ function boundsForAreas(cityAreas: Area[], city: City): LngLatBounds {
 }
 
 // OpenFreeMap's vector tiles give us real road/building/place geometry to lay
-// over the satellite imagery. We don't use its prebuilt "liberty" style
-// wholesale (that paints opaque land/water fills that would hide the imagery)
-// — just its font glyphs and the underlying planet PMTiles archive.
-const VECTOR_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
+// over the satellite imagery (the same feed the tour map uses). It's a
+// TileJSON address that MapLibre reads directly.
+const VECTOR_TILES_URL = "https://tiles.openfreemap.org/planet";
+const GLYPHS_URL = "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf";
 
 // Esri's World Imagery service — free, no API key, global aerial/satellite
 // coverage down to street level in major cities like London and Paris.
@@ -121,19 +114,10 @@ export default function ExploreMapScreen() {
     if (!containerRef.current || mapRef.current) return;
     let cancelled = false;
 
-    (async () => {
-      // Borrow the vector planet archive + font glyphs from OpenFreeMap's
-      // hosted style, but build our own layer stack on top of real satellite
-      // imagery instead of using their opaque vector basemap fills.
-      const vectorStyle: StyleSpecification = await fetch(VECTOR_STYLE_URL).then((r) => r.json());
-      const planetUrl = vectorStyle.sources?.openmaptiles;
-      const vectorUrl =
-        planetUrl && "url" in planetUrl && planetUrl.url ? `pmtiles://${planetUrl.url}` : undefined;
-      if (cancelled || !containerRef.current || !vectorUrl) return;
-
+    {
       const style: StyleSpecification = {
         version: 8,
-        glyphs: vectorStyle.glyphs,
+        glyphs: GLYPHS_URL,
         sources: {
           satellite: {
             type: "raster",
@@ -142,7 +126,7 @@ export default function ExploreMapScreen() {
             maxzoom: 19,
             attribution: "Imagery © Esri, Maxar, Earthstar Geographics",
           },
-          openmaptiles: { type: "vector", url: vectorUrl },
+          openmaptiles: { type: "vector", url: VECTOR_TILES_URL },
         },
         layers: [
           { id: "satellite", type: "raster", source: "satellite" },
@@ -230,7 +214,7 @@ export default function ExploreMapScreen() {
       setTimeout(() => {
         if (!cancelled && !loaded) setMapLoadIssue(true);
       }, 10000);
-    })();
+    }
 
     return () => {
       cancelled = true;

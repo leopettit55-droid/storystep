@@ -12,16 +12,20 @@ export interface Completion {
   /** Start-to-finish seconds, or null when the run doesn't count for speed. */
   sec: number | null;
   at: number;
+  meters?: number | null;
+  steps?: number | null;
+  /** Walked with a friend: only the distance and steps boards count it. */
+  duo?: number;
 }
 
-export type Board = "overall" | "tour" | "most" | "duo";
+export type Board = "overall" | "tour" | "most" | "duo" | "distance" | "steps";
 export type Period = "week" | "month" | "all";
 
 export interface Row {
   rank: number;
   uid: string;
   name: string;
-  /** Seconds for "overall" and "tour", number of tours for "most". */
+  /** Seconds for "overall" and "tour", number of tours for "most", metres for "distance", steps for "steps". */
   value: number;
   /** "overall": the tour the best pace was set on, and its pace in s/km. */
   tour?: string;
@@ -48,7 +52,25 @@ function rankRows(rows: Omit<Row, "rank">[], better: (a: Omit<Row, "rank">, b: O
 }
 
 /** `recent` is the period's finishes (just one tour's for the "tour" board). */
-export function computeBoard(board: Board, recent: Completion[]): Row[] {
+export function computeBoard(board: Board, all: Completion[]): Row[] {
+  if (board === "distance" || board === "steps") {
+    const byUser = new Map<string, { name: string; value: number; at: number }>();
+    for (const c of all) {
+      const amount = (board === "distance" ? c.meters : c.steps) ?? 0;
+      if (amount <= 0) continue;
+      const entry = byUser.get(c.uid) ?? { name: c.name, value: 0, at: 0 };
+      entry.value += amount;
+      entry.at = Math.max(entry.at, c.at);
+      entry.name = c.name;
+      byUser.set(c.uid, entry);
+    }
+    return rankRows(
+      [...byUser].map(([uid, e]) => ({ uid, name: e.name, value: e.value, at: e.at })),
+      (a, b) => b.value - a.value
+    );
+  }
+  // Speed and "most tours" are for solo walks.
+  const recent = all.filter((c) => !c.duo);
   if (board === "most") {
     const byUser = new Map<string, { name: string; tours: Set<string>; at: number }>();
     for (const c of recent) {

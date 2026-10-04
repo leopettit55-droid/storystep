@@ -45,7 +45,15 @@ import { useLanguage } from "../i18n/LanguageContext";
 import type { RootStackParamList } from "../navigation/types";
 import { clearTourProgress, saveTourProgress } from "../state/tourProgress";
 import { useAccountStore } from "../account/accountStore";
-import { finishRun, markRunResumed, markRunSkipped, startRun, submitCompletion } from "../social/completions";
+import {
+  finishRun,
+  markRunResumed,
+  markRunSkipped,
+  startRun,
+  submitCompletion,
+  trackRunPosition,
+  type Finish,
+} from "../social/completions";
 import {
   selectCurrentWaypoint,
   selectNextWaypoint,
@@ -127,7 +135,6 @@ export default function ActiveTourScreen() {
   const enterWaypoint = useTourStore((s) => s.enterWaypoint);
   const pause = useTourStore((s) => s.pause);
   const resume = useTourStore((s) => s.resume);
-  const skipToNext = useTourStore((s) => s.skipToNext);
   const skipToPrevious = useTourStore((s) => s.skipToPrevious);
   const setOffRoute = useTourStore((s) => s.setOffRoute);
   const setLastKnownLocation = useTourStore((s) => s.setLastKnownLocation);
@@ -182,6 +189,8 @@ export default function ActiveTourScreen() {
   }, [detail, detailAnim]);
 
   const trackerRef = useRef<ProximityTracker | null>(null);
+  /** The finished walk's distance and steps, for the completion screen. */
+  const [finish, setFinish] = useState<Finish | null>(null);
   /** Plays a stop on this phone (set while the tour is running). */
   const playStopRef = useRef<((waypoint: Waypoint, startAt?: number) => void) | null>(null);
   /** Narration and location are set up, so the duo room's instructions can be followed. */
@@ -189,6 +198,10 @@ export default function ActiveTourScreen() {
   const visitedRef = useRef(new Set<string>());
   /** A stop that fired while the previous narration was still playing (sequential tours only). */
   const queuedRef = useRef<string | null>(null);
+  /** Stops reached while another stop's story was playing (other tours), in route order. */
+  const waitingRef = useRef<string[]>([]);
+  /** The stop whose story has started and not yet finished (set before the audio has loaded). */
+  const storyRef = useRef<string | null>(null);
 
   // Latest language/t for callbacks created once when the tour starts.
   const tRef = useRef(t);
@@ -249,13 +262,14 @@ export default function ActiveTourScreen() {
     if (area && status === "complete") {
       void clearTourProgress(area.id);
       void useAccountStore.getState().markTourCompleted(area.id);
-      if (duoRef.current) {
-        // Finished together: recorded by the walk's room for the duo leaderboard, not the solo ones.
-        duoSend({ t: "complete" });
-      } else {
-        // Leaderboards: this walk's time (if it counts) and the finish itself.
-        void finishRun(area.id).then(({ seconds, completedAt }) => submitCompletion(area.id, seconds, completedAt));
-      }
+      const together = !!duoRef.current;
+      // Finished together: the room records it for the duo leaderboard (not the solo speed boards).
+      if (together) duoSend({ t: "complete" });
+      // This walk's time (if it counts), distance and steps for the leaderboards.
+      void finishRun(area.id).then((finish) => {
+        setFinish(finish);
+        return submitCompletion(area.id, finish, { duo: together });
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [area, status]);
@@ -299,12 +313,13 @@ export default function ActiveTourScreen() {
     const resumedVisited = resuming ? useTourStore.getState().visitedWaypointIds : [];
     for (const id of resumedVisited) visitedRef.current.add(id);
 
-    // The stop the walker should reach next: the one after the last stop whose
-    // narration started (or the first stop, before anything has played).
+    // The stop the walker should reach next: the first one along the route that
+    // hasn't been heard. (Going back with Skip replays an earlier stop without
+    // un-hearing the later ones, so "the one after the current stop" would be a
+    // stop already heard, and an in-order tour would never move on.)
     const expectedIndex = () => {
-      const s = useTourStore.getState();
-      const cur = s.area?.route[s.currentWaypointIndex];
-      return cur && s.visitedWaypointIds.includes(cur.id) ? s.currentWaypointIndex + 1 : Math.max(0, s.currentWaypointIndex);
+      const i = area.route.findIndex((w) => !visitedRef.current.has(w.id));
+      return i === -1 ? area.route.length : i;
     };
 
     const handleWaypointEnter = (waypointId: string) => {
@@ -328,9 +343,29 @@ export default function ActiveTourScreen() {
           trackerRef.current?.resetTriggeredWaypoint(waypointId);
           return;
         }
+      } else {
+        const idx = area.route.indexOf(waypoint);
+        // The last stop ends the tour, so it only counts once the others have
+        // been heard: on a loop it sits right by stop 1, and would otherwise
+        // finish the tour before the walk has begun. (Skip still gets there.)
+        if (idx === area.route.length - 1 && area.route.slice(0, idx).some((w) => !visitedRef.current.has(w.id))) {
+          trackerRef.current?.resetTriggeredWaypoint(waypointId);
+          return;
+        }
+        // Two stops close together can both be in range at once: never cut a
+        // story off. The new stop plays as soon as the current one finishes.
+        if (storyRef.current && useTourStore.getState().status !== "paused") {
+          if (!waitingRef.current.includes(waypointId)) {
+            waitingRef.current = [...waitingRef.current, waypointId].sort(
+              (a, b) => area.route.findIndex((w) => w.id === a) - area.route.findIndex((w) => w.id === b)
+            );
+          }
+          return;
+        }
       }
 
       queuedRef.current = null;
+      waitingRef.current = waitingRef.current.filter((id) => id !== waypointId);
       // Walking with a friend: tell the room; it starts the stop on both phones together.
       if (duoRef.current) {
         useDuoStore.getState().send({ t: "arrive", i: area.route.indexOf(waypoint) });
@@ -341,7 +376,15 @@ export default function ActiveTourScreen() {
 
     /** Plays a stop here: now, or (duo) so that it starts at `startAt` on both phones. */
     const playStop = (waypoint: Waypoint, startAt?: number) => {
+      // On an in-order tour, reaching a stop (e.g. a friend skipped ahead) means the ones before it are passed.
+      if (area.sequentialStops) {
+        for (const w of area.route.slice(0, area.route.indexOf(waypoint))) {
+          visitedRef.current.add(w.id);
+          trackerRef.current?.markTriggered([w.id]);
+        }
+      }
       visitedRef.current.add(waypoint.id);
+      storyRef.current = waypoint.id;
       enterWaypoint(waypoint.id);
       setTransition(null);
       setDetail({ waypoint, mode: "arrival" });
@@ -351,8 +394,14 @@ export default function ActiveTourScreen() {
     playStopRef.current = playStop;
 
     const handleNarrationEnded = () => {
+      storyRef.current = null;
       if (queuedRef.current) {
         handleWaypointEnter(queuedRef.current);
+        return;
+      }
+      const waiting = waitingRef.current.find((id) => !visitedRef.current.has(id));
+      if (waiting) {
+        handleWaypointEnter(waiting);
         return;
       }
       const current = selectCurrentWaypoint(useTourStore.getState());
@@ -401,7 +450,6 @@ export default function ActiveTourScreen() {
           const current = selectCurrentWaypoint(useTourStore.getState());
           if (current) trackerRef.current.setDemoStart(current.coordinates);
         }
-        await trackerRef.current.start();
       } catch (e) {
         console.warn("[ActiveTourScreen] location tracking unavailable:", e);
       }
@@ -410,7 +458,14 @@ export default function ActiveTourScreen() {
       // immediately rather than waiting for the next GPS fix. Not when
       // continuing: the walker is mid-tour, and stop 1 was heard already.
       // A duo walk's first stop comes from the room, at the shared start time.
+      // Before GPS starts, so a stop next door to the start can't play first.
       if (!resuming && !duoRef.current && area.route[0]) handleWaypointEnter(area.route[0].id);
+
+      try {
+        await trackerRef.current?.start();
+      } catch (e) {
+        console.warn("[ActiveTourScreen] location tracking unavailable:", e);
+      }
       setAudioReady(true);
     })();
 
@@ -465,6 +520,12 @@ export default function ActiveTourScreen() {
   useEffect(() => {
     if (duoCode && lastKnownLocation) useDuoStore.getState().shareLocation(lastKnownLocation.lat, lastKnownLocation.lng);
   }, [duoCode, lastKnownLocation, duoAnon]);
+
+  // Distance walked, for the Distance and Steps leaderboards.
+  useEffect(() => {
+    if (area && started && lastKnownLocation && useTourStore.getState().status !== "complete") trackRunPosition(area.id, lastKnownLocation);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastKnownLocation, started]);
 
   // The walk ended early (friend left, or the 4-hour limit): carry on solo.
   useEffect(() => {
@@ -541,6 +602,22 @@ export default function ActiveTourScreen() {
           <Text style={styles.completeSubtitle}>
             {t("activeTour.tourCompleteBody", { area: areaText.name })}
           </Text>
+          {finish && finish.activity.meters > 0 && (
+            <View style={styles.walkStats}>
+              <View style={styles.walkStat}>
+                <Ionicons name="map-outline" size={18} color={colors.primary} />
+                <Text style={styles.walkStatValue}>{formatKm(finish.activity.meters)}</Text>
+                <Text style={styles.walkStatLabel}>{t("activeTour.walked")}</Text>
+              </View>
+              <View style={styles.walkStat}>
+                <Ionicons name="footsteps-outline" size={18} color={colors.primary} />
+                <Text style={styles.walkStatValue}>{finish.activity.steps.toLocaleString()}</Text>
+                <Text style={styles.walkStatLabel}>
+                  {t(finish.activity.source === "health" ? "activeTour.stepsHealth" : "activeTour.stepsEstimated")}
+                </Text>
+              </View>
+            </View>
+          )}
           {params.duo && duoState?.summary && !duoSolo ? <DuoSummaryCard /> : null}
           <ShareWalkButton area={area} />
           <SharePhotoCard area={area} />
@@ -587,10 +664,20 @@ export default function ActiveTourScreen() {
       duoSend({ t: "goto", i: area.route.indexOf(nextWaypoint), skip: true });
       return;
     }
-    visitedRef.current.delete(nextWaypoint.id);
-    skipToNext();
+    // Skipping to a stop counts as reaching it: it's marked heard (so the map
+    // points on to the stop after it, and walking past it later doesn't replay
+    // it) and everything before it counts as passed.
+    const skipTo = area.route.indexOf(nextWaypoint);
+    for (const w of area.route.slice(0, skipTo + 1)) {
+      visitedRef.current.add(w.id);
+      trackerRef.current?.markTriggered([w.id]);
+    }
+    queuedRef.current = null;
+    enterWaypoint(nextWaypoint.id);
     persistProgress();
+    setTransition(null);
     setDetail({ waypoint: nextWaypoint, mode: "arrival" });
+    storyRef.current = nextWaypoint.id;
     void playWaypointNarration(nextWaypoint);
   };
 
@@ -608,6 +695,7 @@ export default function ActiveTourScreen() {
     if (wp) {
       trackerRef.current?.resetTriggeredWaypoint(wp.id);
       setDetail({ waypoint: wp, mode: "arrival" });
+      storyRef.current = wp.id;
       void playWaypointNarration(wp);
     }
   };
@@ -896,6 +984,7 @@ export default function ActiveTourScreen() {
 }
 
 const PLAY_COLOR = "#2E9E6B";
+const formatKm = (meters: number) => `${(meters / 1000).toFixed(meters < 10_000 ? 2 : 1)} km`;
 /** Walk with a friend: narration this far (seconds) from the shared clock offers a re-sync. */
 const DRIFT_LIMIT_S = 2;
 /** A friend this far away while you wait for them "seems stuck". */
@@ -1050,6 +1139,20 @@ function createStyles(colors: ThemeColors) {
   waypointName: { color: colors.text, fontSize: 32, fontWeight: "700", textAlign: "center" },
   completeScroll: { flexGrow: 1, paddingVertical: 32 },
   completeTitle: { color: colors.text, fontSize: 28, fontWeight: "700" },
+  walkStats: { flexDirection: "row", gap: 12, marginTop: 4 },
+  walkStat: {
+    alignItems: "center",
+    gap: 2,
+    minWidth: 120,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  walkStatValue: { color: colors.text, fontSize: 20, fontWeight: "800" },
+  walkStatLabel: { color: colors.textDim, fontSize: 12 },
   completeSubtitle: { color: colors.textMid, fontSize: 15, marginTop: 8, textAlign: "center" },
   cta: {
     marginTop: 24,

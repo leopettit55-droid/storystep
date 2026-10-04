@@ -31,6 +31,7 @@ import { getAreaById } from "./src/content";
 import { useAccountStore } from "./src/account/accountStore";
 import { isOnline } from "./src/offline/connectivity";
 import { startCompletionSync } from "./src/social/completions";
+import { useHealthStore } from "./src/health/healthPreference";
 import { isTourOffline, useOfflineStore } from "./src/offline/offlineStore";
 import { saveAppShell } from "./src/offline/tourFiles";
 import { useTourStore } from "./src/state/tourStore";
@@ -122,6 +123,7 @@ function AppInner() {
     void startOffline();
     // Finished tours made offline or before signing in get sent when possible.
     startCompletionSync();
+    void useHealthStore.getState().load();
   }, []);
   const { colors, isDark } = useTheme();
   const navTheme = isDark ? NavDarkTheme : NavDefaultTheme;

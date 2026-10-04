@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { api, savedIdentity } from "./api";
 
-export type Board = "overall" | "tour" | "most" | "duo";
+export type Board = "overall" | "tour" | "most" | "duo" | "distance" | "steps";
 export type Period = "week" | "month" | "all";
 
 export interface BoardRow {

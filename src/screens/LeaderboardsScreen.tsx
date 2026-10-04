@@ -17,6 +17,8 @@ const BOARDS: { id: Board; key: string }[] = [
   { id: "overall", key: "leaderboards.overall" },
   { id: "tour", key: "leaderboards.perTour" },
   { id: "most", key: "leaderboards.most" },
+  { id: "distance", key: "leaderboards.distance" },
+  { id: "steps", key: "leaderboards.steps" },
   { id: "duo", key: "leaderboards.duos" },
 ];
 const PERIODS: { id: Period; key: string }[] = [
@@ -78,6 +80,8 @@ export default function LeaderboardsScreen() {
 
   const valueText = (row: BoardRow) => {
     if (board === "most") return row.value === 1 ? t("leaderboards.toursCountOne") : t("leaderboards.toursCount", { count: row.value });
+    if (board === "distance") return `${(row.value / 1000).toFixed(row.value < 100_000 ? 1 : 0)} km`;
+    if (board === "steps") return row.value.toLocaleString();
     return formatDuration(row.value);
   };
   const detailText = (row: BoardRow) => {
@@ -112,7 +116,7 @@ export default function LeaderboardsScreen() {
         <Text style={styles.title}>{t("leaderboards.title")}</Text>
         <Text style={styles.subtitle}>{t(`leaderboards.${board}Explain`)}</Text>
 
-        <View style={styles.tabs} role="tablist">
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs} role="tablist">
           {BOARDS.map((b) => (
             <PressScale
               key={b.id}
@@ -125,7 +129,7 @@ export default function LeaderboardsScreen() {
               <Text style={[styles.tabText, board === b.id && styles.tabTextOn]}>{t(b.key)}</Text>
             </PressScale>
           ))}
-        </View>
+        </ScrollView>
 
         <View style={styles.chips}>
           {PERIODS.map((p) => (
@@ -197,8 +201,8 @@ function createStyles(colors: ThemeColors) {
     scroll: { padding: 20, paddingTop: 16, gap: 12, width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
     title: { fontSize: 32, fontWeight: "700", color: colors.primary, marginTop: 4 },
     subtitle: { fontSize: 14, color: colors.textMid, lineHeight: 20 },
-    tabs: { flexDirection: "row", borderWidth: 1, borderColor: colors.border, borderRadius: 12, padding: 3, gap: 3, marginTop: 4 },
-    tab: { flex: 1, alignItems: "center", paddingVertical: 9, borderRadius: 9 },
+    tabs: { flexGrow: 1, flexDirection: "row", borderWidth: 1, borderColor: colors.border, borderRadius: 12, padding: 3, gap: 3, marginTop: 4 },
+    tab: { flexGrow: 1, alignItems: "center", paddingVertical: 9, paddingHorizontal: 12, borderRadius: 9 },
     tabOn: { backgroundColor: colors.primary },
     tabText: { color: colors.textMid, fontSize: 14, fontWeight: "600" },
     tabTextOn: { color: colors.onPrimary },
