@@ -4,6 +4,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/types";
 import { flushCompletions } from "../social/completions";
+import { takePendingInvite } from "../duo/pendingInvite";
 import {
   Alert,
   SafeAreaView,
@@ -15,6 +16,7 @@ import {
   View,
 } from "react-native";
 import { useAccountStore, type AccountError } from "../account/accountStore";
+import AppleHealthCard from "../components/AppleHealthCard";
 import DownloadedToursCard from "../components/DownloadedToursCard";
 import LanguagePicker from "../components/LanguagePicker";
 import PressScale from "../components/PressScale";
@@ -78,6 +80,12 @@ export default function AccountScreen() {
     toggleMode();
   };
 
+  // Came here from a friend's invite: go straight back to it.
+  const backToInvite = () => {
+    const invite = takePendingInvite();
+    if (invite) navigation.navigate("DuoLobby", invite);
+  };
+
   const handleCreateAccount = async () => {
     setError(null);
     const problem = await useAccountStore.getState().createAccount(name, email, password);
@@ -88,6 +96,7 @@ export default function AccountScreen() {
     }
     notifySuccess();
     void flushCompletions();
+    backToInvite();
     setName("");
     setEmail("");
     setPassword("");
@@ -103,6 +112,7 @@ export default function AccountScreen() {
     }
     notifySuccess();
     void flushCompletions();
+    backToInvite();
     setLoginEmail("");
     setLoginPassword("");
   };
@@ -173,6 +183,9 @@ export default function AccountScreen() {
                 <Text style={styles.signOutButtonText}>{t("account.signOut")}</Text>
               </PressScale>
             </View>
+
+            {/* iPhone app only: offered straight after creating an account, then a switch. */}
+            <AppleHealthCard />
 
           </>
         ) : (

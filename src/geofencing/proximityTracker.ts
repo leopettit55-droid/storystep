@@ -107,8 +107,34 @@ export class LocationSmoother {
   }
 }
 
-/** Beyond this distance from the nearest waypoint, treat the walker as off-route. */
-const OFF_ROUTE_THRESHOLD_M = 120;
+/** Beyond this distance from the walking route (and from every stop), the walker is off-route. */
+const OFF_ROUTE_THRESHOLD_M = 75;
+/** Without a drawn route, the distance from the nearest stop is all there is to go on. */
+const OFF_ROUTE_NO_PATH_M = 120;
+/** Off-route only after this many fixes in a row, so one GPS wobble doesn't flash the warning. */
+const OFF_ROUTE_CONFIRM_FIXES = 2;
+
+/** Distance (m) from a point to the line a→b; flat-earth maths is plenty over a street's length. */
+export function distanceToSegmentMeters(p: Coordinates, a: Coordinates, b: Coordinates): number {
+  const mPerDegLat = 111_320;
+  const mPerDegLng = 111_320 * Math.cos((p.lat * Math.PI) / 180);
+  const ax = (a.lng - p.lng) * mPerDegLng;
+  const ay = (a.lat - p.lat) * mPerDegLat;
+  const bx = (b.lng - p.lng) * mPerDegLng;
+  const by = (b.lat - p.lat) * mPerDegLat;
+  const dx = bx - ax;
+  const dy = by - ay;
+  const lengthSq = dx * dx + dy * dy;
+  const t = lengthSq === 0 ? 0 : Math.max(0, Math.min(1, -(ax * dx + ay * dy) / lengthSq));
+  return Math.hypot(ax + t * dx, ay + t * dy);
+}
+
+/** How far a point is from a walking route (a line through its points). */
+export function distanceToPathMeters(p: Coordinates, path: Coordinates[]): number {
+  let best = Infinity;
+  for (let i = 1; i < path.length; i++) best = Math.min(best, distanceToSegmentMeters(p, path[i - 1], path[i]));
+  return best;
+}
 const POLL_INTERVAL_MS = 3000;
 const MIN_DISTANCE_INTERVAL_M = 5;
 
@@ -132,11 +158,12 @@ export class ProximityTracker {
   private triggeredIds = new Set<string>();
   private smoother = new LocationSmoother();
   private demoWalker: DemoWalker | null = null;
+  private offRouteFixes = 0;
 
   constructor(
     private route: Waypoint[],
     private callbacks: ProximityCallbacks,
-    /** The tour's walking path — used only by the `?demo=walk` simulated walker. */
+    /** The tour's walking path: what "off route" is measured from, and what the `?demo=walk` walker follows. */
     private path?: Coordinates[]
   ) {}
 
@@ -239,6 +266,13 @@ export class ProximityTracker {
       }
     }
 
-    this.callbacks.onOffRoute(nearestDistance > OFF_ROUTE_THRESHOLD_M);
+    // Measured from the route itself: between two far-apart stops the walker can
+    // be hundreds of metres from either while walking exactly the right way.
+    const hasPath = !!this.path && this.path.length > 1;
+    const off = hasPath
+      ? Math.min(nearestDistance, distanceToPathMeters(coords, this.path!)) > OFF_ROUTE_THRESHOLD_M
+      : nearestDistance > OFF_ROUTE_NO_PATH_M;
+    this.offRouteFixes = off ? this.offRouteFixes + 1 : 0;
+    this.callbacks.onOffRoute(this.offRouteFixes >= OFF_ROUTE_CONFIRM_FIXES);
   }
 }

@@ -52,6 +52,27 @@ export default function RouteMap({ region, pins, polyline, dashedPolyline, style
     });
     mapRef.current = map;
 
+    // Frames the whole route. The page can still be laying out when the map
+    // loads (a canvas too small to fit the route), so it's framed again each
+    // time the map's box changes size, until someone moves the map themselves.
+    let moved = false;
+    let framed: LngLatBounds | null = null;
+    const frame = () => {
+      const el = containerRef.current;
+      if (!framed || moved || !el || el.clientWidth < 140 || el.clientHeight < 140) return;
+      map.fitBounds(framed, { padding: 48, maxZoom: 17, duration: 0 });
+    };
+    map.on("dragstart", () => (moved = true));
+    map.on("zoomstart", (e: { originalEvent?: unknown }) => {
+      if (e.originalEvent) moved = true;
+    });
+    const resizeObserver = new ResizeObserver(() => {
+      map.resize();
+      frame();
+    });
+    resizeObserver.observe(containerRef.current);
+    map.once("remove", () => resizeObserver.disconnect());
+
     map.on("load", () => {
       pins.forEach((pin) => {
         new Marker({ element: makePinElement(pin.color) })
@@ -90,7 +111,8 @@ export default function RouteMap({ region, pins, polyline, dashedPolyline, style
           (b, p) => b.extend([p.lng, p.lat]),
           new LngLatBounds([points[0].lng, points[0].lat], [points[0].lng, points[0].lat])
         );
-        map.fitBounds(bounds, { padding: 48, maxZoom: 17, duration: 0 });
+        framed = bounds;
+        frame();
       }
     });
 

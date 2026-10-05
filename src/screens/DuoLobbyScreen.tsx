@@ -12,6 +12,7 @@ import { getAreaById } from "../content";
 import { DUO_COLORS } from "../duo/colors";
 import { acceptInvite, createInvite, getInvite, inviteLink, isValidCode, normalizeCode, type DuoInvite } from "../duo/duoApi";
 import { duoPeople, useDuoStore } from "../duo/duoStore";
+import { rememberInvite } from "../duo/pendingInvite";
 import { requestLocationPermissions } from "../geofencing/geofenceManager";
 import { loadGuide } from "../guides/guidePreference";
 import { tapMedium } from "../haptics";
@@ -177,7 +178,10 @@ export default function DuoLobbyScreen() {
     }
   };
 
-  const goToAccount = () => navigation.navigate("MainTabs", { screen: "Account" } as never);
+  const goToAccount = () => {
+    rememberInvite({ code: invite?.code ?? (params?.code ? normalizeCode(params.code) : undefined), areaId: params?.areaId });
+    navigation.navigate("MainTabs", { screen: "Account" } as never);
+  };
 
   const iAmHost = !!state && state.host.uid === myId;
   const showChoice = !code && !invite && !params?.code;

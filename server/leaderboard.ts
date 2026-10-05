@@ -1,5 +1,5 @@
 /**
- * GET /api/leaderboard?board=overall|tour|most|duo&period=week|month|all&tour=<id>&me=<userId>
+ * GET /api/leaderboard?board=overall|tour|most|duo|distance|steps&period=week|month|all&tour=<id>&me=<userId>
  *
  * The top 100, plus the asking user's own row if they're further down. The
  * full ranking is kept in Cloudflare's cache for 15 seconds, so opening the
@@ -8,7 +8,7 @@
 import { computeBoard, computeDuoBoard, knownTour, periodStart, type Board, type Completion, type DuoCompletion, type Period, type Row } from "./ranking";
 import { error, json, type Env } from "./social";
 
-const BOARDS: Board[] = ["overall", "tour", "most", "duo"];
+const BOARDS: Board[] = ["overall", "tour", "most", "duo", "distance", "steps"];
 const PERIODS: Period[] = ["week", "month", "all"];
 const LIMIT = 100;
 const CACHE_SECONDS = 15;
@@ -30,8 +30,8 @@ async function ranking(env: Env, board: Board, period: Period, tour: string | nu
   }
   const query =
     board === "tour"
-      ? env.DB.prepare("SELECT uid, name, tour, sec, at FROM completions WHERE at >= ? AND tour = ?").bind(since, tour)
-      : env.DB.prepare("SELECT uid, name, tour, sec, at FROM completions WHERE at >= ?").bind(since);
+      ? env.DB.prepare("SELECT uid, name, tour, sec, at, meters, steps, duo FROM completions WHERE at >= ? AND tour = ?").bind(since, tour)
+      : env.DB.prepare("SELECT uid, name, tour, sec, at, meters, steps, duo FROM completions WHERE at >= ?").bind(since);
   const { results } = await query.all<Completion>();
   return { rows: computeBoard(board, results), updatedAt: Date.now() };
 }

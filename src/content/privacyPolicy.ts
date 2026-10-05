@@ -3,7 +3,7 @@ export interface PolicySection {
   body: string;
 }
 
-export const PRIVACY_POLICY_EFFECTIVE_DATE = "3 October 2026";
+export const PRIVACY_POLICY_EFFECTIVE_DATE = "4 October 2026";
 
 export const PRIVACY_POLICY_INTRO =
   "This policy explains what information StoryStep collects, why, and what control you have over it. " +
@@ -25,7 +25,7 @@ export const PRIVACY_POLICY_SECTIONS: PolicySection[] = [
       "Your email and password stay on your device and are never sent to us (the password is kept only as a " +
       "scrambled hash).\n\n" +
       "Leaderboards and tour photos (only if you have an account and use them): your account name; each tour you " +
-      "finish, with its start-to-finish time and the date; photos you choose to share, with the tour, the stop you " +
+      "finish, with its start-to-finish time, the date, the distance you walked and your step count; photos you choose to share, with the tour, the stop you " +
       "tag them to (the stop's location, not your own GPS position), the date, and whether they're public or " +
       "private; and any reports you make about other people's photos. Photos are shrunk before upload, which also " +
       "removes the location and camera details stored inside the original picture file.\n\n" +
@@ -97,6 +97,10 @@ export const PRIVACY_POLICY_SECTIONS: PolicySection[] = [
       "Leaderboards and photos aren't required: without an account, or if you don't share a photo, nothing about " +
       "your walks is sent to us. To have your leaderboard entries removed, contact us.\n" +
       "Revoke permissions: turn off Location or Camera access for StoryStep any time in your phone's system settings.\n" +
+      "Apple Health (iPhone app, only if you connect it): StoryStep reads your step count and walking distance for the " +
+      "time you're on a tour, and saves each tour to Health as a walking workout. Only those two totals for each tour " +
+      "leave your phone (for the leaderboards); nothing else from Health is read or shared, and Health data is never " +
+      "used for advertising. Turn it off under Account → Apple Health, or in the Health app's Sharing settings.\n" +
       "Access or delete what we hold: since account and purchase data lives only on your device, you already have " +
       "direct control over it. If you're in the UK or EU, you also have rights under UK/EU GDPR to request a copy " +
       "of, correct, or ask us to erase any information we do hold about you (for example, emails you've sent us) " +

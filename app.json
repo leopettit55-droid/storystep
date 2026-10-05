@@ -40,11 +40,13 @@
         "android.permission.ACCESS_BACKGROUND_LOCATION",
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_LOCATION",
-        "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ],
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -62,17 +64,37 @@
       [
         "expo-audio",
         {
-          "enableBackgroundPlayback": true
+          "enableBackgroundPlayback": true,
+          "microphonePermission": false,
+          "recordAudioAndroid": false
         }
       ],
       [
         "expo-camera",
         {
-          "cameraPermission": "StoryStep uses your camera to identify landmarks you point it at during the tour."
+          "cameraPermission": "StoryStep uses your camera to identify landmarks you point it at during the tour.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
         }
       ],
       "expo-asset",
-      "expo-font"
+      "expo-font",
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "NSHealthShareUsageDescription": "StoryStep reads the steps and distance of each tour you walk, so they count on the leaderboards.",
+          "NSHealthUpdateUsageDescription": "StoryStep saves each tour you walk to Apple Health as a walking workout.",
+          "background": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "StoryStep lets you choose a photo from your library to share in a tour's gallery.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ]
     ],
     "extra": {
       "googleVisionApiKey": "AIzaSyCl-WB-CTiMpJAy5Oj3KQ7LImln4RSWMnY",
