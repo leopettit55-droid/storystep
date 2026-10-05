@@ -310,6 +310,21 @@ function makeStopElement(waypoint: Waypoint): HTMLDivElement {
   return root;
 }
 
+/** Turns every way of moving the map by hand (drag, zoom, rotate, tilt) on or off. */
+function setInteractive(map: MapLibreMap, on: boolean) {
+  const handlers = [
+    map.dragPan,
+    map.dragRotate,
+    map.scrollZoom,
+    map.boxZoom,
+    map.doubleClickZoom,
+    map.keyboard,
+    map.touchZoomRotate,
+    map.touchPitch,
+  ];
+  handlers.forEach((h) => (on ? h.enable() : h.disable()));
+}
+
 /** Shows a speech bubble above the avatar for `durationMs`; returns a cleanup that removes it early. */
 function showBubble(avatarEl: HTMLDivElement, text: string, durationMs: number): () => void {
   avatarEl.querySelectorAll(".ss-bubble").forEach((b) => b.remove());
@@ -679,6 +694,9 @@ export default function TourMap({
 
     if (focusStop) {
       focusRef.current = true;
+      // The stop view is a fixed scene with the guide standing centre stage:
+      // drags and zooms would slide the street out from under the guide.
+      setInteractive(map, false);
       const { lat, lng } = focusStop.coordinates;
       crossfade(() => {
         root.classList.add("ss-detail");
@@ -690,6 +708,7 @@ export default function TourMap({
 
     if (focusRef.current) {
       focusRef.current = false;
+      setInteractive(map, true);
       followRef.current = true;
       setFollowing(true);
       const at = glide.current.shown ?? userLocation;

@@ -150,7 +150,7 @@ const vi: PartialTranslationDict = {
     guideLater: "Mình sẽ nghe câu chuyện này khi đến đây!",
     backToMap: "Bản đồ",
     introSubtitle: "Chào mừng đến với chuyến tham quan có hướng dẫn",
-    introGreeting: "Xin chào! Chào mừng đến {{area}}. Mình là hướng dẫn viên của bạn.",
+    introGreeting: "Xin chào! Mình là {{guide}}, hướng dẫn viên của bạn. Chào mừng đến {{area}}.",
     introHeadphones: "Bạn nên dùng tai nghe cho chuyến tham quan này.",
     startTour: "Bắt đầu tham quan",
     distanceToStart: "Bạn cách điểm xuất phát khoảng {{distance}} m",
@@ -289,6 +289,7 @@ const vi: PartialTranslationDict = {
   guides: {
     scoutArrived: "Chào mừng! Để mình cho bạn xem một điều đặc biệt.",
     chooseTitle: "Chọn hướng dẫn viên",
+    chooseButton: "Chọn {{guide}}",
     previous: "Hướng dẫn viên trước",
     next: "Hướng dẫn viên tiếp theo",
     scoutDescription: "Hướng dẫn viên gốc của StoryStep, luôn sẵn sàng dạo bước",

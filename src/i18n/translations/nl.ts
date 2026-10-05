@@ -150,7 +150,7 @@ const nl: PartialTranslationDict = {
     guideLater: "Dit verhaal horen we als we hier zijn!",
     backToMap: "Kaart",
     introSubtitle: "Welkom bij je rondleiding",
-    introGreeting: "Hoi! Welkom bij {{area}}. Ik ben je gids.",
+    introGreeting: "Hoi! Ik ben {{guide}}, je gids. Welkom bij {{area}}.",
     introHeadphones: "We raden koptelefoon of oordopjes aan voor deze tour.",
     startTour: "Start tour",
     distanceToStart: "Je bent ongeveer {{distance}} m van het startpunt",
@@ -289,6 +289,7 @@ const nl: PartialTranslationDict = {
   guides: {
     scoutArrived: "Welkom! Ik laat je iets bijzonders zien.",
     chooseTitle: "Kies je gids",
+    chooseButton: "Kies {{guide}}",
     previous: "Vorige gids",
     next: "Volgende gids",
     scoutDescription: "Het StoryStep-origineel, altijd zin in een wandeling",

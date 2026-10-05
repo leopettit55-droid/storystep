@@ -150,7 +150,7 @@ const id: PartialTranslationDict = {
     guideLater: "Kita akan mendengar cerita ini saat sampai di sini!",
     backToMap: "Peta",
     introSubtitle: "Selamat datang di tur berpemandumu",
-    introGreeting: "Hai! Selamat datang di {{area}}. Aku pemandu turmu.",
+    introGreeting: "Hai! Aku {{guide}}, pemandu turmu. Selamat datang di {{area}}.",
     introHeadphones: "Kami sarankan memakai headphone untuk tur ini.",
     startTour: "Mulai tur",
     distanceToStart: "Kamu sekitar {{distance}} m dari titik awal",
@@ -289,6 +289,7 @@ const id: PartialTranslationDict = {
   guides: {
     scoutArrived: "Selamat datang! Biar kutunjukkan sesuatu yang istimewa.",
     chooseTitle: "Pilih pemandumu",
+    chooseButton: "Pilih {{guide}}",
     previous: "Pemandu sebelumnya",
     next: "Pemandu berikutnya",
     scoutDescription: "Pemandu asli StoryStep, selalu siap berjalan",

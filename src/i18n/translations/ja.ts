@@ -150,7 +150,7 @@ const ja: PartialTranslationDict = {
     guideLater: "ここに着いたらこのお話を聞こうね！",
     backToMap: "地図",
     introSubtitle: "ガイドツアーへようこそ",
-    introGreeting: "こんにちは！{{area}}へようこそ。ツアーガイドだよ。",
+    introGreeting: "こんにちは！ツアーガイドの{{guide}}だよ。{{area}}へようこそ。",
     introHeadphones: "このツアーではヘッドホンのご使用をおすすめします。",
     startTour: "ツアーを始める",
     distanceToStart: "スタート地点まで約{{distance}}m",
@@ -289,6 +289,7 @@ const ja: PartialTranslationDict = {
   guides: {
     scoutArrived: "ようこそ！特別なものを見せてあげるね。",
     chooseTitle: "ガイドを選ぼう",
+    chooseButton: "{{guide}}にする",
     previous: "前のガイド",
     next: "次のガイド",
     scoutDescription: "StoryStepのオリジナル。いつでも散歩にぴったり",

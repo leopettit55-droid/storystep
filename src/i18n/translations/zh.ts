@@ -150,7 +150,7 @@ const zh: PartialTranslationDict = {
     guideLater: "到了这里我们就会听到这个故事！",
     backToMap: "地图",
     introSubtitle: "欢迎参加导览之旅",
-    introGreeting: "你好！欢迎来到{{area}}。我是你的导游。",
+    introGreeting: "你好！我是你的导游{{guide}}。欢迎来到{{area}}。",
     introHeadphones: "建议在本次导览中使用耳机。",
     startTour: "开始导览",
     distanceToStart: "你距离起点约{{distance}}米",
@@ -288,6 +288,7 @@ const zh: PartialTranslationDict = {
   guides: {
     scoutArrived: "欢迎！让我带你看看特别的东西。",
     chooseTitle: "选择你的导游",
+    chooseButton: "选择{{guide}}",
     previous: "上一位导游",
     next: "下一位导游",
     scoutDescription: "StoryStep的原创导游，随时准备出发",

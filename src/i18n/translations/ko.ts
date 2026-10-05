@@ -150,7 +150,7 @@ const ko: PartialTranslationDict = {
     guideLater: "여기에 도착하면 이 이야기를 들을 거예요!",
     backToMap: "지도",
     introSubtitle: "가이드 투어에 오신 것을 환영해요",
-    introGreeting: "안녕하세요! {{area}}에 오신 걸 환영해요. 저는 투어 가이드예요.",
+    introGreeting: "안녕하세요! 투어 가이드 {{guide}}입니다. {{area}}에 오신 걸 환영해요.",
     introHeadphones: "이 투어에는 헤드폰 사용을 권장해요.",
     startTour: "투어 시작",
     distanceToStart: "출발 지점까지 약 {{distance}}m",
@@ -289,6 +289,7 @@ const ko: PartialTranslationDict = {
   guides: {
     scoutArrived: "환영해요! 특별한 걸 보여 줄게요.",
     chooseTitle: "가이드를 골라요",
+    chooseButton: "{{guide}} 선택",
     previous: "이전 가이드",
     next: "다음 가이드",
     scoutDescription: "언제나 산책 준비가 된 StoryStep 오리지널",

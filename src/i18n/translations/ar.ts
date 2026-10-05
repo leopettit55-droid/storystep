@@ -150,7 +150,7 @@ const ar: PartialTranslationDict = {
     guideLater: "سنستمع إلى هذه القصة عندما نصل إلى هنا!",
     backToMap: "الخريطة",
     introSubtitle: "مرحبًا بك في جولتك المصحوبة بمرشد",
-    introGreeting: "مرحبًا! أهلًا بك في {{area}}. أنا مرشدك في هذه الجولة.",
+    introGreeting: "مرحبًا! أنا {{guide}}، مرشدك في هذه الجولة. أهلًا بك في {{area}}.",
     introHeadphones: "ننصحك باستخدام سماعات الرأس في هذه الجولة.",
     startTour: "ابدأ الجولة",
     distanceToStart: "أنت على بُعد {{distance}} م تقريبًا من نقطة البداية",
@@ -289,6 +289,7 @@ const ar: PartialTranslationDict = {
   guides: {
     scoutArrived: "أهلًا بك! دعني أريك شيئًا مميزًا.",
     chooseTitle: "اختر مرشدك",
+    chooseButton: "اختر {{guide}}",
     previous: "المرشد السابق",
     next: "المرشد التالي",
     scoutDescription: "مرشد StoryStep الأصلي، مستعد دائمًا للمشي",
