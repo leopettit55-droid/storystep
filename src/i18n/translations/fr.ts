@@ -150,7 +150,7 @@ const fr: PartialTranslationDict = {
     guideLater: "On entendra cette histoire en arrivant ici !",
     backToMap: "Carte",
     introSubtitle: "Bienvenue dans ta visite guidée",
-    introGreeting: "Salut ! Bienvenue à {{area}}. Je suis ton guide.",
+    introGreeting: "Salut ! Je suis {{guide}}, ton guide. Bienvenue à {{area}}.",
     introHeadphones: "Nous te conseillons d'utiliser des écouteurs pour cette visite.",
     startTour: "Commencer la visite",
     distanceToStart: "Tu es à environ {{distance}} m du départ",
@@ -289,6 +289,7 @@ const fr: PartialTranslationDict = {
   guides: {
     scoutArrived: "Bienvenue ! Laisse-moi te montrer quelque chose de spécial.",
     chooseTitle: "Choisis ton guide",
+    chooseButton: "Choisir {{guide}}",
     previous: "Guide précédent",
     next: "Guide suivant",
     scoutDescription: "L'original de StoryStep, toujours partant pour marcher",

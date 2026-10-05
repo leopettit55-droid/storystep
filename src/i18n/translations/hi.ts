@@ -150,7 +150,7 @@ const hi: PartialTranslationDict = {
     guideLater: "यहाँ पहुँचकर हम यह कहानी सुनेंगे!",
     backToMap: "नक्शा",
     introSubtitle: "आपके गाइडेड टूर में स्वागत है",
-    introGreeting: "नमस्ते! {{area}} में आपका स्वागत है। मैं आपका टूर गाइड हूँ।",
+    introGreeting: "नमस्ते! मैं {{guide}} हूँ, आपका टूर गाइड। {{area}} में आपका स्वागत है।",
     introHeadphones: "इस टूर के लिए हेडफ़ोन इस्तेमाल करने की सलाह दी जाती है।",
     startTour: "टूर शुरू करें",
     distanceToStart: "आप शुरुआती बिंदु से लगभग {{distance}} मी दूर हैं",
@@ -289,6 +289,7 @@ const hi: PartialTranslationDict = {
   guides: {
     scoutArrived: "स्वागत है! चलिए आपको कुछ खास दिखाता हूँ।",
     chooseTitle: "अपना गाइड चुनें",
+    chooseButton: "{{guide}} चुनें",
     previous: "पिछला गाइड",
     next: "अगला गाइड",
     scoutDescription: "StoryStep का अपना गाइड, सैर के लिए हमेशा तैयार",

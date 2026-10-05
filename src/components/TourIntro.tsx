@@ -16,15 +16,16 @@ export interface TourIntroProps {
   onStart: () => void;
   /** Called once the exit animation has finished. */
   onDone: () => void;
-  /** The chosen tour guide, picked here by swiping once the Start button is up. */
+  /** The chosen tour guide, picked here first — before the guide says anything. */
   guide: GuideId;
   onGuideChange: (guide: GuideId) => void;
 }
 
-/** Timeline (ms from mount). The map's fly-in runs underneath for the first ~3s. */
+/** Timeline (ms). The map's fly-in runs underneath for the first ~3s. From mount: */
 const PANEL_IN_AT = 1800;
 const MASCOT_AT = 2200;
-const GREETING_AT = 2800;
+/** From the guide being chosen: */
+const GREETING_AT = 600;
 const GREETING_MS = 3500;
 const HEADPHONES_AT = GREETING_AT + GREETING_MS + 300;
 const HEADPHONES_MS = 3200;
@@ -37,10 +38,12 @@ const TEAL = "#3FBFB6";
 
 /**
  * The tour's cinematic entry: while the map flies in from above, a panel
- * rises with the guide, who greets the walker and suggests headphones, then
- * the Start button appears — and the walker can swipe through the other
- * guides to choose who leads the tour. Tapping the panel early skips ahead.
+ * rises with the guides to choose from (swipe, arrows or dots). Once one is
+ * chosen, that guide greets the walker by name and suggests headphones, then
+ * the Start button appears. Tapping the panel early skips ahead.
  */
+type Phase = "arrive" | "choose" | "greet" | "ready";
+
 export default function TourIntro({
   title,
   distanceToStart,
@@ -56,12 +59,15 @@ export default function TourIntro({
   const panel = useRef(new Animated.Value(0)).current;
   const mascot = useRef(new Animated.Value(0)).current;
   const bob = useRef(new Animated.Value(0)).current;
+  const picker = useRef(new Animated.Value(0)).current;
   const button = useRef(new Animated.Value(0)).current;
   const exit = useRef(new Animated.Value(0)).current;
 
   const [bubble, setBubble] = useState<string | null>(null);
   const bubbleAnim = useRef(new Animated.Value(0)).current;
-  const [buttonShown, setButtonShown] = useState(false);
+  const [phase, setPhase] = useState<Phase>("arrive");
+  const phaseRef = useRef(phase);
+  phaseRef.current = phase;
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const at = (ms: number, fn: () => void) => timers.current.push(setTimeout(fn, ms));
@@ -86,36 +92,63 @@ export default function TourIntro({
     });
   };
 
-  const revealButton = () => {
-    setButtonShown((shown) => {
-      if (!shown) {
-        Animated.timing(button, { toValue: 1, duration: 600, delay: 200, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
-      }
-      return true;
-    });
+  const fadeIn = (value: Animated.Value) =>
+    Animated.timing(value, { toValue: 1, duration: 600, delay: 200, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
+
+  // First the guides to choose from, with the "Choose" button.
+  const openChooser = () => {
+    if (phaseRef.current !== "arrive") return;
+    setPhase("choose");
+    fadeIn(picker);
+    fadeIn(button);
+  };
+
+  // Then the Start button, once the chosen guide has said hello.
+  const revealStart = () => {
+    if (phaseRef.current === "ready") return;
+    setPhase("ready");
+    fadeIn(button);
   };
 
   useEffect(() => {
     at(PANEL_IN_AT, () =>
       Animated.timing(panel, { toValue: 1, duration: 700, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start()
     );
-    at(MASCOT_AT, popMascot);
-    at(GREETING_AT, () => showBubble(t("activeTour.introGreeting", { area: title }), GREETING_MS));
-    at(HEADPHONES_AT, () => {
-      showBubble(t("activeTour.introHeadphones"), HEADPHONES_MS);
-      revealButton();
+    at(MASCOT_AT, () => {
+      popMascot();
+      openChooser();
     });
     return () => timers.current.forEach(clearTimeout);
     // Runs once: the intro is a fixed timeline.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Tapping the panel before the button is up skips ahead to it.
+  // The guide is chosen: they greet the walker by name, suggest headphones, and Start appears.
+  const confirmGuide = () => {
+    if (phaseRef.current !== "choose") return;
+    setPhase("greet");
+    picker.setValue(0);
+    button.setValue(0);
+    mascot.setValue(0.55);
+    Animated.spring(mascot, { toValue: 1, friction: 5, tension: 90, useNativeDriver: true }).start();
+    at(GREETING_AT, () =>
+      showBubble(t("activeTour.introGreeting", { area: title, guide: getGuide(guide).name }), GREETING_MS)
+    );
+    at(HEADPHONES_AT, () => {
+      showBubble(t("activeTour.introHeadphones"), HEADPHONES_MS);
+      revealStart();
+    });
+  };
+
+  // Tapping the panel early skips ahead: to the guides while it rises, to Start while the guide talks.
   const skipAhead = () => {
-    if (buttonShown) return;
-    panel.setValue(1);
-    mascot.setValue(1);
-    revealButton();
+    if (phase === "arrive") {
+      panel.setValue(1);
+      mascot.setValue(1);
+      openChooser();
+    } else if (phase === "greet") {
+      revealStart();
+    }
   };
 
   // Choosing a guide: swipe the character, or tap the arrows/dots.
@@ -169,12 +202,18 @@ export default function TourIntro({
     opacity: bubbleAnim,
     transform: [{ translateY: bubbleAnim.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) }],
   };
+  const pickerStyle = {
+    opacity: picker,
+    transform: [{ translateY: picker.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }],
+  };
   const buttonStyle = {
     opacity: button,
     transform: [{ translateY: button.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }],
   };
 
   const farFromStart = distanceToStart != null && distanceToStart > FAR_FROM_START_M;
+  const choosing = phase === "choose";
+  const picking = phase === "arrive" || choosing;
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
@@ -188,8 +227,8 @@ export default function TourIntro({
               </Animated.View>
             )}
           </View>
-          <View style={styles.stage} {...(buttonShown ? swipe.panHandlers : {})}>
-            {buttonShown && (
+          <View style={styles.stage} {...(choosing ? swipe.panHandlers : {})}>
+            {choosing && (
               <Pressable style={styles.arrow} onPress={() => choose(index - 1)} aria-label={t("guides.previous")} hitSlop={8}>
                 <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
               </Pressable>
@@ -197,14 +236,14 @@ export default function TourIntro({
             <Animated.View style={mascotStyle}>
               <Mascot size={120} guide={guide} />
             </Animated.View>
-            {buttonShown && (
+            {choosing && (
               <Pressable style={styles.arrow} onPress={() => choose(index + 1)} aria-label={t("guides.next")} hitSlop={8}>
                 <Ionicons name="chevron-forward" size={22} color="#FFFFFF" />
               </Pressable>
             )}
           </View>
-          {buttonShown ? (
-            <Animated.View style={[styles.guideInfo, buttonStyle]}>
+          {picking ? (
+            <Animated.View style={[styles.guideInfo, pickerStyle]} pointerEvents={choosing ? "auto" : "none"}>
               <Text style={styles.chooseLabel}>{t("guides.chooseTitle")}</Text>
               <Text style={styles.guideName}>{current.name}</Text>
               <Text style={styles.guideDescription}>{t(current.descriptionKey)}</Text>
@@ -227,11 +266,20 @@ export default function TourIntro({
             </>
           )}
 
-          <Animated.View style={[styles.buttonArea, buttonStyle]} pointerEvents={buttonShown ? "auto" : "none"}>
-            <PressScale style={styles.startButton} scaleTo={0.96} onPress={handleStart}>
-              <Text style={styles.startButtonText}>{t("activeTour.startTour")}</Text>
-            </PressScale>
-            {farFromStart && (
+          <Animated.View
+            style={[styles.buttonArea, buttonStyle]}
+            pointerEvents={choosing || phase === "ready" ? "auto" : "none"}
+          >
+            {picking ? (
+              <PressScale style={styles.startButton} scaleTo={0.96} onPress={confirmGuide}>
+                <Text style={styles.startButtonText}>{t("guides.chooseButton", { guide: current.name })}</Text>
+              </PressScale>
+            ) : (
+              <PressScale style={styles.startButton} scaleTo={0.96} onPress={handleStart}>
+                <Text style={styles.startButtonText}>{t("activeTour.startTour")}</Text>
+              </PressScale>
+            )}
+            {phase === "ready" && farFromStart && (
               <Pressable style={styles.directions} onPress={onDirections} role="link">
                 <Ionicons name="navigate" size={14} color="#FFFFFF" />
                 <Text style={styles.directionsText}>

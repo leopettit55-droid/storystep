@@ -150,7 +150,7 @@ const sv: PartialTranslationDict = {
     guideLater: "Den här historien hör vi när vi kommer hit!",
     backToMap: "Karta",
     introSubtitle: "Välkommen till din guidade tur",
-    introGreeting: "Hej! Välkommen till {{area}}. Jag är din guide.",
+    introGreeting: "Hej! Jag heter {{guide}} och är din guide. Välkommen till {{area}}.",
     introHeadphones: "Vi rekommenderar hörlurar för den här turen.",
     startTour: "Starta turen",
     distanceToStart: "Du är cirka {{distance}} m från starten",
@@ -289,6 +289,7 @@ const sv: PartialTranslationDict = {
   guides: {
     scoutArrived: "Välkommen! Låt mig visa dig något speciellt.",
     chooseTitle: "Välj din guide",
+    chooseButton: "Välj {{guide}}",
     previous: "Föregående guide",
     next: "Nästa guide",
     scoutDescription: "StoryStep-originalet, alltid redo för en promenad",

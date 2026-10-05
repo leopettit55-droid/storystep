@@ -150,7 +150,7 @@ const tr: PartialTranslationDict = {
     guideLater: "Bu hikâyeyi buraya gelince dinleyeceğiz!",
     backToMap: "Harita",
     introSubtitle: "Rehberli turuna hoş geldin",
-    introGreeting: "Merhaba! {{area}}'e hoş geldin. Ben tur rehberinim.",
+    introGreeting: "Merhaba! Ben {{guide}}, tur rehberin. {{area}}'e hoş geldin.",
     introHeadphones: "Bu tur için kulaklık kullanmanı öneririz.",
     startTour: "Turu başlat",
     distanceToStart: "Başlangıç noktasına yaklaşık {{distance}} m uzaktasın",
@@ -289,6 +289,7 @@ const tr: PartialTranslationDict = {
   guides: {
     scoutArrived: "Hoş geldin! Sana özel bir şey göstereyim.",
     chooseTitle: "Rehberini seç",
+    chooseButton: "Seç: {{guide}}",
     previous: "Önceki rehber",
     next: "Sonraki rehber",
     scoutDescription: "StoryStep'in orijinali, yürüyüşe her zaman hazır",

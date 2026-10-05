@@ -150,7 +150,7 @@ const ru: PartialTranslationDict = {
     guideLater: "Эту историю мы услышим, когда придём сюда!",
     backToMap: "Карта",
     introSubtitle: "Добро пожаловать на экскурсию",
-    introGreeting: "Привет! Добро пожаловать в {{area}}. Я твой гид.",
+    introGreeting: "Привет! Я {{guide}}, твой гид. Добро пожаловать в {{area}}.",
     introHeadphones: "Для этой экскурсии рекомендуем наушники.",
     startTour: "Начать экскурсию",
     distanceToStart: "До старта около {{distance}} м",
@@ -289,6 +289,7 @@ const ru: PartialTranslationDict = {
   guides: {
     scoutArrived: "Добро пожаловать! Сейчас покажу тебе кое-что особенное.",
     chooseTitle: "Выбери гида",
+    chooseButton: "Выбрать: {{guide}}",
     previous: "Предыдущий гид",
     next: "Следующий гид",
     scoutDescription: "Оригинальный гид StoryStep, всегда готов к прогулке",

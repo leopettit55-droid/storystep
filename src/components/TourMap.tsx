@@ -44,7 +44,10 @@ export default function TourMap({
   onWaypointPress,
   friend,
   style,
+  focusStop,
 }: TourMapProps) {
+  // The stop view is a fixed scene: the map only moves by hand in map mode.
+  const movable = !focusStop;
   const center = userLocation ?? area.route[0]?.coordinates ?? area.startingPoint;
   const line = area.path && area.path.length > 1 ? area.path : area.route.map((w) => w.coordinates);
 
@@ -53,6 +56,10 @@ export default function TourMap({
       style={style}
       showsUserLocation
       followsUserLocation
+      scrollEnabled={movable}
+      zoomEnabled={movable}
+      rotateEnabled={movable}
+      pitchEnabled={movable}
       initialRegion={{
         latitude: center.lat,
         longitude: center.lng,

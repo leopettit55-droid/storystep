@@ -150,7 +150,7 @@ const th: PartialTranslationDict = {
     guideLater: "เราจะได้ฟังเรื่องนี้เมื่อมาถึงที่นี่!",
     backToMap: "แผนที่",
     introSubtitle: "ยินดีต้อนรับสู่ทัวร์พร้อมไกด์",
-    introGreeting: "สวัสดี! ยินดีต้อนรับสู่ {{area}} ฉันคือไกด์ของคุณ",
+    introGreeting: "สวัสดี! ฉันชื่อ {{guide}} ไกด์ของคุณ ยินดีต้อนรับสู่ {{area}}",
     introHeadphones: "แนะนำให้ใช้หูฟังสำหรับทัวร์นี้",
     startTour: "เริ่มทัวร์",
     distanceToStart: "คุณอยู่ห่างจากจุดเริ่มต้นประมาณ {{distance}} ม.",
@@ -289,6 +289,7 @@ const th: PartialTranslationDict = {
   guides: {
     scoutArrived: "ยินดีต้อนรับ! ให้ฉันพาไปดูอะไรพิเศษหน่อย",
     chooseTitle: "เลือกไกด์ของคุณ",
+    chooseButton: "เลือก {{guide}}",
     previous: "ไกด์ก่อนหน้า",
     next: "ไกด์ถัดไป",
     scoutDescription: "ไกด์ต้นฉบับของ StoryStep พร้อมเดินเสมอ",

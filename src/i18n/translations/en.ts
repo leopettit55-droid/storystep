@@ -155,7 +155,7 @@ const en = {
     guideLater: "We'll hear this story when we get here!",
     backToMap: "Map",
     introSubtitle: "Welcome to your guided tour",
-    introGreeting: "Hi there! Welcome to {{area}}. I'm your tour guide.",
+    introGreeting: "Hi there! I'm {{guide}}, your tour guide. Welcome to {{area}}.",
     introHeadphones: "We recommend using headphones for this tour.",
     startTour: "Start tour",
     distanceToStart: "You're about {{distance}} m from the start",
@@ -524,6 +524,7 @@ const en = {
   guides: {
     scoutArrived: "Welcome! Let me show you something special.",
     chooseTitle: "Choose your tour guide",
+    chooseButton: "Choose {{guide}}",
     previous: "Previous guide",
     next: "Next guide",
     scoutDescription: "The StoryStep original, always up for a walk",
