@@ -290,6 +290,8 @@ const sv: PartialTranslationDict = {
     scoutArrived: "Välkommen! Låt mig visa dig något speciellt.",
     chooseTitle: "Välj din guide",
     chooseButton: "Välj {{guide}}",
+    playPreview: "Hör {{guide}}s röst",
+    stopPreview: "Stoppa {{guide}}s röst",
     previous: "Föregående guide",
     next: "Nästa guide",
     scoutDescription: "StoryStep-originalet, alltid redo för en promenad",

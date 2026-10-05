@@ -289,6 +289,8 @@ const zh: PartialTranslationDict = {
     scoutArrived: "欢迎！让我带你看看特别的东西。",
     chooseTitle: "选择你的导游",
     chooseButton: "选择{{guide}}",
+    playPreview: "听听{{guide}}的声音",
+    stopPreview: "停止{{guide}}的声音",
     previous: "上一位导游",
     next: "下一位导游",
     scoutDescription: "StoryStep的原创导游，随时准备出发",

@@ -290,6 +290,8 @@ const ko: PartialTranslationDict = {
     scoutArrived: "환영해요! 특별한 걸 보여 줄게요.",
     chooseTitle: "가이드를 골라요",
     chooseButton: "{{guide}} 선택",
+    playPreview: "{{guide}}의 목소리 듣기",
+    stopPreview: "{{guide}}의 목소리 멈추기",
     previous: "이전 가이드",
     next: "다음 가이드",
     scoutDescription: "언제나 산책 준비가 된 StoryStep 오리지널",

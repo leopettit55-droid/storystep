@@ -290,6 +290,8 @@ const fr: PartialTranslationDict = {
     scoutArrived: "Bienvenue ! Laisse-moi te montrer quelque chose de spécial.",
     chooseTitle: "Choisis ton guide",
     chooseButton: "Choisir {{guide}}",
+    playPreview: "Écouter la voix de {{guide}}",
+    stopPreview: "Arrêter la voix de {{guide}}",
     previous: "Guide précédent",
     next: "Guide suivant",
     scoutDescription: "L'original de StoryStep, toujours partant pour marcher",

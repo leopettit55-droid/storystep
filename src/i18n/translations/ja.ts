@@ -290,6 +290,8 @@ const ja: PartialTranslationDict = {
     scoutArrived: "ようこそ！特別なものを見せてあげるね。",
     chooseTitle: "ガイドを選ぼう",
     chooseButton: "{{guide}}にする",
+    playPreview: "{{guide}}の声を聞く",
+    stopPreview: "{{guide}}の声を止める",
     previous: "前のガイド",
     next: "次のガイド",
     scoutDescription: "StoryStepのオリジナル。いつでも散歩にぴったり",

@@ -290,6 +290,8 @@ const vi: PartialTranslationDict = {
     scoutArrived: "Chào mừng! Để mình cho bạn xem một điều đặc biệt.",
     chooseTitle: "Chọn hướng dẫn viên",
     chooseButton: "Chọn {{guide}}",
+    playPreview: "Nghe giọng của {{guide}}",
+    stopPreview: "Dừng giọng của {{guide}}",
     previous: "Hướng dẫn viên trước",
     next: "Hướng dẫn viên tiếp theo",
     scoutDescription: "Hướng dẫn viên gốc của StoryStep, luôn sẵn sàng dạo bước",

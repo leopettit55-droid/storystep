@@ -1,5 +1,6 @@
 import type { Waypoint } from "../schema";
 import { NARRATION_CUES } from "./cues";
+import { GUIDE_SCRIPTS } from "./guideScripts";
 import { splitSentences } from "./sentences";
 import { es } from "./subtitles/es";
 import { fr } from "./subtitles/fr";
@@ -23,8 +24,10 @@ export interface SubtitleTrack {
 export function subtitleTrack(waypoint: Waypoint, language: string, recording: string = waypoint.id): SubtitleTrack | null {
   const starts = NARRATION_CUES[recording];
   if (!starts) return null;
-  const english = splitSentences(waypoint.narration.scriptText);
-  const translated = SUBTITLE_TRANSLATIONS[language]?.[waypoint.id];
+  // A guide's own recording may say something else entirely: caption what they say.
+  const guideScript = GUIDE_SCRIPTS[recording];
+  const english = splitSentences(guideScript ?? waypoint.narration.scriptText);
+  const translated = guideScript ? undefined : SUBTITLE_TRANSLATIONS[language]?.[waypoint.id];
   // A translation that's fallen out of step with the script (lines added or
   // removed) would caption the wrong sentence — show English instead.
   const lines = translated && translated.length === english.length ? translated : english;

@@ -1,7 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Easing, PanResponder, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Animated, Easing, PanResponder, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  hasGuidePreview,
+  playGuidePreview,
+  stopGuidePreview,
+  subscribeGuidePreview,
+  type PreviewState,
+} from "../audio/guidePreview";
 import { getGuide, GUIDES, type GuideId } from "../guides/guides";
 import { useLanguage } from "../i18n/LanguageContext";
 import Mascot from "./Mascot";
@@ -66,6 +73,15 @@ export default function TourIntro({
   const [bubble, setBubble] = useState<string | null>(null);
   const bubbleAnim = useRef(new Animated.Value(0)).current;
   const [phase, setPhase] = useState<Phase>("arrive");
+  /** The voice preview playing (or loading) in the picker, if any. */
+  const [preview, setPreview] = useState<{ guide: GuideId; state: PreviewState } | null>(null);
+  useEffect(() => {
+    const unsubscribe = subscribeGuidePreview((g, s) => setPreview(g && s ? { guide: g, state: s } : null));
+    return () => {
+      unsubscribe();
+      stopGuidePreview();
+    };
+  }, []);
   const phaseRef = useRef(phase);
   phaseRef.current = phase;
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -126,6 +142,7 @@ export default function TourIntro({
   // The guide is chosen: they greet the walker by name, suggest headphones, and Start appears.
   const confirmGuide = () => {
     if (phaseRef.current !== "choose") return;
+    stopGuidePreview();
     setPhase("greet");
     picker.setValue(0);
     button.setValue(0);
@@ -156,6 +173,8 @@ export default function TourIntro({
   const choose = (next: number) => {
     const wrapped = (next + GUIDES.length) % GUIDES.length;
     if (wrapped === index) return;
+    // A preview belongs to the guide on screen: moving on stops it.
+    stopGuidePreview();
     onGuideChange(GUIDES[wrapped].id);
     // Each new guide pops in.
     mascot.setValue(0.55);
@@ -245,7 +264,33 @@ export default function TourIntro({
           {picking ? (
             <Animated.View style={[styles.guideInfo, pickerStyle]} pointerEvents={choosing ? "auto" : "none"}>
               <Text style={styles.chooseLabel}>{t("guides.chooseTitle")}</Text>
-              <Text style={styles.guideName}>{current.name}</Text>
+              <View style={styles.nameRow}>
+                <Text style={styles.guideName}>{current.name}</Text>
+                {hasGuidePreview(current.id) && (
+                  <Pressable
+                    onPress={() => (preview?.guide === current.id ? stopGuidePreview() : playGuidePreview(current.id))}
+                    style={({ hovered, pressed }: { hovered?: boolean; pressed: boolean }) => [
+                      styles.previewButton,
+                      hovered && styles.previewButtonHover,
+                      pressed && styles.previewButtonPressed,
+                    ]}
+                    aria-label={t(preview?.guide === current.id ? "guides.stopPreview" : "guides.playPreview", {
+                      guide: current.name,
+                    })}
+                    hitSlop={8}
+                  >
+                    {preview?.guide === current.id && preview.state === "loading" ? (
+                      <ActivityIndicator size="small" color="#FFFFFF" />
+                    ) : (
+                      <Ionicons
+                        name={preview?.guide === current.id ? "stop" : "volume-high"}
+                        size={preview?.guide === current.id ? 15 : 18}
+                        color="#FFFFFF"
+                      />
+                    )}
+                  </Pressable>
+                )}
+              </View>
               <Text style={styles.guideDescription}>{t(current.descriptionKey)}</Text>
               <View style={styles.dots}>
                 {GUIDES.map((g, i) => (
@@ -356,6 +401,17 @@ const styles = StyleSheet.create({
   },
   guideInfo: { alignItems: "center", marginTop: 10 },
   chooseLabel: { color: "#FFFFFF", fontSize: 13, fontWeight: "700", opacity: 0.85, textTransform: "uppercase", letterSpacing: 0.6 },
+  nameRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  previewButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "rgba(255,255,255,0.25)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  previewButtonHover: { backgroundColor: "rgba(255,255,255,0.4)" },
+  previewButtonPressed: { backgroundColor: "rgba(255,255,255,0.5)", transform: [{ scale: 0.92 }] },
   guideName: {
     marginTop: 4,
     color: "#FFFFFF",

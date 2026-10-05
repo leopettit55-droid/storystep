@@ -290,6 +290,8 @@ const ar: PartialTranslationDict = {
     scoutArrived: "أهلًا بك! دعني أريك شيئًا مميزًا.",
     chooseTitle: "اختر مرشدك",
     chooseButton: "اختر {{guide}}",
+    playPreview: "استمع إلى صوت {{guide}}",
+    stopPreview: "أوقف صوت {{guide}}",
     previous: "المرشد السابق",
     next: "المرشد التالي",
     scoutDescription: "مرشد StoryStep الأصلي، مستعد دائمًا للمشي",

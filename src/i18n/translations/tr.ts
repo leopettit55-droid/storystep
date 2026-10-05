@@ -290,6 +290,8 @@ const tr: PartialTranslationDict = {
     scoutArrived: "Hoş geldin! Sana özel bir şey göstereyim.",
     chooseTitle: "Rehberini seç",
     chooseButton: "Seç: {{guide}}",
+    playPreview: "Sesini dinle: {{guide}}",
+    stopPreview: "Sesi durdur: {{guide}}",
     previous: "Önceki rehber",
     next: "Sonraki rehber",
     scoutDescription: "StoryStep'in orijinali, yürüyüşe her zaman hazır",

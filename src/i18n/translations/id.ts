@@ -290,6 +290,8 @@ const id: PartialTranslationDict = {
     scoutArrived: "Selamat datang! Biar kutunjukkan sesuatu yang istimewa.",
     chooseTitle: "Pilih pemandumu",
     chooseButton: "Pilih {{guide}}",
+    playPreview: "Dengarkan suara {{guide}}",
+    stopPreview: "Hentikan suara {{guide}}",
     previous: "Pemandu sebelumnya",
     next: "Pemandu berikutnya",
     scoutDescription: "Pemandu asli StoryStep, selalu siap berjalan",
