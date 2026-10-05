@@ -77,9 +77,16 @@ export const NARRATION_CUES: Record<string, number[]> = {
   "eiffel-tower": [0, 11.6, 18, 29.7, 43.2, 53],
   "champ-de-mars": [0, 8.2, 18.6, 39.2, 47.8],
   "ecole-militaire": [0, 6.3, 18.1, 34.9, 49.8, 51.5],
+  "new-college-lane-bridge-of-sighs@ollie": [0, 11.3, 22.2, 44.9, 56.1, 62.4],
+  "bodleian-old-schools-quad@ollie": [0, 19.8, 23.5, 39.5, 50.2, 67],
+  "christ-church-tom-tower@ollie": [0, 12.6, 23.7, 48.2, 62.9],
+  "turf-tavern@ollie": [0, 16.3, 39.2, 56, 58.2],
 };
 
 /** Guides' own recordings of a stop (web paths, served from public/audio), keyed by waypoint id then guide id. */
 export const GUIDE_RECORDINGS: Record<string, Partial<Record<string, string>>> = {
-
+  "new-college-lane-bridge-of-sighs": {"ollie":"/audio/oxford-harry-potter-stop1-ollie.mp3"},
+  "bodleian-old-schools-quad": {"ollie":"/audio/oxford-harry-potter-stop2-ollie.mp3"},
+  "christ-church-tom-tower": {"ollie":"/audio/oxford-harry-potter-stop3-ollie.mp3"},
+  "turf-tavern": {"ollie":"/audio/oxford-harry-potter-stop4-ollie.mp3"},
 };
