@@ -77,9 +77,23 @@ export const NARRATION_CUES: Record<string, number[]> = {
   "eiffel-tower": [0, 11.6, 18, 29.7, 43.2, 53],
   "champ-de-mars": [0, 8.2, 18.6, 39.2, 47.8],
   "ecole-militaire": [0, 6.3, 18.1, 34.9, 49.8, 51.5],
+  "new-college-lane-bridge-of-sighs@ollie": [0, 6.3, 14, 22.2, 31.8, 41.6, 44.9, 50.8, 60.1],
+  "new-college-lane-bridge-of-sighs@pip": [0, 5.5, 12.2, 19.7, 28.6, 38.5, 41.8, 47.9, 57],
+  "bodleian-old-schools-quad@ollie": [0, 8.1, 16.5, 23.5, 29.6, 35.5, 41.7, 50.2, 55.9, 64.2, 67],
+  "christ-church-tom-tower@ollie": [0, 10.6, 21, 26.2, 34.9, 40.1, 46.8, 51.4, 57.6, 62.9],
+  "turf-tavern@ollie": [0, 10, 16.3, 23.4, 33.4, 39.2, 46.4, 52.1, 56],
 };
 
 /** Guides' own recordings of a stop (web paths, served from public/audio), keyed by waypoint id then guide id. */
 export const GUIDE_RECORDINGS: Record<string, Partial<Record<string, string>>> = {
+  "new-college-lane-bridge-of-sighs": {"ollie":"/audio/oxford-harry-potter-stop1-ollie.mp3","pip":"/audio/oxford-harry-potter-stop1-pip.mp3"},
+  "bodleian-old-schools-quad": {"ollie":"/audio/oxford-harry-potter-stop2-ollie.mp3"},
+  "christ-church-tom-tower": {"ollie":"/audio/oxford-harry-potter-stop3-ollie.mp3"},
+  "turf-tavern": {"ollie":"/audio/oxford-harry-potter-stop4-ollie.mp3"},
+};
 
+/** Each guide's short voice preview for the guide picker (web paths, served from public/audio). */
+export const GUIDE_PREVIEWS: Partial<Record<string, string>> = {
+  "ollie": "/audio/guide-preview-ollie.mp3",
+  "pip": "/audio/guide-preview-pip.mp3"
 };

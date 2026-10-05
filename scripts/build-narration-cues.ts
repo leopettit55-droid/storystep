@@ -12,7 +12,11 @@
  * named <tour id>-stop<stop number>-<guide id>.mp3 (e.g.
  * oxford-harry-potter-stop1-pip.mp3, guides being scout, pip, hoot, ollie). Each
  * one found is timed too and listed in GUIDE_RECORDINGS, which the app uses
- * instead of the standard recording when that guide is chosen.
+ * instead of the standard recording when that guide is chosen. If the guide
+ * says something other than the stop's script, put what they say in
+ * src/content/narration/guideScripts.ts so it's timed and captioned instead.
+ * A guide's short voice preview for the guide picker goes there too, as
+ * guide-preview-<guide id>.mp3, and is listed in GUIDE_PREVIEWS.
  *
  * Re-run after a recording or script changes, or a tour is added:
  *   npx tsx scripts/build-narration-cues.ts
@@ -20,12 +24,15 @@
 import fs from "node:fs";
 import path from "node:path";
 import { MPEGDecoder } from "mpg123-decoder";
+import { GUIDE_SCRIPTS } from "../src/content/narration/guideScripts";
 import { paragraphStarts, splitSentences } from "../src/content/narration/sentences";
 
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "src/content/narration/cues.ts");
 const GUIDE_AUDIO_DIR = path.join(ROOT, "public/audio");
 const GUIDE_FILE = /^(.+)-stop(\d+)-(scout|pip|hoot|ollie)\.mp3$/;
+/** A short "hello, I'm …" clip for the guide picker: guide-preview-<guide>.mp3 (Professor Hoot may be "professor-hoot"). */
+const PREVIEW_FILE = /^guide-preview-(scout|pip|hoot|professor-hoot|ollie)\.mp3$/;
 
 // The tour files `require()` images and audio for the bundler. Here we only
 // need to know which file each one is, so a require of an asset returns its path.
@@ -175,9 +182,23 @@ async function main() {
       console.warn(`  public/audio/${file}: no stop ${stopNumber} in a tour called "${areaId}" — skipped`);
       continue;
     }
-    cues[`${waypoint.id}@${guide}`] = await timeRecording(path.join(GUIDE_AUDIO_DIR, file), waypoint.narration.scriptText);
+    const key = `${waypoint.id}@${guide}`;
+    const own = GUIDE_SCRIPTS[key];
+    cues[key] = await timeRecording(path.join(GUIDE_AUDIO_DIR, file), own ?? waypoint.narration.scriptText);
     (guideRecordings[waypoint.id] ??= {})[guide] = `/audio/${file}`;
-    console.log(`${areaId} stop ${stopNumber}, ${guide}'s voice: timed`);
+    console.log(
+      `${areaId} stop ${stopNumber}, ${guide}'s voice: timed` +
+        (own ? " (own script)" : " (standard script — add theirs to guideScripts.ts if they say something else)")
+    );
+  }
+
+  const previews: Record<string, string> = {};
+  for (const file of files) {
+    const match = PREVIEW_FILE.exec(file);
+    if (!match) continue;
+    const guide = match[1] === "professor-hoot" ? "hoot" : match[1];
+    previews[guide] = `/audio/${file}`;
+    console.log(`${guide}'s voice preview: found`);
   }
 
   const body = Object.entries(cues)
@@ -193,7 +214,9 @@ async function main() {
       ` * or "<waypoint id>@<guide id>" for a guide's own recording. */\n` +
       `export const NARRATION_CUES: Record<string, number[]> = {\n${body}\n};\n\n` +
       `/** Guides' own recordings of a stop (web paths, served from public/audio), keyed by waypoint id then guide id. */\n` +
-      `export const GUIDE_RECORDINGS: Record<string, Partial<Record<string, string>>> = {\n${recordings}\n};\n`
+      `export const GUIDE_RECORDINGS: Record<string, Partial<Record<string, string>>> = {\n${recordings}\n};\n\n` +
+      `/** Each guide's short voice preview for the guide picker (web paths, served from public/audio). */\n` +
+      `export const GUIDE_PREVIEWS: Partial<Record<string, string>> = ${JSON.stringify(previews, null, 2)};\n`
   );
   console.log(
     `Wrote ${Object.keys(cues).length} recordings (${Object.keys(guideRecordings).length} stops with guide voices) to ${path.relative(ROOT, OUT)}`

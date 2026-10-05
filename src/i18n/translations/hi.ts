@@ -290,6 +290,8 @@ const hi: PartialTranslationDict = {
     scoutArrived: "स्वागत है! चलिए आपको कुछ खास दिखाता हूँ।",
     chooseTitle: "अपना गाइड चुनें",
     chooseButton: "{{guide}} चुनें",
+    playPreview: "{{guide}} की आवाज़ सुनें",
+    stopPreview: "{{guide}} की आवाज़ रोकें",
     previous: "पिछला गाइड",
     next: "अगला गाइड",
     scoutDescription: "StoryStep का अपना गाइड, सैर के लिए हमेशा तैयार",

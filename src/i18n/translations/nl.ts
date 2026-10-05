@@ -290,6 +290,8 @@ const nl: PartialTranslationDict = {
     scoutArrived: "Welkom! Ik laat je iets bijzonders zien.",
     chooseTitle: "Kies je gids",
     chooseButton: "Kies {{guide}}",
+    playPreview: "Hoor de stem van {{guide}}",
+    stopPreview: "Stop de stem van {{guide}}",
     previous: "Vorige gids",
     next: "Volgende gids",
     scoutDescription: "Het StoryStep-origineel, altijd zin in een wandeling",

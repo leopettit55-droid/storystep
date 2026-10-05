@@ -290,6 +290,8 @@ const ru: PartialTranslationDict = {
     scoutArrived: "Добро пожаловать! Сейчас покажу тебе кое-что особенное.",
     chooseTitle: "Выбери гида",
     chooseButton: "Выбрать: {{guide}}",
+    playPreview: "Послушать голос: {{guide}}",
+    stopPreview: "Остановить голос: {{guide}}",
     previous: "Предыдущий гид",
     next: "Следующий гид",
     scoutDescription: "Оригинальный гид StoryStep, всегда готов к прогулке",

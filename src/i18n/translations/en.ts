@@ -525,6 +525,8 @@ const en = {
     scoutArrived: "Welcome! Let me show you something special.",
     chooseTitle: "Choose your tour guide",
     chooseButton: "Choose {{guide}}",
+    playPreview: "Hear {{guide}}'s voice",
+    stopPreview: "Stop {{guide}}'s voice",
     previous: "Previous guide",
     next: "Next guide",
     scoutDescription: "The StoryStep original, always up for a walk",
