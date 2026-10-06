@@ -11,6 +11,7 @@ export const parisIleDeLaCite: Area = {
   estimatedDistanceKm: 1.8,
   difficulty: "easy",
   isContentComplete: true,
+  enableInteractiveGuide: true,
   image: require("../../../assets/tours/paris-ile-de-la-cite.jpg"),
   price: { singleTour: 4.99 },
   startingPoint: {

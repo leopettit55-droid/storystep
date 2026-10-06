@@ -1,5 +1,5 @@
 /**
- * "Ask your guide" (test feature, Magdalen College only): a visitor types a
+ * "Ask your guide" (tours with enableInteractiveGuide): a visitor types a
  * question at a stop, Claude answers in the chosen guide's voice from that
  * stop's script, and Google Cloud Text-to-Speech reads the answer out.
  *
@@ -157,6 +157,8 @@ async function writeAnswer(
     const text = response.content
       .flatMap((block) => (block.type === "text" ? [block.text] : []))
       .join(" ")
+      // It's spoken and shown as plain text: drop any markdown emphasis that slips through.
+      .replace(/[*_#`]+/g, "")
       .trim();
     if (response.stop_reason === "refusal" || !text) {
       log.claudeError = response.stop_reason === "refusal" ? "refusal" : "empty";

@@ -20,6 +20,7 @@ export const oxfordInklings: Area = {
     coordinates: { lat: 51.75156, lng: -1.2557 },
   },
   isContentComplete: true,
+  enableInteractiveGuide: true,
   image: require("../../../assets/tours/oxford-inklings.jpg"),
   price: { singleTour: 4.99 },
   startingPoint: {

@@ -11,6 +11,7 @@ export const parisLouvre: Area = {
   estimatedDistanceKm: 2.4,
   difficulty: "easy",
   isContentComplete: true,
+  enableInteractiveGuide: true,
   image: require("../../../assets/tours/paris-louvre.jpg"),
   price: { singleTour: 4.99 },
   startingPoint: {

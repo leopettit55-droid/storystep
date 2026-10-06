@@ -642,7 +642,7 @@ export default function ActiveTourScreen() {
 
   const isPlaying = status === "touring";
 
-  // "Ask your guide" (test feature): website only, tours that switch it on, and
+  // "Ask your guide": website only, tours that switch it on, and
   // not on a duo walk, where pausing here would put the two phones out of step.
   const canAsk = Platform.OS === "web" && !!area.enableInteractiveGuide && !duoCode;
   const openAsk = () => {

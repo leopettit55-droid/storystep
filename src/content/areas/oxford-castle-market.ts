@@ -20,6 +20,7 @@ export const oxfordCastleMarket: Area = {
     coordinates: { lat: 51.75066, lng: -1.26265 },
   },
   isContentComplete: true,
+  enableInteractiveGuide: true,
   image: require("../../../assets/tours/oxford-castle.jpg"),
   price: { singleTour: 4.99 },
   startingPoint: {

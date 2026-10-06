@@ -151,7 +151,6 @@ export const oxfordMagdalen: Area = {
   price: { singleTour: 4.99 },
   freeLandmarkScanner: true,
   sequentialStops: true,
-  // Testing "Ask your guide" here only; keep it off the other tours until it's been tried.
   enableInteractiveGuide: true,
   accessNote:
     "This tour and the scanner work inside the college grounds, which need a Magdalen College visitor ticket (bought separately from the college, online or on the day, card only). Opening hours vary and the college closes on some days, so check magd.ox.ac.uk before you go. Please keep to the paths, stay off the grass, and don't enter staircases or areas marked private.",

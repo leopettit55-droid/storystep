@@ -521,7 +521,7 @@ const en = {
   },
 
 
-  // "Ask your guide" test (Magdalen only for now): English only until it's kept.
+  // "Ask your guide": English only for now (answers are in English too).
   askGuide: {
     button: "Ask your guide",
     title: "Ask your guide",

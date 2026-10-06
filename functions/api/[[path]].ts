@@ -7,7 +7,7 @@
  *   GET  /api/leaderboard    server/leaderboard.ts
  *   *    /api/photos/...     server/photos.ts
  *   *    /api/duo/...        server/duo.ts (Walk with a friend)
- *   POST /api/guide-answer   server/guideAnswer.ts (Ask your guide, test feature)
+ *   POST /api/guide-answer   server/guideAnswer.ts (Ask your guide)
  */
 import { recordCompletion } from "../../server/completions";
 import { handleDuo } from "../../server/duo";
