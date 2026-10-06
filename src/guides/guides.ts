@@ -128,14 +128,15 @@ const OLLIE = `
     <circle cx="92.5" cy="47" r="5" fill="#7A4D31" stroke="#3B2414" stroke-width="2.5"/>
   </g>`;
 
+/** In picker order: Professor Hoot first — he narrates in the original recorded voice. */
 export const GUIDES: Guide[] = [
+  { id: "hoot", name: "Professor Hoot", descriptionKey: "guides.hootDescription", arrivalKey: "guides.hootArrived", svg: HOOT },
   { id: "scout", name: "Scout", descriptionKey: "guides.scoutDescription", arrivalKey: "guides.scoutArrived", svg: SCOUT },
   { id: "pip", name: "Pip", descriptionKey: "guides.pipDescription", arrivalKey: "guides.pipArrived", svg: PIP },
-  { id: "hoot", name: "Professor Hoot", descriptionKey: "guides.hootDescription", arrivalKey: "guides.hootArrived", svg: HOOT },
   { id: "ollie", name: "Ollie", descriptionKey: "guides.ollieDescription", arrivalKey: "guides.ollieArrived", svg: OLLIE },
 ];
 
-export const DEFAULT_GUIDE: GuideId = "scout";
+export const DEFAULT_GUIDE: GuideId = "hoot";
 
 export function getGuide(id: string | null | undefined): Guide {
   return GUIDES.find((g) => g.id === id) ?? GUIDES[0];
