@@ -11,6 +11,7 @@ export const soho: Area = {
   estimatedDistanceKm: 2.1,
   difficulty: "easy",
   isContentComplete: true,
+  enableInteractiveGuide: true,
   image: require("../../../assets/tours/soho.jpg"),
   price: { singleTour: 4.99 },
   startingPoint: {

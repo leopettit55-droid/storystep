@@ -20,6 +20,7 @@ export const oxfordHarryPotter: Area = {
     coordinates: { lat: 51.75469, lng: -1.25286 },
   },
   isContentComplete: true,
+  enableInteractiveGuide: true,
   image: require("../../../assets/tours/oxford-harry-potter.jpg"),
   price: { singleTour: 4.99 },
   startingPoint: {

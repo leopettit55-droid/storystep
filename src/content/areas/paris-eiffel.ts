@@ -11,6 +11,7 @@ export const parisEiffel: Area = {
   estimatedDistanceKm: 2.2,
   difficulty: "easy",
   isContentComplete: true,
+  enableInteractiveGuide: true,
   image: require("../../../assets/tours/paris-eiffel.jpg"),
   price: { singleTour: 4.99 },
   startingPoint: {

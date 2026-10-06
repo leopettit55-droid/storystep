@@ -11,6 +11,7 @@ export const westminster: Area = {
   estimatedDistanceKm: 2.3,
   difficulty: "moderate",
   isContentComplete: true,
+  enableInteractiveGuide: true,
   image: require("../../../assets/tours/westminster.jpg"),
   price: { singleTour: 4.99 },
   startingPoint: {

@@ -20,6 +20,7 @@ export const oxfordBodleian: Area = {
     coordinates: { lat: 51.75469, lng: -1.25286 },
   },
   isContentComplete: true,
+  enableInteractiveGuide: true,
   image: require("../../../assets/tours/oxford-radcliffe.jpg"),
   price: { singleTour: 4.99 },
   startingPoint: {

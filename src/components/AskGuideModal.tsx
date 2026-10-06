@@ -28,7 +28,7 @@ export interface AskGuideModalProps {
 }
 
 /**
- * "Ask your guide" (test feature, see server/guideAnswer.ts): type a question
+ * "Ask your guide" (see server/guideAnswer.ts): type a question
  * at a stop and hear the guide answer it. The answer plays as soon as it's
  * ready, with its transcript below, and the sheet closes when it finishes.
  */

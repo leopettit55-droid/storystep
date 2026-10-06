@@ -71,8 +71,8 @@ export interface Area {
   freeLandmarkScanner?: boolean;
   /** The place offers only the free landmark scanner: no purchase, price, or tour start. */
   scannerOnly?: boolean;
-  /** Test feature: "Ask your guide" on each stop (a question answered by Claude
-   * and spoken with Google Cloud Text-to-Speech). Off unless set — see server/guideAnswer.ts. */
+  /** "Ask your guide" on each stop: a question answered by Claude and spoken
+   * with Google Cloud Text-to-Speech (server/guideAnswer.ts). Off unless set. */
   enableInteractiveGuide?: boolean;
   /** Shown on the tour page — e.g. a separate entry ticket the visitor needs. */
   accessNote?: string;

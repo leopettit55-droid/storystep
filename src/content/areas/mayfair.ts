@@ -16,6 +16,7 @@ export const mayfair: Area = {
   estimatedDistanceKm: 2.7,
   difficulty: "easy",
   isContentComplete: true,
+  enableInteractiveGuide: true,
   image: require("../../../assets/tours/mayfair.jpg"),
   price: { singleTour: 4.99 },
   startingPoint: {

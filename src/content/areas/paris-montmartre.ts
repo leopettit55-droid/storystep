@@ -11,6 +11,7 @@ export const parisMontmartre: Area = {
   estimatedDistanceKm: 2.6,
   difficulty: "moderate",
   isContentComplete: true,
+  enableInteractiveGuide: true,
   image: require("../../../assets/tours/paris-montmartre.jpg"),
   price: { singleTour: 4.99 },
   startingPoint: {
