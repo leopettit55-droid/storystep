@@ -23,6 +23,8 @@ export interface StopDetailProps {
   bottomClearance: number;
   /** The walker's chosen tour guide, who stands centre stage. */
   guide: GuideId;
+  /** Shows "Ask your guide" (tours with enableInteractiveGuide). */
+  onAsk?: () => void;
 }
 
 const BUBBLE_MS = 3200;
@@ -46,6 +48,7 @@ export default function StopDetail({
   topInset,
   bottomClearance,
   guide: guideId,
+  onAsk,
 }: StopDetailProps) {
   const { t } = useLanguage();
   const guide = getGuide(guideId);
@@ -152,6 +155,13 @@ export default function StopDetail({
         <Text style={styles.exitText}>{t("activeTour.backToMap")}</Text>
       </PressScale>
 
+      {onAsk && (
+        <PressScale style={[styles.askButton, { top: topInset + 12 }]} scaleTo={0.92} onPress={onAsk}>
+          <Ionicons name="chatbubble-ellipses" size={18} color="#FFFFFF" />
+          <Text style={styles.exitText}>{t("askGuide.button")}</Text>
+        </PressScale>
+      )}
+
       <View style={styles.stage} pointerEvents="box-none">
         <View style={styles.bubbleSlot} pointerEvents="none">
           {bubble && (
@@ -209,6 +219,17 @@ const styles = StyleSheet.create({
     ...(Platform.OS === "web" ? ({ backdropFilter: "blur(8px)" } as object) : {}),
   },
   exitText: { color: "#FFFFFF", fontSize: 15, fontWeight: "700" },
+  askButton: {
+    position: "absolute",
+    left: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    height: 44,
+    paddingHorizontal: 16,
+    borderRadius: 22,
+    backgroundColor: "#2E9E6B",
+  },
   stage: { position: "absolute", left: 0, right: 0, bottom: 0, alignItems: "center" },
   bubbleSlot: { minHeight: 80, justifyContent: "flex-end", alignItems: "center", marginBottom: 8, alignSelf: "stretch" },
   bubble: {

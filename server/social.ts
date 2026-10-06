@@ -13,6 +13,9 @@ export interface Env {
   PHOTOS: KVNamespace;
   /** "Walk with a friend" rooms (duo/room.ts, deployed as the storystep-duo Worker). */
   DUO: DurableObjectNamespace;
+  /** "Ask your guide" (server/guideAnswer.ts). Secrets, set with `wrangler pages secret put`. */
+  ANTHROPIC_API_KEY?: string;
+  GOOGLE_TTS_API_KEY?: string;
 }
 
 export interface TourMeta {
@@ -20,7 +23,10 @@ export interface TourMeta {
   name: string;
   city: string;
   distanceKm: number;
-  stops: { id: string; name: string; lat: number; lng: number }[];
+  /** "Ask your guide" is on for this tour (server/guideAnswer.ts). */
+  interactiveGuide?: boolean;
+  /** `script` is only included for tours with interactiveGuide. */
+  stops: { id: string; name: string; lat: number; lng: number; script?: string }[];
 }
 
 export const TOURS = tours as TourMeta[];

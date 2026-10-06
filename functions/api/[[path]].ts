@@ -7,9 +7,11 @@
  *   GET  /api/leaderboard    server/leaderboard.ts
  *   *    /api/photos/...     server/photos.ts
  *   *    /api/duo/...        server/duo.ts (Walk with a friend)
+ *   POST /api/guide-answer   server/guideAnswer.ts (Ask your guide, test feature)
  */
 import { recordCompletion } from "../../server/completions";
 import { handleDuo } from "../../server/duo";
+import { answerGuideQuestion } from "../../server/guideAnswer";
 import { getLeaderboard } from "../../server/leaderboard";
 import { handlePhotos } from "../../server/photos";
 import { cleanName, createUser, error, json, preflight, type Env } from "../../server/social";
@@ -37,6 +39,9 @@ export const onRequest: PagesFunction<Env> = async ({ request, env, waitUntil })
     }
     if (route === "photos") return handlePhotos(env, request, rest);
     if (route === "duo") return handleDuo(env, request, rest);
+    if (route === "guide-answer" && rest.length === 0) {
+      return request.method === "POST" ? answerGuideQuestion(env, request, waitUntil) : error(405, "Use POST");
+    }
     return error(404, "Not found");
   } catch (e) {
     console.error(e);

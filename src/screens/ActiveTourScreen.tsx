@@ -68,6 +68,7 @@ import SharePhotoCard from "../components/SharePhotoCard";
 import NarrationSubtitle from "../components/NarrationSubtitle";
 import StopDetail, { type StopDetailMode } from "../components/StopDetail";
 import TourIntro from "../components/TourIntro";
+import AskGuideModal from "../components/AskGuideModal";
 import TourMap, { type AvatarLine } from "../components/TourMap";
 import { DEFAULT_GUIDE, type GuideId } from "../guides/guides";
 import { loadGuide, saveGuide } from "../guides/guidePreference";
@@ -180,6 +181,9 @@ export default function ActiveTourScreen() {
 
   // The street-level stop view: open on arrival, or when a stop marker is tapped.
   const [detail, setDetail] = useState<{ waypoint: Waypoint; mode: StopDetailMode } | null>(null);
+  /** "Ask your guide" is open, and whether opening it paused the story. */
+  const [asking, setAsking] = useState(false);
+  const askPausedRef = useRef(false);
   const detailRef = useRef(detail);
   detailRef.current = detail;
   /** 0 → 1 as the stop view takes over (the map HUD fades out). */
@@ -636,6 +640,27 @@ export default function ActiveTourScreen() {
 
   const isPlaying = status === "touring";
 
+  // "Ask your guide" (test feature): website only, tours that switch it on, and
+  // not on a duo walk, where pausing here would put the two phones out of step.
+  const canAsk = Platform.OS === "web" && !!area.enableInteractiveGuide && !duoCode;
+  const openAsk = () => {
+    // The story pauses while the guide answers, and carries on afterwards.
+    askPausedRef.current = isPlaying;
+    if (isPlaying) {
+      pause();
+      pauseNarration();
+    }
+    setAsking(true);
+  };
+  const closeAsk = () => {
+    setAsking(false);
+    if (askPausedRef.current) {
+      resume();
+      resumeNarration();
+    }
+    askPausedRef.current = false;
+  };
+
   const handleTogglePlay = () => {
     // Duo: pausing pauses both phones; resuming restarts both from the same second.
     if (duoCode) {
@@ -925,7 +950,12 @@ export default function ActiveTourScreen() {
           topInset={insets.top}
           bottomClearance={insets.bottom + CONTROLS_BOTTOM + 70 + 16 + SUBTITLE_SPACE}
           guide={guide}
+          onAsk={canAsk ? openAsk : undefined}
         />
+      )}
+
+      {asking && detail && (
+        <AskGuideModal tourId={area.id} stop={detail.waypoint} guide={guide} onClose={closeAsk} />
       )}
 
       {detail && duoActive && duoFriend && (

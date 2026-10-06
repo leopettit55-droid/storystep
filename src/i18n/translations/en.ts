@@ -521,6 +521,22 @@ const en = {
   },
 
 
+  // "Ask your guide" test (Magdalen only for now): English only until it's kept.
+  askGuide: {
+    button: "Ask your guide",
+    title: "Ask your guide",
+    placeholder: "What would you like to know about {{stop}}?",
+    ask: "Ask {{guide}}",
+    thinking: "{{guide}} is thinking… usually 2–5 seconds",
+    remaining: "{{count}} questions left at this stop",
+    limit: "That's all the questions for this stop. Try again at the next one!",
+    error: "Sorry, {{guide}} couldn't answer just now. Please try again.",
+    noAudio: "The voice isn't available right now, so here's the answer in writing.",
+    play: "Play the answer",
+    pause: "Pause the answer",
+    aiNotice: "This answer and its voice are AI-generated, so double-check anything important.",
+    close: "Close",
+  },
   guides: {
     scoutArrived: "Welcome! Let me show you something special.",
     chooseTitle: "Choose your tour guide",

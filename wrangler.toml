@@ -20,3 +20,10 @@ id = "221415be59a34d7a933a696f569e6aaf"
 name = "DUO"
 class_name = "DuoRoom"
 script_name = "storystep-duo"
+
+# "Ask your guide" (server/guideAnswer.ts) needs two secrets. They're never
+# written here (this file is public); set each one, per environment, with:
+#   npx wrangler pages secret put ANTHROPIC_API_KEY --project-name storystep --env preview
+#   npx wrangler pages secret put GOOGLE_TTS_API_KEY --project-name storystep --env preview
+# (drop "--env preview" for the live site). Without them the guide gives a
+# pre-written reply, as text.
