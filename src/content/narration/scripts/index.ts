@@ -4,7 +4,8 @@ import { es } from "./es";
 /**
  * The stops' narration scripts in other languages, made by
  * scripts/translate-scripts.ts from the English (`from` is a fingerprint of
- * the English it was translated from, so a changed stop is re-translated).
+ * the English it was translated from, so a changed stop is re-translated;
+ * hand fixes to a translation stay until then).
  * They're what the guides record in that language
  * (scripts/build-guide-voices.ts) and the subtitles shown with it.
  */
