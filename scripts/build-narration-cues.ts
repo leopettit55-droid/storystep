@@ -187,8 +187,7 @@ async function main() {
     cues[key] = await timeRecording(path.join(GUIDE_AUDIO_DIR, file), own ?? waypoint.narration.scriptText);
     (guideRecordings[waypoint.id] ??= {})[guide] = `/audio/${file}`;
     console.log(
-      `${areaId} stop ${stopNumber}, ${guide}'s voice: timed` +
-        (own ? " (own script)" : " (standard script — add theirs to guideScripts.ts if they say something else)")
+      `${areaId} stop ${stopNumber}, ${guide}'s voice: timed` + (own ? " (own script)" : "")
     );
   }
 
