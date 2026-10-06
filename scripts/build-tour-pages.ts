@@ -160,14 +160,23 @@ function copyMapWorker() {
 }
 
 /** The tour list the social server trusts (server/social.ts): ids,
- * names, distances and stop locations, so a phone can't invent any of them. */
+ * names, distances and stop locations, so a phone can't invent any of them.
+ * Tours with "Ask your guide" also carry each stop's script, which the guide
+ * answers from (server/guideAnswer.ts). */
 function writeServerTourList(tours: Area[]) {
   const list = tours.map((a) => ({
     id: a.id,
     name: a.name,
     city: a.city,
     distanceKm: a.estimatedDistanceKm,
-    stops: a.route.map((w) => ({ id: w.id, name: w.name, lat: w.coordinates.lat, lng: w.coordinates.lng })),
+    ...(a.enableInteractiveGuide ? { interactiveGuide: true } : {}),
+    stops: a.route.map((w) => ({
+      id: w.id,
+      name: w.name,
+      lat: w.coordinates.lat,
+      lng: w.coordinates.lng,
+      ...(a.enableInteractiveGuide ? { script: w.narration.scriptText } : {}),
+    })),
   }));
   fs.writeFileSync(path.join(ROOT, "server", "tours.generated.json"), JSON.stringify(list, null, 2) + "\n");
 }
