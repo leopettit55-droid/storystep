@@ -18,6 +18,7 @@
  * seconds, timings — for latency and cost (`wrangler pages deployment tail`).
  */
 import Anthropic from "@anthropic-ai/sdk";
+import { GUIDE_VOICES } from "../src/guides/voices";
 import { error, json, tourById, type Env, type TourMeta } from "./social";
 
 /** Haiku for speed and cost: answers are short and grounded in the stop's script. */
@@ -31,29 +32,12 @@ const RATE_WINDOW_S = 60 * 60;
 /** Answers to the same question at the same stop are reused for a month. */
 const CACHE_TTL_S = 30 * 24 * 60 * 60;
 
-/** Each guide's character, and their Google Cloud Text-to-Speech voice (British English). */
-const GUIDES: Record<string, { name: string; persona: string; voice: string; speakingRate?: number }> = {
-  scout: {
-    name: "Scout",
-    persona: "the StoryStep original, warm, inviting and friendly",
-    voice: "en-GB-Wavenet-B",
-  },
-  pip: {
-    name: "Pip",
-    persona: "a cheerful penguin, upbeat and bubbly",
-    voice: "en-GB-Wavenet-C",
-  },
-  hoot: {
-    name: "Professor Hoot",
-    persona: "a wise old owl, measured, authoritative and scholarly",
-    voice: "en-GB-Standard-A",
-  },
-  ollie: {
-    name: "Ollie",
-    persona: "a young explorer, playful, cheeky and adventurous",
-    voice: "en-GB-Wavenet-B",
-    speakingRate: 1.1,
-  },
+/** Each guide's character. Their voices are in src/guides/voices.ts. */
+const GUIDES: Record<string, { name: string; persona: string }> = {
+  scout: { name: "Scout", persona: "the StoryStep original, warm, inviting and friendly" },
+  pip: { name: "Pip", persona: "a cheerful penguin, upbeat and bubbly" },
+  hoot: { name: "Professor Hoot", persona: "a wise old owl, measured, authoritative and scholarly" },
+  ollie: { name: "Ollie", persona: "a young explorer, playful, cheeky and adventurous" },
 };
 
 type Stop = TourMeta["stops"][number];
@@ -206,8 +190,8 @@ async function speak(env: Env, text: string, guideId: string, log: Record<string
       headers: { "content-type": "application/json", "x-goog-api-key": env.GOOGLE_TTS_API_KEY },
       body: JSON.stringify({
         input: { text },
-        voice: { languageCode: "en-GB", name: GUIDES[guideId].voice },
-        audioConfig: { audioEncoding: "MP3", speakingRate: GUIDES[guideId].speakingRate ?? 1 },
+        voice: { languageCode: "en-GB", name: GUIDE_VOICES[guideId as keyof typeof GUIDE_VOICES].name },
+        audioConfig: { audioEncoding: "MP3", speakingRate: GUIDE_VOICES[guideId as keyof typeof GUIDE_VOICES].speakingRate },
       }),
     });
     if (!res.ok) {
