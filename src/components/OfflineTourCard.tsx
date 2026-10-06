@@ -95,20 +95,19 @@ export default function OfflineTourCard({ area }: { area: Area }) {
     );
   }
 
+  // Not downloaded: a quiet, optional line rather than a call to action — most walkers have signal.
   return (
-    <View style={styles.card}>
-      <Ionicons name="cloud-download-outline" size={20} color={colors.primary} />
-      <View style={styles.text}>
-        <Text style={styles.title}>{t("offline.downloadTitle")}</Text>
-        <Text style={styles.body}>{online ? t("offline.downloadBody") : t("offline.needConnection")}</Text>
-      </View>
+    <View style={styles.quiet}>
+      <Ionicons name="cloud-download-outline" size={15} color={colors.textDim} />
+      <Text style={styles.quietText}>{online ? t("offline.downloadBody") : t("offline.needConnection")}</Text>
       <PressScale
-        style={[styles.button, !online && styles.buttonDisabled]}
+        style={[styles.quietLink, !online && styles.buttonDisabled]}
         scaleTo={0.95}
         disabled={!online}
         onPress={() => void download(area.id)}
+        aria-label={t("offline.downloadTitle")}
       >
-        <Text style={styles.buttonText}>{t("offline.download")}</Text>
+        <Text style={styles.quietLinkText}>{t("offline.download")}</Text>
       </PressScale>
     </View>
   );
@@ -147,6 +146,18 @@ function createStyles(colors: ThemeColors) {
     buttonText: { color: colors.onPrimary, fontSize: 13, fontWeight: "700" },
     linkButton: { paddingVertical: 8, paddingHorizontal: 6 },
     linkText: { color: colors.primary, fontSize: 13, fontWeight: "600" },
+    quiet: {
+      marginTop: 20,
+      paddingTop: 12,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: colors.border,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    quietText: { flex: 1, minWidth: 0, color: colors.textDim, fontSize: 12, lineHeight: 17 },
+    quietLink: { paddingVertical: 6, paddingHorizontal: 4 },
+    quietLinkText: { color: colors.textDim, fontSize: 12, fontWeight: "600", textDecorationLine: "underline" },
     track: { height: 6, borderRadius: 3, backgroundColor: colors.border, overflow: "hidden" },
     fill: { height: "100%", borderRadius: 3, backgroundColor: colors.primary },
   });

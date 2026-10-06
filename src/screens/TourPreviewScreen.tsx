@@ -286,8 +286,6 @@ export default function TourPreviewScreen() {
           </PressScale>
         )}
 
-        {!scannerOnly && <OfflineTourCard area={area} />}
-
         {!scannerOnly && (
           <PressScale
             style={styles.galleryLink}
@@ -308,6 +306,9 @@ export default function TourPreviewScreen() {
             </View>
           </PressScale>
         )}
+
+        {/* Last on the page: there for walkers who want it, not in everyone's way. */}
+        {!scannerOnly && <OfflineTourCard area={area} />}
         </View>
       </View>
     </SafeAreaView>
