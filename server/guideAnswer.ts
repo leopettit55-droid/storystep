@@ -20,7 +20,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { error, json, tourById, type Env, type TourMeta } from "./social";
 
-const MODEL = "claude-opus-5-5";
+/** Haiku for speed and cost: answers are short and grounded in the stop's script. */
+const MODEL = "claude-haiku-4-5";
 /** Answers are spoken, so keep them short enough to listen to on the spot. */
 const MAX_WORDS = 70;
 const MAX_QUESTION_CHARS = 300;
@@ -150,20 +151,19 @@ async function writeAnswer(
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 1, timeout: 20_000 });
   const stopNumber = tour.stops.indexOf(stop) + 1;
   try {
-    const response = await client.beta.messages.create({
+    const response = await client.messages.create({
       model: MODEL,
-      max_tokens: 2000,
-      output_config: { effort: "low" },
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
+      max_tokens: 400,
       system:
         `You are ${guide.name}, ${guide.persona}, a tour guide on StoryStep's walking tour of ${tour.name}, ${tour.city}. ` +
         `Answer the visitor's question about ${stop.name} (stop ${stopNumber} of ${tour.stops.length}) in your distinctive voice. ` +
+        // The opening stop holds the tour's key facts (who, when), so it comes along to every stop.
+        (stopNumber > 1 ? `At the start of the tour you told them:\n\n<tour_intro>\n${tour.stops[0].script}\n</tour_intro>\n\n` : "") +
         `This is what you've just told them at this stop:\n\n<stop_script>\n${stop.script}\n</stop_script>\n\n` +
         `Keep answers under ${MAX_WORDS} words: answer the question first, in two to four short sentences, and let your ` +
         `character come through in how you say it rather than in extra lines. They're read aloud, so write plain spoken sentences with no lists, headings, ` +
-        `markdown or emoji. Use what the stop script says and well-established facts; if you're not sure, say so plainly ` +
-        `rather than guess. If the question has nothing to do with the tour, or isn't suitable for a family audience, ` +
+        `markdown or emoji. Only give a date, number or name if it's in the scripts above or you're certain of it; ` +
+        `if you're not sure, say so plainly rather than guess. Answer only what was asked. If the question has nothing to do with the tour, or isn't suitable for a family audience, ` +
         `gently bring them back to what's around them.`,
       messages: [{ role: "user", content: `${question}\n\nStop: ${stop.name}. Tour: ${tour.name}.` }],
     });
