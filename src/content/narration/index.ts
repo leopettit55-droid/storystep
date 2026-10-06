@@ -1,6 +1,7 @@
 import type { Waypoint } from "../schema";
 import { NARRATION_CUES } from "./cues";
 import { GUIDE_SCRIPTS } from "./guideScripts";
+import { scriptIn } from "./scripts";
 import { splitSentences } from "./sentences";
 import { es } from "./subtitles/es";
 import { fr } from "./subtitles/fr";
@@ -20,10 +21,17 @@ export interface SubtitleTrack {
   lines: string[];
 }
 
-/** `recording` is the cue key of what's playing: the waypoint id, or "<waypoint id>@<guide>". */
+/** `recording` is the cue key of what's playing: the waypoint id, "<waypoint id>@<guide>", or "<waypoint id>@<guide>.<language>". */
 export function subtitleTrack(waypoint: Waypoint, language: string, recording: string = waypoint.id): SubtitleTrack | null {
   const starts = NARRATION_CUES[recording];
   if (!starts) return null;
+  // A recording in another language is captioned with that language's script.
+  const spoken = /@[a-z]+\.([a-z]{2})$/.exec(recording)?.[1];
+  if (spoken) {
+    const script = scriptIn(waypoint, spoken);
+    const lines = script ? splitSentences(script) : [];
+    return starts.length === lines.length ? { starts, lines } : null;
+  }
   // A guide's own recording may say something else entirely: caption what they say.
   const guideScript = GUIDE_SCRIPTS[recording];
   const english = splitSentences(guideScript ?? waypoint.narration.scriptText);

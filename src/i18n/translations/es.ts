@@ -323,6 +323,21 @@ const es: PartialTranslationDict = {
   },
 
 
+  askGuide: {
+    button: "Pregunta a tu guía",
+    title: "Pregunta a tu guía",
+    placeholder: "¿Qué te gustaría saber sobre {{stop}}?",
+    ask: "Preguntar a {{guide}}",
+    thinking: "{{guide}} está pensando… suele tardar 2–5 segundos",
+    remaining: "Te quedan {{count}} preguntas en esta parada",
+    limit: "Ya no quedan preguntas para esta parada. ¡Prueba en la siguiente!",
+    error: "Lo siento, {{guide}} no ha podido responder ahora mismo. Inténtalo de nuevo.",
+    noAudio: "La voz no está disponible ahora mismo, así que aquí tienes la respuesta por escrito.",
+    play: "Escuchar la respuesta",
+    pause: "Pausar la respuesta",
+    aiNotice: "Esta respuesta y su voz están generadas por IA, así que comprueba cualquier dato importante.",
+    close: "Cerrar",
+  },
   guides: {
     scoutArrived: "¡Bienvenido! Déjame enseñarte algo especial.",
     chooseTitle: "Elige a tu guía",

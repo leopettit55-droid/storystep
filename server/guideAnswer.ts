@@ -3,7 +3,7 @@
  * question at a stop, Claude answers in the chosen guide's voice from that
  * stop's script, and Google Cloud Text-to-Speech reads the answer out.
  *
- *   POST /api/guide-answer  { question, currentStop, tourId, guideId }
+ *   POST /api/guide-answer  { question, currentStop, tourId, guideId, language? }
  *     -> { audioUrl, transcript, duration, source, cached }
  *
  * Only tours with `enableInteractiveGuide` (src/content) are answered: the
@@ -18,7 +18,7 @@
  * seconds, timings — for latency and cost (`wrangler pages deployment tail`).
  */
 import Anthropic from "@anthropic-ai/sdk";
-import { GUIDE_VOICES } from "../src/guides/voices";
+import { guideVoice, isNarrationLanguage } from "../src/guides/voices";
 import { error, json, tourById, type Env, type TourMeta } from "./social";
 
 /** Haiku for speed and cost: answers are short and grounded in the stop's script. */
@@ -57,12 +57,14 @@ export async function answerGuideQuestion(
   const tour = typeof body?.tourId === "string" ? tourById(body.tourId) : undefined;
   const guideId = typeof body?.guideId === "string" && body.guideId in GUIDES ? body.guideId : "scout";
   const stopNumber = Number(body?.currentStop);
+  // Answers come in the walker's language where the guides speak it, else English.
+  const language = typeof body?.language === "string" && isNarrationLanguage(body.language) ? body.language : "en";
   if (question.length < 3) return error(400, "Ask a question first");
   if (!tour?.interactiveGuide) return error(404, "Ask your guide isn't available on this tour");
   const stop = Number.isInteger(stopNumber) ? tour.stops[stopNumber - 1] : undefined;
   if (!stop?.script) return error(400, "Unknown stop");
 
-  const log: Record<string, unknown> = { event: "guide-answer", tour: tour.id, stop: stop.id, guide: guideId, question };
+  const log: Record<string, unknown> = { event: "guide-answer", tour: tour.id, stop: stop.id, guide: guideId, language, question };
   const ip = req.headers.get("cf-connecting-ip") ?? "unknown";
   const rateKey = `qa:rate:${ip}:${tour.id}:${stop.id}`;
   try {
@@ -77,7 +79,7 @@ export async function answerGuideQuestion(
     log.rateLimitError = e instanceof Error ? e.message : String(e);
   }
 
-  const cacheKey = `qa:answer:${tour.id}:${stop.id}:${guideId}:${await hash(normalise(question))}`;
+  const cacheKey = `qa:answer:${tour.id}:${stop.id}:${guideId}${language === "en" ? "" : `:${language}`}:${await hash(normalise(question))}`;
   const cached = await env.PHOTOS.get<Cached>(cacheKey, "json").catch((e: unknown) => {
     log.cacheError = e instanceof Error ? e.message : String(e);
     return null;
@@ -89,10 +91,10 @@ export async function answerGuideQuestion(
   }
 
   const started = Date.now();
-  const { text: transcript, source } = await writeAnswer(env, tour, stop, guideId, question, log);
+  const { text: transcript, source } = await writeAnswer(env, tour, stop, guideId, language, question, log);
   log.claudeMs = Date.now() - started;
   const ttsStarted = Date.now();
-  const audio = await speak(env, transcript, guideId, log);
+  const audio = await speak(env, transcript, guideId, language, log);
   log.ttsMs = Date.now() - ttsStarted;
   log.ttsChars = audio ? transcript.length : 0;
   const answer = reply({ transcript, audio }, source, false);
@@ -124,13 +126,14 @@ async function writeAnswer(
   tour: TourMeta,
   stop: Stop,
   guideId: string,
+  language: string,
   question: string,
   log: Record<string, unknown>
 ): Promise<{ text: string; source: Source }> {
   const guide = GUIDES[guideId];
   if (!env.ANTHROPIC_API_KEY) {
     log.claudeError = "no key";
-    return { text: fallbackAnswer(stop), source: "fallback" };
+    return { text: fallbackAnswer(stop, language), source: "fallback" };
   }
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 1, timeout: 20_000 });
   const stopNumber = tour.stops.indexOf(stop) + 1;
@@ -147,7 +150,9 @@ async function writeAnswer(
         `Keep answers under ${MAX_WORDS} words: answer the question first, in two to four short sentences, and let your ` +
         `character come through in how you say it rather than in extra lines. They're read aloud, so write plain spoken sentences with no lists, headings, ` +
         `markdown or emoji. Only give a date, number or name if it's in the scripts above or you're certain of it; ` +
-        `if you're not sure, say so plainly rather than guess. Answer only what was asked. If the question has nothing to do with the tour, or isn't suitable for a family audience, ` +
+        `if you're not sure, say so plainly rather than guess. Answer only what was asked. ` +
+        (language === "es" ? `Answer in Spanish as spoken in Spain, using informal tú, whatever language the question is in. ` : "") +
+        `If the question has nothing to do with the tour, or isn't suitable for a family audience, ` +
         `gently bring them back to what's around them.`,
       messages: [{ role: "user", content: `${question}\n\nStop: ${stop.name}. Tour: ${tour.name}.` }],
     });
@@ -162,7 +167,7 @@ async function writeAnswer(
       .trim();
     if (response.stop_reason === "refusal" || !text) {
       log.claudeError = response.stop_reason === "refusal" ? "refusal" : "empty";
-      return { text: fallbackAnswer(stop), source: "fallback" };
+      return { text: fallbackAnswer(stop, language), source: "fallback" };
     }
     return { text, source: "claude" };
   } catch (e) {
@@ -170,30 +175,32 @@ async function writeAnswer(
     else if (e instanceof Anthropic.AuthenticationError) log.claudeError = "bad key";
     else if (e instanceof Anthropic.APIError) log.claudeError = `api ${e.status}`;
     else log.claudeError = e instanceof Error ? e.message : String(e);
-    return { text: fallbackAnswer(stop), source: "fallback" };
+    return { text: fallbackAnswer(stop, language), source: "fallback" };
   }
 }
 
 /** When Claude can't answer: a friendly line plus the stop's opening fact. */
-function fallbackAnswer(stop: Stop): string {
+function fallbackAnswer(stop: Stop, language = "en"): string {
   const opening = (stop.script ?? "").split(/(?<=[.!?])\s+/)[0] ?? "";
+  if (language === "es") return `¡Buena pregunta! Ahora mismo no puedo comprobarlo, pero aquí tienes algo sobre ${stop.name}: ${opening}`.trim();
   return `Good question! I can't look that up right now, but here's something about ${stop.name}: ${opening}`.trim();
 }
 
 /** The answer as MP3 (base64), or null if text-to-speech isn't set up or fails. */
-async function speak(env: Env, text: string, guideId: string, log: Record<string, unknown>): Promise<string | null> {
+async function speak(env: Env, text: string, guideId: string, language: string, log: Record<string, unknown>): Promise<string | null> {
   if (!env.GOOGLE_TTS_API_KEY) {
     log.ttsError = "no key";
     return null;
   }
+  const voice = guideVoice(language, guideId as Parameters<typeof guideVoice>[1]);
   try {
     const res = await fetch("https://texttospeech.googleapis.com/v1/text:synthesize", {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": env.GOOGLE_TTS_API_KEY },
       body: JSON.stringify({
         input: { text },
-        voice: { languageCode: "en-GB", name: GUIDE_VOICES[guideId as keyof typeof GUIDE_VOICES].name },
-        audioConfig: { audioEncoding: "MP3", speakingRate: GUIDE_VOICES[guideId as keyof typeof GUIDE_VOICES].speakingRate },
+        voice: { languageCode: voice.languageCode, name: voice.name },
+        audioConfig: { audioEncoding: "MP3", speakingRate: voice.speakingRate },
       }),
     });
     if (!res.ok) {

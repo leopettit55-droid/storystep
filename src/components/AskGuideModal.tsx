@@ -33,7 +33,7 @@ export interface AskGuideModalProps {
  * ready, with its transcript below, and the sheet closes when it finishes.
  */
 export default function AskGuideModal({ tourId, stop, guide: tourGuide, onClose }: AskGuideModalProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [guide, setGuide] = useState<GuideId>(tourGuide);
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
@@ -91,7 +91,7 @@ export default function AskGuideModal({ tourId, stop, guide: tourGuide, onClose 
       const res = await fetch(apiUrl("/api/guide-answer"), {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ question: q, currentStop: stop.order, tourId, guideId: guide }),
+        body: JSON.stringify({ question: q, currentStop: stop.order, tourId, guideId: guide, language }),
       });
       const data = (await res.json().catch(() => null)) as (Answer & { error?: string; code?: string }) | null;
       if (res.status === 429 || data?.code === "limit") {
