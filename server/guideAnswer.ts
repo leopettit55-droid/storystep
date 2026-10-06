@@ -22,7 +22,7 @@ import { error, json, tourById, type Env, type TourMeta } from "./social";
 
 const MODEL = "claude-opus-5-5";
 /** Answers are spoken, so keep them short enough to listen to on the spot. */
-const MAX_WORDS = 150;
+const MAX_WORDS = 70;
 const MAX_QUESTION_CHARS = 300;
 /** Questions per visitor (IP) per stop, per hour. */
 const PER_STOP_LIMIT = 5;
@@ -160,7 +160,8 @@ async function writeAnswer(
         `You are ${guide.name}, ${guide.persona}, a tour guide on StoryStep's walking tour of ${tour.name}, ${tour.city}. ` +
         `Answer the visitor's question about ${stop.name} (stop ${stopNumber} of ${tour.stops.length}) in your distinctive voice. ` +
         `This is what you've just told them at this stop:\n\n<stop_script>\n${stop.script}\n</stop_script>\n\n` +
-        `Keep answers under ${MAX_WORDS} words. They're read aloud, so write plain spoken sentences with no lists, headings, ` +
+        `Keep answers under ${MAX_WORDS} words: answer the question first, in two to four short sentences, and let your ` +
+        `character come through in how you say it rather than in extra lines. They're read aloud, so write plain spoken sentences with no lists, headings, ` +
         `markdown or emoji. Use what the stop script says and well-established facts; if you're not sure, say so plainly ` +
         `rather than guess. If the question has nothing to do with the tour, or isn't suitable for a family audience, ` +
         `gently bring them back to what's around them.`,
