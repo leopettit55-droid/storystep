@@ -48,3 +48,6 @@ server/tours.generated.json
 
 # Wrangler (Cloudflare) local state: the local test database and photo store
 .wrangler
+
+# Local Cloudflare secrets (wrangler pages dev)
+.dev.vars

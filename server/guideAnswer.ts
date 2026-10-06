@@ -10,17 +10,19 @@
  * build writes those tours' stop scripts into tours.generated.json.
  *
  * Secrets (wrangler pages secret put …): ANTHROPIC_API_KEY, GOOGLE_TTS_API_KEY.
+ * Answers are cached in KV (PHOTOS, "qa:" keys) next to the question limit.
  * Without Claude the guide gives a pre-written reply; without text-to-speech
- * the answer comes back as text only (audioUrl null). Every answer logs one
- * "guide-answer" line with timings and usage, for latency and cost
- * (`wrangler pages deployment tail`).
+ * the answer comes back as text only (audioUrl null); if the cache or limit
+ * store fails, it carries on without them. Every question logs one
+ * "guide-answer" line — question, answer, Claude tokens, voice characters and
+ * seconds, timings — for latency and cost (`wrangler pages deployment tail`).
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { error, json, tourById, type Env, type TourMeta } from "./social";
 
 const MODEL = "claude-opus-5-5";
-/** One neutral British voice for every guide for now. */
-const VOICE = { languageCode: "en-GB", name: "en-GB-Neural2-B" };
+/** Answers are spoken, so keep them short enough to listen to on the spot. */
+const MAX_WORDS = 150;
 const MAX_QUESTION_CHARS = 300;
 /** Questions per visitor (IP) per stop, per hour. */
 const PER_STOP_LIMIT = 5;
@@ -28,11 +30,29 @@ const RATE_WINDOW_S = 60 * 60;
 /** Answers to the same question at the same stop are reused for a month. */
 const CACHE_TTL_S = 30 * 24 * 60 * 60;
 
-const GUIDES: Record<string, { name: string; persona: string }> = {
-  scout: { name: "Scout", persona: "the StoryStep original: friendly, upbeat and always up for a walk" },
-  pip: { name: "Pip", persona: "a cheerful penguin who never gets lost: warm, bright and encouraging" },
-  hoot: { name: "Professor Hoot", persona: "a wise old owl with a head full of history: thoughtful and precise" },
-  ollie: { name: "Ollie", persona: "a cheeky young explorer who knows every shortcut: playful and quick" },
+/** Each guide's character, and their Google Cloud Text-to-Speech voice (British English). */
+const GUIDES: Record<string, { name: string; persona: string; voice: string; speakingRate?: number }> = {
+  scout: {
+    name: "Scout",
+    persona: "the StoryStep original, warm, inviting and friendly",
+    voice: "en-GB-Wavenet-B",
+  },
+  pip: {
+    name: "Pip",
+    persona: "a cheerful penguin, upbeat and bubbly",
+    voice: "en-GB-Wavenet-C",
+  },
+  hoot: {
+    name: "Professor Hoot",
+    persona: "a wise old owl, measured, authoritative and scholarly",
+    voice: "en-GB-Standard-A",
+  },
+  ollie: {
+    name: "Ollie",
+    persona: "a young explorer, playful, cheeky and adventurous",
+    voice: "en-GB-Wavenet-B",
+    speakingRate: 1.1,
+  },
 };
 
 type Stop = TourMeta["stops"][number];
@@ -57,36 +77,51 @@ export async function answerGuideQuestion(
   const stop = Number.isInteger(stopNumber) ? tour.stops[stopNumber - 1] : undefined;
   if (!stop?.script) return error(400, "Unknown stop");
 
+  const log: Record<string, unknown> = { event: "guide-answer", tour: tour.id, stop: stop.id, guide: guideId, question };
   const ip = req.headers.get("cf-connecting-ip") ?? "unknown";
   const rateKey = `qa:rate:${ip}:${tour.id}:${stop.id}`;
-  const asked = Number((await env.PHOTOS.get(rateKey)) ?? 0);
-  if (asked >= PER_STOP_LIMIT) {
-    return json({ error: "That's all the questions for this stop. Try again at the next one!", code: "limit" }, 429);
+  try {
+    const asked = Number((await env.PHOTOS.get(rateKey)) ?? 0);
+    if (asked >= PER_STOP_LIMIT) {
+      console.log(JSON.stringify({ ...log, limited: true }));
+      return json({ error: "That's all the questions for this stop. Try again at the next one!", code: "limit" }, 429);
+    }
+    await env.PHOTOS.put(rateKey, String(asked + 1), { expirationTtl: RATE_WINDOW_S });
+  } catch (e) {
+    // The limit is a guard, not the feature: if the store is down, still answer.
+    log.rateLimitError = e instanceof Error ? e.message : String(e);
   }
-  await env.PHOTOS.put(rateKey, String(asked + 1), { expirationTtl: RATE_WINDOW_S });
 
-  const log: Record<string, unknown> = { event: "guide-answer", tour: tour.id, stop: stop.id, guide: guideId };
   const cacheKey = `qa:answer:${tour.id}:${stop.id}:${guideId}:${await hash(normalise(question))}`;
-  const cached = await env.PHOTOS.get<Cached>(cacheKey, "json");
+  const cached = await env.PHOTOS.get<Cached>(cacheKey, "json").catch((e: unknown) => {
+    log.cacheError = e instanceof Error ? e.message : String(e);
+    return null;
+  });
   if (cached) {
-    console.log(JSON.stringify({ ...log, cached: true }));
-    return json(reply(cached, "claude", true));
+    const answer = reply(cached, "claude", true);
+    console.log(JSON.stringify({ ...log, cached: true, answer: cached.transcript, voiceSeconds: answer.duration }));
+    return json(answer);
   }
 
   const started = Date.now();
   const { text: transcript, source } = await writeAnswer(env, tour, stop, guideId, question, log);
   log.claudeMs = Date.now() - started;
   const ttsStarted = Date.now();
-  const audio = await speak(env, transcript, log);
+  const audio = await speak(env, transcript, guideId, log);
   log.ttsMs = Date.now() - ttsStarted;
-  log.ttsChars = transcript.length;
-  console.log(JSON.stringify({ ...log, cached: false, source, audio: !!audio }));
+  log.ttsChars = audio ? transcript.length : 0;
+  const answer = reply({ transcript, audio }, source, false);
+  console.log(JSON.stringify({ ...log, cached: false, source, answer: transcript, voiceSeconds: answer.duration }));
 
   // Only keep real answers that came with their audio.
   if (source === "claude" && audio) {
-    waitUntil(env.PHOTOS.put(cacheKey, JSON.stringify({ transcript, audio } satisfies Cached), { expirationTtl: CACHE_TTL_S }));
+    waitUntil(
+      env.PHOTOS.put(cacheKey, JSON.stringify({ transcript, audio } satisfies Cached), { expirationTtl: CACHE_TTL_S }).catch(
+        (e: unknown) => console.warn("guide-answer: couldn't save the answer", e)
+      )
+    );
   }
-  return json(reply({ transcript, audio }, source, false));
+  return json(answer);
 }
 
 function reply({ transcript, audio }: Cached, source: Source, cached: boolean) {
@@ -122,14 +157,14 @@ async function writeAnswer(
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
       system:
-        `You are ${guide.name}, ${guide.persona}, guiding a visitor around StoryStep's walking tour of ${tour.name}, ${tour.city}. ` +
-        `They're at stop ${stopNumber} of ${tour.stops.length}: ${stop.name}. This is what you've just told them here:\n\n` +
-        `<stop_script>\n${stop.script}\n</stop_script>\n\n` +
-        `Answer their question in character. Your words are read aloud, so write 2 to 4 short spoken sentences ` +
-        `(under 80 words) with no lists, headings, markdown or emoji. Use what the stop script says and well-established facts; ` +
-        `if you're not sure, say so plainly rather than guess. If the question has nothing to do with the tour, or isn't ` +
-        `suitable for a family audience, gently bring them back to what's around them.`,
-      messages: [{ role: "user", content: question }],
+        `You are ${guide.name}, ${guide.persona}, a tour guide on StoryStep's walking tour of ${tour.name}, ${tour.city}. ` +
+        `Answer the visitor's question about ${stop.name} (stop ${stopNumber} of ${tour.stops.length}) in your distinctive voice. ` +
+        `This is what you've just told them at this stop:\n\n<stop_script>\n${stop.script}\n</stop_script>\n\n` +
+        `Keep answers under ${MAX_WORDS} words. They're read aloud, so write plain spoken sentences with no lists, headings, ` +
+        `markdown or emoji. Use what the stop script says and well-established facts; if you're not sure, say so plainly ` +
+        `rather than guess. If the question has nothing to do with the tour, or isn't suitable for a family audience, ` +
+        `gently bring them back to what's around them.`,
+      messages: [{ role: "user", content: `${question}\n\nStop: ${stop.name}. Tour: ${tour.name}.` }],
     });
     log.inputTokens = response.usage.input_tokens;
     log.outputTokens = response.usage.output_tokens;
@@ -159,7 +194,7 @@ function fallbackAnswer(stop: Stop): string {
 }
 
 /** The answer as MP3 (base64), or null if text-to-speech isn't set up or fails. */
-async function speak(env: Env, text: string, log: Record<string, unknown>): Promise<string | null> {
+async function speak(env: Env, text: string, guideId: string, log: Record<string, unknown>): Promise<string | null> {
   if (!env.GOOGLE_TTS_API_KEY) {
     log.ttsError = "no key";
     return null;
@@ -168,7 +203,11 @@ async function speak(env: Env, text: string, log: Record<string, unknown>): Prom
     const res = await fetch("https://texttospeech.googleapis.com/v1/text:synthesize", {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": env.GOOGLE_TTS_API_KEY },
-      body: JSON.stringify({ input: { text }, voice: VOICE, audioConfig: { audioEncoding: "MP3" } }),
+      body: JSON.stringify({
+        input: { text },
+        voice: { languageCode: "en-GB", name: GUIDES[guideId].voice },
+        audioConfig: { audioEncoding: "MP3", speakingRate: GUIDES[guideId].speakingRate ?? 1 },
+      }),
     });
     if (!res.ok) {
       log.ttsError = `google ${res.status}: ${(await res.text()).slice(0, 200)}`;
