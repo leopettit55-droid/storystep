@@ -7,6 +7,7 @@ import {
   playGuidePreview,
   stopGuidePreview,
   subscribeGuidePreview,
+  type NarrationSample,
   type PreviewState,
 } from "../audio/guidePreview";
 import { getGuide, GUIDES, type GuideId } from "../guides/guides";
@@ -26,6 +27,8 @@ export interface TourIntroProps {
   /** The chosen tour guide, picked here first — before the guide says anything. */
   guide: GuideId;
   onGuideChange: (guide: GuideId) => void;
+  /** The opening of this tour's narration, previewed for guides who narrate in that voice. */
+  voiceSample?: NarrationSample | null;
 }
 
 /** Timeline (ms). The map's fly-in runs underneath for the first ~3s. From mount: */
@@ -59,6 +62,7 @@ export default function TourIntro({
   onDone,
   guide,
   onGuideChange,
+  voiceSample,
 }: TourIntroProps) {
   const { t } = useLanguage();
   const insets = useSafeAreaInsets();
@@ -266,9 +270,9 @@ export default function TourIntro({
               <Text style={styles.chooseLabel}>{t("guides.chooseTitle")}</Text>
               <View style={styles.nameRow}>
                 <Text style={styles.guideName}>{current.name}</Text>
-                {hasGuidePreview(current.id) && (
+                {hasGuidePreview(current.id, voiceSample) && (
                   <Pressable
-                    onPress={() => (preview?.guide === current.id ? stopGuidePreview() : playGuidePreview(current.id))}
+                    onPress={() => (preview?.guide === current.id ? stopGuidePreview() : playGuidePreview(current.id, voiceSample))}
                     style={({ hovered, pressed }: { hovered?: boolean; pressed: boolean }) => [
                       styles.previewButton,
                       hovered && styles.previewButtonHover,

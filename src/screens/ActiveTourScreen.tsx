@@ -68,11 +68,13 @@ import SharePhotoCard from "../components/SharePhotoCard";
 import NarrationSubtitle from "../components/NarrationSubtitle";
 import StopDetail, { type StopDetailMode } from "../components/StopDetail";
 import TourIntro from "../components/TourIntro";
+import type { NarrationSample } from "../audio/guidePreview";
+import { NARRATION_CUES } from "../content/narration/cues";
 import AskGuideModal from "../components/AskGuideModal";
 import TourMap, { type AvatarLine } from "../components/TourMap";
 import { DEFAULT_GUIDE, type GuideId } from "../guides/guides";
 import { loadGuide, saveGuide } from "../guides/guidePreference";
-import type { Waypoint } from "../content";
+import type { Area, Waypoint } from "../content";
 
 type Nav = NativeStackNavigationProp<RootStackParamList, "ActiveTour">;
 type RouteProp = { params: RootStackParamList["ActiveTour"] };
@@ -832,6 +834,7 @@ export default function ActiveTourScreen() {
           onDone={() => setIntroShowing(false)}
           guide={guide}
           onGuideChange={handleGuideChange}
+          voiceSample={openingSample(area)}
         />
       )}
 
@@ -1193,4 +1196,15 @@ function createStyles(colors: ThemeColors) {
   },
   ctaText: { color: colors.onPrimary, fontSize: 16, fontWeight: "600" },
   });
+}
+
+/** The tour's first sentence or two in its own narration voice, for the guide picker's preview. */
+function openingSample(area: Area): NarrationSample | null {
+  const first = area.route[0];
+  const source = first?.narration.audioSource;
+  if (source == null) return null;
+  // End on a sentence break, a few seconds in.
+  const starts = NARRATION_CUES[first.id] ?? [];
+  const endAt = starts.find((t) => t >= 2.5 && t <= 12) ?? 6;
+  return { source, endAt };
 }
