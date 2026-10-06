@@ -64,7 +64,7 @@ export default function TourIntro({
   onGuideChange,
   voiceSample,
 }: TourIntroProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const insets = useSafeAreaInsets();
 
   const panel = useRef(new Animated.Value(0)).current;
@@ -270,9 +270,9 @@ export default function TourIntro({
               <Text style={styles.chooseLabel}>{t("guides.chooseTitle")}</Text>
               <View style={styles.nameRow}>
                 <Text style={styles.guideName}>{current.name}</Text>
-                {hasGuidePreview(current.id, voiceSample) && (
+                {hasGuidePreview(current.id, language, voiceSample) && (
                   <Pressable
-                    onPress={() => (preview?.guide === current.id ? stopGuidePreview() : playGuidePreview(current.id, voiceSample))}
+                    onPress={() => (preview?.guide === current.id ? stopGuidePreview() : playGuidePreview(current.id, language, voiceSample))}
                     style={({ hovered, pressed }: { hovered?: boolean; pressed: boolean }) => [
                       styles.previewButton,
                       hovered && styles.previewButtonHover,

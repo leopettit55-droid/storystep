@@ -1,11 +1,16 @@
 /**
- * Records every stop's narration in each guide's voice (those with
- * recordsTours in src/guides/voices.ts), with Google Cloud
- * Text-to-Speech (voices in src/guides/voices.ts), plus each guide's short
- * "hello" for the guide picker:
+ * Records every stop's narration in each guide's voice, in each narration
+ * language (voices in src/guides/voices.ts; guides with recordsTours there),
+ * with Google Cloud Text-to-Speech, plus each guide's short "hello" for the
+ * guide picker. English has no suffix; other languages add theirs:
  *
- *   public/audio/<tour id>-stop<n>-<guide>.mp3
- *   public/audio/guide-preview-<guide>.mp3
+ *   public/audio/<tour id>-stop<n>-<guide>.mp3        (English)
+ *   public/audio/<tour id>-stop<n>-<guide>.es.mp3     (Spanish)
+ *   public/audio/guide-preview-<guide>[.es].mp3
+ *
+ * Other languages record from the translated scripts
+ * (src/content/narration/scripts, made by scripts/translate-scripts.ts);
+ * stops not yet translated are skipped.
  *
  * The app plays a guide's recording whenever one exists (see
  * scripts/build-narration-cues.ts, which times the subtitles — run it after
@@ -15,6 +20,7 @@
  *   npx tsx scripts/build-guide-voices.ts               every tour
  *   npx tsx scripts/build-guide-voices.ts oxford-magdalen   one tour
  *   npx tsx scripts/build-guide-voices.ts oxford-magdalen --stop=1   one stop
+ *   npx tsx scripts/build-guide-voices.ts --lang=es     one language
  *   npx tsx scripts/build-guide-voices.ts --dry-run     list what would be made
  *
  * Needs GOOGLE_TTS_API_KEY, from the environment or .dev.vars (git-ignored).
@@ -23,7 +29,8 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { GUIDES } from "../src/guides/guides";
-import { GUIDE_PREVIEW_LINES, GUIDE_VOICES } from "../src/guides/voices";
+import { scriptIn } from "../src/content/narration/scripts";
+import { GUIDE_PREVIEW_LINES, GUIDE_VOICES, NARRATION_LANGUAGES, type NarrationLanguage } from "../src/guides/voices";
 
 // The tour files `require()` images and audio for the bundler; here a require of an asset returns its path.
 for (const ext of [".jpg", ".jpeg", ".png", ".webp", ".mp3", ".m4a", ".wav", ".glb"]) {
@@ -39,13 +46,12 @@ const ROOT = path.resolve(__dirname, "..");
 const OUT_DIR = path.join(ROOT, "public/audio");
 const MANIFEST = path.join(OUT_DIR, "guide-voices.json");
 const PARALLEL = 4;
-/** Guides who narrate in their own (Google) voice; the rest use the standard narration. */
-const RECORDED = GUIDES.filter((g) => GUIDE_VOICES[g.id].recordsTours);
 
 interface Job {
   file: string;
   text: string;
-  guide: keyof typeof GUIDE_VOICES;
+  language: NarrationLanguage;
+  guide: (typeof GUIDES)[number]["id"];
 }
 
 function apiKey(): string {
@@ -61,19 +67,19 @@ function apiKey(): string {
 
 /** What a recording was made from: when this changes, it's remade. */
 function fingerprint(job: Job): string {
-  const voice = GUIDE_VOICES[job.guide];
+  const voice = GUIDE_VOICES[job.language][job.guide];
   return crypto.createHash("sha256").update(`${voice.name}|${voice.speakingRate}|${job.text}`).digest("hex").slice(0, 16);
 }
 
 async function synthesize(key: string, job: Job): Promise<Buffer> {
-  const voice = GUIDE_VOICES[job.guide];
+  const voice = GUIDE_VOICES[job.language][job.guide];
   for (let attempt = 1; ; attempt++) {
     const res = await fetch("https://texttospeech.googleapis.com/v1/text:synthesize", {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": key },
       body: JSON.stringify({
         input: { text: job.text },
-        voice: { languageCode: "en-GB", name: voice.name },
+        voice: { languageCode: voice.languageCode, name: voice.name },
         audioConfig: { audioEncoding: "MP3", speakingRate: voice.speakingRate },
       }),
     });
@@ -97,22 +103,35 @@ async function main() {
   const only = args.find((a) => !a.startsWith("--"));
   const stopArg = args.find((a) => a.startsWith("--stop="));
   const onlyStop = stopArg ? Number(stopArg.slice("--stop=".length)) : null;
+  const langArg = args.find((a) => a.startsWith("--lang="))?.slice("--lang=".length);
+  const languages = NARRATION_LANGUAGES.filter((l) => !langArg || l === langArg);
 
   const jobs: Job[] = [];
-  for (const area of areas) {
-    if (only && area.id !== only) continue;
-    for (const waypoint of area.route) {
-      if (onlyStop != null && waypoint.order !== onlyStop) continue;
-      for (const guide of RECORDED) {
-        jobs.push({ file: `${area.id}-stop${waypoint.order}-${guide.id}.mp3`, text: waypoint.narration.scriptText, guide: guide.id });
+  let untranslated = 0;
+  for (const language of languages) {
+    const suffix = language === "en" ? "" : `.${language}`;
+    const recorded = GUIDES.filter((g) => GUIDE_VOICES[language][g.id].recordsTours);
+    for (const area of areas) {
+      if (only && area.id !== only) continue;
+      for (const waypoint of area.route) {
+        if (onlyStop != null && waypoint.order !== onlyStop) continue;
+        const text = scriptIn(waypoint, language);
+        if (!text) {
+          untranslated += 1;
+          continue;
+        }
+        for (const guide of recorded) {
+          jobs.push({ file: `${area.id}-stop${waypoint.order}-${guide.id}${suffix}.mp3`, text, language, guide: guide.id });
+        }
+      }
+    }
+    if (!only) {
+      for (const guide of recorded) {
+        jobs.push({ file: `guide-preview-${guide.id}${suffix}.mp3`, text: GUIDE_PREVIEW_LINES[language][guide.id], language, guide: guide.id });
       }
     }
   }
-  if (!only) {
-    for (const guide of RECORDED) {
-      jobs.push({ file: `guide-preview-${guide.id}.mp3`, text: GUIDE_PREVIEW_LINES[guide.id], guide: guide.id });
-    }
-  }
+  if (untranslated) console.log(`${untranslated} stops skipped: not translated yet (scripts/translate-scripts.ts).`);
 
   const manifest: Record<string, string> = fs.existsSync(MANIFEST) ? JSON.parse(fs.readFileSync(MANIFEST, "utf8")) : {};
   const todo = jobs.filter((j) => manifest[j.file] !== fingerprint(j) || !fs.existsSync(path.join(OUT_DIR, j.file)));

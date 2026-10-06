@@ -15,9 +15,16 @@ export function setNarrationGuide(guide: string): void {
   narrationGuide = guide;
 }
 
+/** The language guides narrate in, where they've recorded it (web); English otherwise. */
+let narrationLanguage = "en";
+export function setNarrationLanguage(language: string): void {
+  narrationLanguage = language;
+}
+
 /** What's playing: which stop, and which recording of it — the waypoint id for
- * the standard one, or "<waypoint id>@<guide>" for a guide's own (matching the
- * keys in content/narration/cues). */
+ * the standard one, "<waypoint id>@<guide>" for a guide's own, or
+ * "<waypoint id>@<guide>.<language>" in another language (matching the keys
+ * in content/narration/cues). */
 export interface NarrationPlaying {
   waypointId: string;
   recording: string;
@@ -68,18 +75,22 @@ function narrationFailed(waypoint: Waypoint, problem: NarrationProblem) {
  * guide's own recording comes first when it's saved or there's a connection;
  * otherwise the standard narrator plays, so offline tours never break.
  */
-async function narrationSource(waypoint: Waypoint): Promise<{ source: number | string | null; guideVoice: boolean }> {
-  const guideFile = narrationGuide && Platform.OS === "web" ? GUIDE_RECORDINGS[waypoint.id]?.[narrationGuide] : undefined;
+async function narrationSource(waypoint: Waypoint): Promise<{ source: number | string | null; recording: string }> {
+  // The guide in the walker's language if they've recorded it, else in English.
+  const byLanguage = narrationGuide && Platform.OS === "web" ? GUIDE_RECORDINGS[waypoint.id] : undefined;
+  const ownLanguage = byLanguage?.[narrationLanguage]?.[narrationGuide!] ? narrationLanguage : "en";
+  const guideFile = byLanguage?.[ownLanguage]?.[narrationGuide!];
   if (guideFile) {
+    const recording = ownLanguage === "en" ? `${waypoint.id}@${narrationGuide}` : `${waypoint.id}@${narrationGuide}.${ownLanguage}`;
     const saved = await savedAudioUrl(guideFile);
     if (saved) {
       if (blobUrl) URL.revokeObjectURL(blobUrl);
       blobUrl = saved;
-      return { source: saved, guideVoice: true };
+      return { source: saved, recording };
     }
-    if (isOnline()) return { source: guideFile, guideVoice: true };
+    if (isOnline()) return { source: guideFile, recording };
   }
-  return { source: await standardSource(waypoint), guideVoice: false };
+  return { source: await standardSource(waypoint), recording: waypoint.id };
 }
 
 async function standardSource(waypoint: Waypoint): Promise<number | string | null> {
@@ -240,9 +251,9 @@ export async function playWaypointNarration(waypoint: Waypoint, options: { start
     return;
   }
   let source: number | string | null;
-  let guideVoice = false;
+  let recording = waypoint.id;
   try {
-    ({ source, guideVoice } = await narrationSource(waypoint));
+    ({ source, recording } = await narrationSource(waypoint));
   } catch {
     source = null;
   }
@@ -275,7 +286,7 @@ export async function playWaypointNarration(waypoint: Waypoint, options: { start
   }
   current = loaded = {
     waypointId: waypoint.id,
-    recording: guideVoice ? `${waypoint.id}@${narrationGuide}` : waypoint.id,
+    recording,
   };
   emitProgress(0);
 

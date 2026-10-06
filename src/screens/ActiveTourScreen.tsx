@@ -16,6 +16,7 @@ import {
   resumeNarration,
   setNarrationEndedHandler,
   setNarrationGuide,
+  setNarrationLanguage,
   setupAudioPlayback,
   stopNarration,
   subscribeNarrationErrors,
@@ -176,6 +177,9 @@ export default function ActiveTourScreen() {
   }, [duoState?.guide]);
   // Stops the guide has recorded play in their own voice.
   useEffect(() => setNarrationGuide(guide), [guide]);
+  // Guides narrate in the walker's language where they've recorded it. A duo walk stays in
+  // English, so both phones play the same recording and keep in step.
+  useEffect(() => setNarrationLanguage(duoCode ? "en" : language), [duoCode, language]);
   const handleGuideChange = (next: GuideId) => {
     setGuide(next);
     if (area) saveGuide(area.id, next);

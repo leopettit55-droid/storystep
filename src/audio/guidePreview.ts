@@ -2,7 +2,7 @@ import { createAudioPlayer, type AudioPlayer, type AudioStatus } from "expo-audi
 import { Platform } from "react-native";
 import { GUIDE_PREVIEWS } from "../content/narration/cues";
 import type { GuideId } from "../guides/guides";
-import { GUIDE_VOICES } from "../guides/voices";
+import { guideVoice } from "../guides/voices";
 
 /**
  * The guide picker's voice previews: a short "hello" from each guide. One
@@ -32,8 +32,16 @@ function set(guide: GuideId | null, next: PreviewState | null) {
   listeners.forEach((l) => l(current, state));
 }
 
-export function hasGuidePreview(guide: GuideId, sample?: NarrationSample | null): boolean {
-  return Platform.OS === "web" && !!(GUIDE_PREVIEWS[guide] || (sample && !GUIDE_VOICES[guide].recordsTours));
+/** The guide's recorded hello in `language`, or in English. */
+function ownPreview(guide: GuideId, language: string): string | undefined {
+  return GUIDE_PREVIEWS[language]?.[guide] ?? GUIDE_PREVIEWS.en?.[guide];
+}
+
+/** Whether the guide narrates in the tour's own voice (no recordings of their own) in `language`. */
+const usesTourVoice = (guide: GuideId, language: string) => !guideVoice(language, guide).recordsTours;
+
+export function hasGuidePreview(guide: GuideId, language: string, sample?: NarrationSample | null): boolean {
+  return Platform.OS === "web" && !!((sample && usesTourVoice(guide, language)) || ownPreview(guide, language));
 }
 
 /** Follows which guide's preview is loading or playing. */
@@ -44,12 +52,11 @@ export function subscribeGuidePreview(listener: Listener): () => void {
 }
 
 /** Plays the guide's hello — or, for a guide who uses the tour's narration voice, the `sample` of it. */
-export function playGuidePreview(guide: GuideId, sample?: NarrationSample | null): void {
-  const own = GUIDE_PREVIEWS[guide];
-  const useSample = !own && sample && !GUIDE_VOICES[guide].recordsTours;
-  const source = own ?? (useSample ? sample.source : null);
+export function playGuidePreview(guide: GuideId, language: string, sample?: NarrationSample | null): void {
+  const useSample = !!sample && usesTourVoice(guide, language);
+  const source = useSample ? sample.source : ownPreview(guide, language);
   if (source == null || Platform.OS !== "web") return;
-  stopAt = useSample ? sample.endAt : null;
+  stopAt = useSample ? sample!.endAt : null;
   if (!player) {
     player = createAudioPlayer(source, { updateInterval: 100 });
     player.addListener("playbackStatusUpdate", (status: AudioStatus) => {

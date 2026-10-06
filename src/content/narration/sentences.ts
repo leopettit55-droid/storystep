@@ -1,5 +1,5 @@
 /** Abbreviations whose full stop doesn't end a sentence ("St. Mary's"). */
-const ABBREVIATIONS = new Set(["st", "dr", "mr", "mrs", "ms", "prof", "rev", "no", "vs", "etc"]);
+const ABBREVIATIONS = new Set(["st", "dr", "mr", "mrs", "ms", "prof", "rev", "no", "vs", "etc", "sr", "sra", "srta", "dra", "sto", "sta"]);
 
 /**
  * Splits an English narration script into subtitle-sized sentences. Shared
@@ -14,8 +14,8 @@ export function splitSentences(script: string): string[] {
     let current: string[] = [];
     words.forEach((word, i) => {
       current.push(word);
-      const endsSentence = /[.!?]["'”’)]*$/.test(word);
-      const bare = word.replace(/[.!?"'”’)]+$/, "").toLowerCase();
+      const endsSentence = /[.!?]["'”’»)]*$/.test(word);
+      const bare = word.replace(/[.!?"'”’»)]+$/, "").toLowerCase();
       // "C. S. Lewis": a lone capital letter with a full stop is an initial.
       const isInitial = /^[A-Z]\.$/.test(word);
       const isLast = i === words.length - 1;
