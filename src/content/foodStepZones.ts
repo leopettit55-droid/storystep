@@ -18,22 +18,22 @@ const ZONES: Record<string, FoodStepZone[]> = {
       name: "Northern Quarter",
       description: "Indie cafes, bars and street food from Oldham Street down to Dale Street",
       outline: [
-        [-2.238, 53.485], [-2.2318, 53.485], [-2.229, 53.483], [-2.23, 53.4804],
-        [-2.2348, 53.4814], [-2.2366, 53.4822], [-2.238, 53.4826],
+        [-2.2384, 53.485], [-2.2318, 53.485], [-2.229, 53.483], [-2.23, 53.4804],
+        [-2.2348, 53.4814], [-2.2366, 53.4822], [-2.2384, 53.4826],
       ],
     },
     {
       id: "mackie-mayor",
       name: "Mackie Mayor & Smithfield",
       description: "Food halls in the old market buildings around Swan Street",
-      outline: [[-2.238, 53.4868], [-2.2305, 53.4866], [-2.2318, 53.485], [-2.238, 53.485]],
+      outline: [[-2.2384, 53.4868], [-2.2305, 53.4866], [-2.2318, 53.485], [-2.2384, 53.485]],
     },
     {
       id: "city-centre",
       name: "City Centre",
       description: "The shopping streets around the Arndale, Exchange Square, King Street and Spring Gardens",
       outline: [
-        [-2.2465, 53.4865], [-2.238, 53.4858], [-2.238, 53.4826], [-2.24, 53.4812], [-2.2385, 53.4797],
+        [-2.2465, 53.4865], [-2.2384, 53.4858], [-2.2384, 53.4826], [-2.24, 53.4812], [-2.2385, 53.4797],
         [-2.2412, 53.4797], [-2.244, 53.4808], [-2.2462, 53.483],
       ],
     },
@@ -42,7 +42,7 @@ const ZONES: Record<string, FoodStepZone[]> = {
       name: "Piccadilly",
       description: "The gardens, Portland Street and the station approach",
       outline: [
-        [-2.24, 53.4812], [-2.238, 53.4826], [-2.2366, 53.4822], [-2.2348, 53.4814], [-2.23, 53.4804],
+        [-2.24, 53.4812], [-2.2384, 53.4826], [-2.2366, 53.4822], [-2.2348, 53.4814], [-2.23, 53.4804],
         [-2.2296, 53.48], [-2.23, 53.4768], [-2.234, 53.479], [-2.2368, 53.4776], [-2.2385, 53.4797],
       ],
     },
@@ -56,7 +56,7 @@ const ZONES: Record<string, FoodStepZone[]> = {
       id: "the-village",
       name: "The Village",
       description: "Canal Street's bars and the new Kampus neighbourhood",
-      outline: [[-2.2368, 53.4776], [-2.234, 53.479], [-2.23, 53.4768], [-2.2335, 53.4752], [-2.2372, 53.476]],
+      outline: [[-2.2368, 53.4776], [-2.234, 53.479], [-2.23, 53.4768], [-2.2335, 53.4752], [-2.2372, 53.476], [-2.24, 53.477]],
     },
     {
       id: "deansgate-st-peters",
@@ -64,20 +64,27 @@ const ZONES: Record<string, FoodStepZone[]> = {
       description: "Big-name restaurants and grand old halls along Deansgate",
       outline: [
         [-2.2465, 53.4865], [-2.2462, 53.483], [-2.244, 53.4808], [-2.2412, 53.4797], [-2.24, 53.477],
-        [-2.2445, 53.4765], [-2.25, 53.477], [-2.2497, 53.4778], [-2.2486, 53.48], [-2.2478, 53.483], [-2.2478, 53.486],
+        [-2.2445, 53.4765], [-2.2515, 53.4757], [-2.2508, 53.4783], [-2.2486, 53.48], [-2.2478, 53.483],
+        [-2.2505, 53.484], [-2.2498, 53.4862],
       ],
     },
     {
       id: "spinningfields",
       name: "Spinningfields",
       description: "Smart restaurants and bars between Deansgate and the river",
-      outline: [[-2.2478, 53.483], [-2.2486, 53.48], [-2.2497, 53.4778], [-2.253, 53.479], [-2.2545, 53.4825], [-2.2505, 53.484]],
+      outline: [[-2.2478, 53.483], [-2.2486, 53.48], [-2.2508, 53.4783], [-2.253, 53.479], [-2.2545, 53.4825], [-2.2505, 53.484]],
     },
     {
       id: "oxford-street",
       name: "Oxford Street",
       description: "Quick, student-friendly eats along Oxford Street and Oxford Road",
-      outline: [[-2.2445, 53.4765], [-2.24, 53.477], [-2.2372, 53.476], [-2.238, 53.472], [-2.243, 53.4715], [-2.2455, 53.4745]],
+      outline: [[-2.2445, 53.4765], [-2.24, 53.477], [-2.2372, 53.476], [-2.238, 53.472], [-2.243, 53.4715], [-2.2465, 53.475]],
+    },
+    {
+      id: "curry-mile",
+      name: "Curry Mile (Rusholme)",
+      description: "Wilmslow Road's famous strip of curry houses, grills and sweet shops, a bus ride south",
+      outline: [[-2.2275, 53.4595], [-2.2235, 53.4595], [-2.2225, 53.452], [-2.2265, 53.452]],
     },
   ],
 };

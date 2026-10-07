@@ -191,7 +191,7 @@ export default function FoodStepMapScreen() {
     // Fitted flat, then tilted: MapLibre's own fit allows for the tilt and
     // zooms right out to keep the far edge in view. Padding keeps the pins
     // clear of the header and of Scout.
-    const padding = { top: 40, left: 40, right: 60, bottom: compact ? 200 : 170 };
+    const padding = { top: 40, left: 40, right: 60, bottom: compact ? 250 : 290 };
     const { width, height } = map.getContainer().getBoundingClientRect();
     const x = (lng: number) => (lng + 180) / 360;
     const y = (lat: number) => (1 - Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360)) / Math.PI) / 2;
