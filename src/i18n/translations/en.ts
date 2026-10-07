@@ -257,7 +257,7 @@ const en = {
     offerTitle: "Download before you go?",
     offerBody: "Saves this tour on your phone, so the narration keeps playing if you lose signal on the way.",
     offerDownload: "Download and start",
-    offerSkip: "Start without downloading",
+    offerSkip: "Start",
     accountTitle: "Downloaded tours",
     accountEmpty: "None yet. Download a tour from its page to walk it with no signal.",
     accountTotal: "{{size}} used on this device",

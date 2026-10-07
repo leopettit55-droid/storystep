@@ -232,11 +232,13 @@ export default function TourPreviewScreen() {
           <View style={styles.offer}>
             <Text style={styles.offerTitle}>{t("offline.offerTitle")}</Text>
             <Text style={styles.offerBody}>{t("offline.offerBody")}</Text>
-            <PressScale style={styles.cta} scaleTo={0.96} onPress={handleDownloadThenStart}>
-              <Text style={styles.ctaText}>{t("offline.offerDownload")}</Text>
+            {/* Most walkers just want to go, so starting straight away is the
+                main button and downloading is the quiet extra. */}
+            <PressScale style={styles.cta} scaleTo={0.96} onPress={handleStartWithoutDownload}>
+              <Text style={styles.ctaText}>{t("offline.offerSkip")}</Text>
             </PressScale>
-            <PressScale style={styles.startAgain} scaleTo={0.96} onPress={handleStartWithoutDownload}>
-              <Text style={styles.startAgainText}>{t("offline.offerSkip")}</Text>
+            <PressScale style={styles.startAgain} scaleTo={0.96} onPress={handleDownloadThenStart}>
+              <Text style={styles.startAgainText}>{t("offline.offerDownload")}</Text>
             </PressScale>
           </View>
         ) : null}
