@@ -1,13 +1,21 @@
 import { useNavigation, useRoute, type RouteProp } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import { LngLatBounds, Map as MapLibreMap, Marker, NavigationControl } from "maplibre-gl";
+import {
+  LngLatBounds,
+  Map as MapLibreMap,
+  Marker,
+  NavigationControl,
+  type ExpressionSpecification,
+  type GeoJSONSource,
+} from "maplibre-gl";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import BackButton from "../components/BackButton";
 import FoodStepGuide from "../components/FoodStepGuide";
 import Skeleton from "../components/Skeleton";
 import { getFoodStepCity, getFoodStepCuisine, type FoodStepCity } from "../content/foodStep";
 import { restaurantsFor, type FoodStepRestaurant } from "../content/foodStepRestaurants";
+import { zoneContains, zonesFor, type FoodStepZone } from "../content/foodStepZones";
 import { FOODSTEP_GREEN } from "../content/sisterProducts";
 import { useLanguage } from "../i18n/LanguageContext";
 import { EXPLORE_MAP_CREDIT, exploreMapStyle } from "../map/exploreMapStyle";
@@ -45,6 +53,34 @@ function makePin(restaurant: FoodStepRestaurant): { root: HTMLDivElement; dot: H
   return { root, dot };
 }
 
+const ZONE_SOURCE = "foodstep-zones";
+
+/** How the zones are drawn. Faint everywhere, fading out as you zoom in to
+ * street level; the picked one (if any) gets a solid green outline at every zoom. */
+function zonePaint(zoneId: string | null) {
+  const picked: ExpressionSpecification = ["==", ["get", "id"], zoneId ?? ""];
+  const byZoom = (far: number, near: number, street: number, pickedValue: number): ExpressionSpecification => [
+    "interpolate", ["linear"], ["zoom"],
+    13, ["case", picked, pickedValue, far],
+    15.5, ["case", picked, pickedValue, near],
+    17, ["case", picked, pickedValue, street],
+  ];
+  return {
+    fill: { "fill-opacity": byZoom(0.1, 0.06, 0, 0.16) },
+    line: {
+      "line-color": ["case", picked, FOODSTEP_GREEN, "#CFF5D6"] as ExpressionSpecification,
+      "line-width": ["case", picked, 3, 1.2] as ExpressionSpecification,
+      "line-opacity": byZoom(0.75, 0.45, 0, 0.95),
+    },
+    label: { "text-opacity": byZoom(1, 0.85, 0, 0.85) },
+  };
+}
+
+/** Points to frame: a zone's outline, or the restaurants. */
+function pointsOf(zone: FoodStepZone | null, restaurants: FoodStepRestaurant[]): [number, number][] {
+  return zone ? zone.outline : restaurants.map((r) => [r.lng, r.lat]);
+}
+
 /** A FoodStep cuisine in a city: StoryStep's 3D explore map with a pin for
  * each restaurant (only Manchester's Mexican so far), and Scout to welcome the
  * visitor and answer questions. */
@@ -68,6 +104,15 @@ export default function FoodStepMapScreen() {
   );
   const [selected, setSelected] = useState<FoodStepRestaurant | null>(null);
   const dotsRef = useRef<Record<string, HTMLDivElement>>({});
+  // Neighbourhoods: always faintly on the map; picking one shows only its restaurants.
+  const zones = useMemo(() => (city ? zonesFor(city.id) : []), [city]);
+  const [zoneId, setZoneId] = useState<string | null>(null);
+  const zone = zones.find((z) => z.id === zoneId) ?? null;
+  const shown = useMemo(
+    () => (zone ? restaurants.filter((r) => zoneContains(zone, r.lng, r.lat)) : restaurants),
+    [zone, restaurants]
+  );
+  const zoneName = (id: string) => zones.find((z) => z.id === id)?.name;
 
   // Initialize the map once; it stays mounted while people move between cities.
   useEffect(() => {
@@ -106,12 +151,14 @@ export default function FoodStepMapScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [!!city]);
 
-  // Frame the restaurants (leaving room for Scout at the bottom), or the
-  // city's food area if there aren't any yet; again for each city or cuisine.
+  // Frame the picked zone, or the restaurants (leaving room for Scout at the
+  // bottom), or the city's food area if there aren't any; again for each
+  // city, cuisine or zone.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !city || !mapReady) return;
-    if (restaurants.length === 0) {
+    const points = pointsOf(zone, restaurants);
+    if (points.length === 0) {
       map.flyTo({ ...cameraFor(city), duration: 1400 });
       return;
     }
@@ -122,8 +169,8 @@ export default function FoodStepMapScreen() {
     const { width, height } = map.getContainer().getBoundingClientRect();
     const x = (lng: number) => (lng + 180) / 360;
     const y = (lat: number) => (1 - Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360)) / Math.PI) / 2;
-    const xs = restaurants.map((r) => x(r.lng));
-    const ys = restaurants.map((r) => y(r.lat));
+    const xs = points.map(([lng]) => x(lng));
+    const ys = points.map(([, lat]) => y(lat));
     const spanX = Math.max(...xs) - Math.min(...xs) || 1e-6;
     const spanY = Math.max(...ys) - Math.min(...ys) || 1e-6;
     const fitZoom = Math.log2(
@@ -133,7 +180,7 @@ export default function FoodStepMapScreen() {
       )
     );
     const bounds = new LngLatBounds();
-    restaurants.forEach((r) => bounds.extend([r.lng, r.lat]));
+    points.forEach((p) => bounds.extend(p));
     map.flyTo({
       center: bounds.getCenter(),
       zoom: Math.min(fitZoom, 16.5),
@@ -143,14 +190,71 @@ export default function FoodStepMapScreen() {
       duration: 1400,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [city?.id, cuisine?.id, mapReady]);
+  }, [city?.id, cuisine?.id, zoneId, mapReady]);
 
-  // The restaurants' pins; tapping one opens its details.
+  // A new city or cuisine starts with every zone showing.
+  useEffect(() => setZoneId(null), [city?.id, cuisine?.id]);
+
+  // The zones' outlines and names, under the 3D buildings so they don't hide them.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
-    setSelected(null);
-    const markers = restaurants.map((r) => {
+    const data: GeoJSON.FeatureCollection = {
+      type: "FeatureCollection",
+      features: zones.map((z) => ({
+        type: "Feature",
+        properties: { id: z.id, name: z.name },
+        geometry: { type: "Polygon", coordinates: [[...z.outline, z.outline[0]]] },
+      })),
+    };
+    const source = map.getSource<GeoJSONSource>(ZONE_SOURCE);
+    if (source) {
+      source.setData(data);
+      return;
+    }
+    map.addSource(ZONE_SOURCE, { type: "geojson", data });
+    const paint = zonePaint(null);
+    map.addLayer(
+      { id: "foodstep-zones-fill", type: "fill", source: ZONE_SOURCE, paint: { "fill-color": FOODSTEP_GREEN, ...paint.fill } },
+      "storystep-3d-buildings"
+    );
+    map.addLayer({ id: "foodstep-zones-line", type: "line", source: ZONE_SOURCE, layout: { "line-join": "round" }, paint: paint.line });
+    map.addLayer({
+      id: "foodstep-zones-label",
+      type: "symbol",
+      source: ZONE_SOURCE,
+      // Names are for the wider view; at street level the map's own labels are enough.
+      maxzoom: 16,
+      layout: {
+        "text-field": ["get", "name"],
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 12,
+        "text-letter-spacing": 0.04,
+      },
+      paint: { "text-color": "#DDF8E2", "text-halo-color": "rgba(10,40,20,0.8)", "text-halo-width": 1.4, ...paint.label },
+    });
+  }, [zones, mapReady]);
+
+  // The picked zone stands out.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady || !map.getLayer("foodstep-zones-fill")) return;
+    type PaintName = Parameters<MapLibreMap["setPaintProperty"]>[1];
+    type PaintValue = Parameters<MapLibreMap["setPaintProperty"]>[2];
+    const apply = (layer: string, props: Record<string, PaintValue>) =>
+      Object.entries(props).forEach(([name, value]) => map.setPaintProperty(layer, name as PaintName, value));
+    const paint = zonePaint(zoneId);
+    apply("foodstep-zones-fill", paint.fill);
+    apply("foodstep-zones-line", paint.line);
+    apply("foodstep-zones-label", paint.label);
+  }, [zoneId, mapReady, zones]);
+
+  // The restaurants' pins (only the picked zone's, if one is); tapping one opens its details.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+    setSelected((s) => (s && shown.some((r) => r.id === s.id) ? s : null));
+    const markers = shown.map((r) => {
       const { root, dot } = makePin(r);
       root.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -163,14 +267,14 @@ export default function FoodStepMapScreen() {
       markers.forEach((m) => m.remove());
       dotsRef.current = {};
     };
-  }, [restaurants, mapReady]);
+  }, [shown, mapReady]);
 
   // The picked restaurant's pin stands out.
   useEffect(() => {
     Object.entries(dotsRef.current).forEach(([id, dot]) => {
       dot.style.transform = selected?.id === id ? "scale(1.45)" : "scale(1)";
     });
-  }, [selected]);
+  }, [selected, shown]);
 
   const toCities = () => navigation.navigate("FoodStep");
   const toCuisines = () => city && navigation.navigate("FoodStepCity", { cityId: city.id });
@@ -211,6 +315,49 @@ export default function FoodStepMapScreen() {
             {t(restaurants.length ? "foodStep.mapSubtitlePins" : "foodStep.mapSubtitle")}
           </Text>
         )}
+
+        {/* Zones: tap one to see just its restaurants, again (or "All areas") for all of them. */}
+        {zones.length > 0 && (
+          <>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.zoneChips}>
+              <Pressable
+                style={[styles.zoneChip, !zone && styles.zoneChipActive]}
+                onPress={() => setZoneId(null)}
+                aria-selected={!zone}
+              >
+                <Text style={[styles.zoneChipText, !zone && styles.zoneChipTextActive]}>
+                  {t("foodStep.allAreas", { count: restaurants.length })}
+                </Text>
+              </Pressable>
+              {zones.map((z) => {
+                const active = z.id === zoneId;
+                const count = restaurants.filter((r) => zoneContains(z, r.lng, r.lat)).length;
+                return (
+                  <Pressable
+                    key={z.id}
+                    style={[styles.zoneChip, active && styles.zoneChipActive]}
+                    onPress={() => setZoneId(active ? null : z.id)}
+                    aria-selected={active}
+                  >
+                    <Text style={[styles.zoneChipText, active && styles.zoneChipTextActive]}>
+                      {z.name} · {count}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+            {zone && (
+              <View style={styles.zoneInfo}>
+                <Text style={styles.zoneInfoText} numberOfLines={2}>
+                  {shown.length ? zone.description : t("foodStep.zoneEmpty", { cuisine: cuisine?.name ?? "" })}
+                </Text>
+                <Pressable onPress={() => setZoneId(null)} hitSlop={8}>
+                  <Text style={styles.zoneReset}>{t("foodStep.showAll")}</Text>
+                </Pressable>
+              </View>
+            )}
+          </>
+        )}
       </View>
 
       <View style={styles.mapWrap}>
@@ -246,6 +393,12 @@ export default function FoodStepMapScreen() {
                 ? ` · ★ ${selected.rating.score}/${selected.rating.outOf} (${selected.rating.source})`
                 : ""}
             </Text>
+            {zoneName(selected.zone) && (
+              <View style={styles.placeAddressRow}>
+                <Ionicons name="walk" size={14} color={FOODSTEP_GREEN} />
+                <Text style={styles.placeAddress}>{zoneName(selected.zone)}</Text>
+              </View>
+            )}
             <View style={styles.placeAddressRow}>
               <Ionicons name="location" size={14} color={FOODSTEP_GREEN} />
               <Text style={styles.placeAddress}>{selected.address}</Text>
@@ -297,6 +450,21 @@ function createStyles(colors: ThemeColors) {
     },
     mapIssueTitle: { fontSize: 15, fontWeight: "700", color: colors.text, textAlign: "center" },
     mapIssueBody: { fontSize: 12.5, color: colors.textMid, textAlign: "center" },
+    zoneChips: { flexDirection: "row", gap: 8, paddingTop: 4 },
+    zoneChip: {
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: "rgba(60,185,79,0.45)",
+      backgroundColor: "rgba(60,185,79,0.08)",
+    },
+    zoneChipActive: { backgroundColor: FOODSTEP_GREEN, borderColor: FOODSTEP_GREEN },
+    zoneChipText: { fontSize: 12.5, fontWeight: "600", color: colors.textMid },
+    zoneChipTextActive: { color: "#FFFFFF" },
+    zoneInfo: { flexDirection: "row", alignItems: "center", gap: 10 },
+    zoneInfoText: { flex: 1, fontSize: 12.5, color: colors.textMid },
+    zoneReset: { fontSize: 12.5, fontWeight: "700", color: FOODSTEP_GREEN, textDecorationLine: "underline" },
     place: {
       position: "absolute",
       top: 12,
