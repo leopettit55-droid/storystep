@@ -33,12 +33,11 @@ export const FOODSTEP_CITIES: FoodStepCity[] = [
     id: "manchester",
     name: "Manchester",
     country: "United Kingdom",
-    description: "Street food, curry and modern British",
+    description: "Street food, curry, Mexican and Italian",
     center: [-2.2374, 53.4826],
     cuisines: [
       { id: "curry", name: "Curry", description: "The Curry Mile and beyond" },
       { id: "street-food", name: "Street Food", description: "Food halls and market stalls" },
-      { id: "modern-british", name: "Modern British", description: "Northern produce, new ideas" },
     ],
   },
   {
