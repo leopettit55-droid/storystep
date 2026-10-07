@@ -15,6 +15,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { getFoodStepCity, getFoodStepCuisine, type FoodStepCity, type FoodStepCuisine } from "../src/content/foodStep";
 import { restaurantsFor } from "../src/content/foodStepRestaurants";
+import { zonesFor } from "../src/content/foodStepZones";
 import { isNarrationLanguage } from "../src/guides/voices";
 import { GUIDES, hash, normalise, reply, speak, type Cached, type Source } from "./guideAnswer";
 import { error, json, type Env } from "./social";
@@ -110,7 +111,12 @@ async function writeAnswer(
   // Where the map has restaurant pins, Scout can recommend those, and only those.
   const places = restaurants.length
     ? `The map shows these restaurants, which you may recommend by name:\n\n<restaurants>\n` +
-      restaurants.map((r) => `${r.name} (${r.style}), ${r.address}: ${r.description}`).join("\n") +
+      restaurants
+        .map((r) => {
+          const area = zonesFor(city.id).find((z) => z.id === r.zone)?.name;
+          return `${r.name} (${r.style})${area ? `, in ${area}` : ""}, ${r.address}: ${r.description}`;
+        })
+        .join("\n") +
       `\n</restaurants>\n\nDon't name any other restaurants, cafes or addresses, and don't invent details about these beyond what's above. `
     : `Don't name specific restaurants, cafes or addresses; FoodStep doesn't have its restaurant listings here yet, ` +
       `so talk about areas, dishes and habits instead, and if they ask for a particular place, say you'll be able to show them soon. `;
