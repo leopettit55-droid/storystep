@@ -2,6 +2,7 @@ import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import LanguagePicker from "../components/LanguagePicker";
+import { SISTER_PRODUCTS } from "../content/sisterProducts";
 import { useLanguage } from "../i18n/LanguageContext";
 import { useTheme } from "../ThemeContext";
 import type { ThemeColors } from "../theme";
@@ -14,6 +15,9 @@ const LABEL_KEYS: Record<string, string> = {
   Help: "nav.help",
 };
 
+// Pages with their own place in the bar (the sister products), not a link on the right.
+const HIDDEN_LINKS = ["FoodStep", "FoodStepCity", "FoodStepMap"];
+
 export default function DesktopTopBar({ state, navigation }: BottomTabBarProps) {
   const { t } = useLanguage();
   const { colors } = useTheme();
@@ -23,7 +27,7 @@ export default function DesktopTopBar({ state, navigation }: BottomTabBarProps) 
       <View style={styles.inner}>
         <Pressable
           style={styles.logoWrap}
-          onPress={() => navigation.navigate(state.routes[0].name)}
+          onPress={() => navigation.navigate("Tours")}
         >
           <View style={styles.logoMark}>
             <Text style={styles.logoMarkText}>S</Text>
@@ -31,8 +35,25 @@ export default function DesktopTopBar({ state, navigation }: BottomTabBarProps) 
           <Text style={styles.logoText}>StoryStep</Text>
         </Pressable>
 
+        {/* Sister products, not live yet: placeholders until they have pages. */}
+        <View style={styles.products}>
+          {SISTER_PRODUCTS.map((p) => (
+            <Pressable
+              key={p.name}
+              style={styles.logoWrap}
+              onPress={p.route ? () => navigation.navigate(p.route) : undefined}
+            >
+              <View style={[styles.logoMark, { backgroundColor: p.color }]}>
+                <Text style={styles.logoMarkText}>{p.letter}</Text>
+              </View>
+              <Text style={styles.logoText}>{p.name}</Text>
+            </Pressable>
+          ))}
+        </View>
+
         <View style={styles.links}>
           {state.routes.map((route, index) => {
+            if (HIDDEN_LINKS.includes(route.name)) return null;
             const focused = state.index === index;
             return (
               <Pressable
@@ -82,6 +103,16 @@ function createStyles(colors: ThemeColors) {
     },
     logoMarkText: { color: colors.onPrimary, fontSize: 15, fontWeight: "800" },
     logoText: { fontSize: 18, fontWeight: "800", color: colors.text },
+    products: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 24,
+      marginLeft: 24,
+      marginRight: "auto",
+      paddingLeft: 24,
+      borderLeftWidth: 1,
+      borderColor: colors.border,
+    },
     links: { flexDirection: "row", alignItems: "center", gap: 28 },
     link: { paddingVertical: 4 },
     linkText: { fontSize: 14, fontWeight: "600", color: colors.textDim },

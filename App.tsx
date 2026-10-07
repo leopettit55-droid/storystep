@@ -92,6 +92,9 @@ const SECTION_TITLE_KEYS: Record<string, string> = {
   Tours: "nav.tours",
   Account: "nav.account",
   Help: "nav.help",
+  FoodStep: "foodStep.title",
+  FoodStepCity: "foodStep.title",
+  FoodStepMap: "foodStep.title",
   PrivacyPolicy: "home.footerPrivacy",
   TermsOfService: "home.footerTerms",
   ContactUs: "help.contactUs",
@@ -147,7 +150,16 @@ function AppInner() {
             screens: {
               MainTabs: {
                 path: "",
-                screens: { Home: "", Map: "map", Tours: "tours", Account: "account", Help: "help" },
+                screens: {
+                  Home: "",
+                  Map: "map",
+                  Tours: "tours",
+                  Account: "account",
+                  Help: "help",
+                  FoodStep: "foodstep",
+                  FoodStepCity: "foodstep/:cityId",
+                  FoodStepMap: "foodstep/:cityId/:cuisineId",
+                },
               },
               TourPreview: "tour/:areaId",
               TourGallery: "tour/:areaId/gallery",

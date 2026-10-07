@@ -3,11 +3,18 @@ import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export type MainTabParamList = {
-  Home: undefined;
+  /** intro: show the landing podium again, even if it was already seen this visit. */
+  Home: { intro?: boolean } | undefined;
   Map: undefined;
   Tours: undefined;
   Account: undefined;
   Help: undefined;
+  /** FoodStep's city picker. Hidden from the tab bars; reached from the landing podium. */
+  FoodStep: undefined;
+  /** A FoodStep city's cuisines. */
+  FoodStepCity: { cityId: string };
+  /** A cuisine in a FoodStep city, on the 3D map. */
+  FoodStepMap: { cityId: string; cuisineId: string };
 };
 
 export type RootStackParamList = {

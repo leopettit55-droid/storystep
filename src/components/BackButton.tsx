@@ -11,11 +11,13 @@ interface Props {
    * (e.g. above a scrollable page's title). */
   variant?: "floating" | "inline";
   style?: StyleProp<ViewStyle>;
+  /** Instead of going back a screen. */
+  onPress?: () => void;
 }
 
 /** Every stack screen pushed with headerShown:false needs its own way back —
  * there's no native header chevron to fall back on. */
-export default function BackButton({ variant = "floating", style }: Props) {
+export default function BackButton({ variant = "floating", style, onPress }: Props) {
   const navigation = useNavigation();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -23,7 +25,7 @@ export default function BackButton({ variant = "floating", style }: Props) {
   return (
     <Pressable
       style={[variant === "floating" ? styles.floating : styles.inline, style]}
-      onPress={() => navigation.goBack()}
+      onPress={onPress ?? (() => navigation.goBack())}
       hitSlop={8}
     >
       <Ionicons

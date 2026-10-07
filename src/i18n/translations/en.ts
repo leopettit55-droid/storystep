@@ -22,6 +22,20 @@ const en = {
 
   landing: {
     exploreButton: "Explore",
+    comingSoon: "Coming soon",
+  },
+
+  foodStep: {
+    title: "FoodStep",
+    subtitle: "Pick a city",
+    citiesTitle: "Cities",
+    cuisinesTitle: "{{city}} Cuisines",
+    cuisinesSubtitle: "Choose a cuisine",
+    cuisinesSection: "Cuisines",
+    cityNotFound: "We couldn't find that city.",
+    mapTitle: "{{cuisine}} in {{city}}",
+    mapSubtitle: "Real streets and buildings in 3D. Drag to look around; restaurants are coming soon.",
+    mapAppOnly: "The 3D map is on the web version, at storystep.site. Restaurants are coming soon.",
   },
 
   home: {
