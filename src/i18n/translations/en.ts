@@ -35,6 +35,10 @@ const en = {
     cityNotFound: "We couldn't find that city.",
     mapTitle: "{{cuisine}} in {{city}}",
     mapSubtitle: "Real streets and buildings in 3D. Drag to look around; restaurants are coming soon.",
+    mapSubtitlePins: "Real streets and buildings in 3D. Drag to look around, and tap a pin to see the restaurant.",
+    welcome: "Hi there! Welcome to {{city}}. Let me show you some {{cuisine}} options in {{city}}.",
+    hideGuide: "Hide {{guide}}",
+    showGuide: "Show {{guide}}",
     mapAppOnly: "The 3D map is on the web version, at storystep.site. Restaurants are coming soon.",
   },
 
@@ -550,6 +554,9 @@ const en = {
     pause: "Pause the answer",
     aiNotice: "This answer and its voice are AI-generated, so double-check anything important.",
     close: "Close",
+    foodPlaceholder: "What would you like to know about {{cuisine}} in {{city}}?",
+    foodRemaining: "{{count}} questions left here this hour",
+    foodLimit: "That's all the questions for now. Try again in an hour, or pick another cuisine!",
   },
   guides: {
     scoutArrived: "Welcome! Let me show you something special.",

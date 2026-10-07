@@ -3,13 +3,14 @@ import { createAudioPlayer, type AudioPlayer, type AudioStatus } from "expo-audi
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import type { Waypoint } from "../content";
+import type { FoodStepCity, FoodStepCuisine } from "../content/foodStep";
 import { getGuide, GUIDES, type GuideId } from "../guides/guides";
 import { useLanguage } from "../i18n/LanguageContext";
 import { apiUrl } from "../social/api";
 import Mascot from "./Mascot";
 import PressScale from "./PressScale";
 
-/** Questions per stop, per visit (the server also limits by visitor). */
+/** Questions per stop (or FoodStep cuisine), per visit (the server also limits by visitor). */
 const PER_STOP_LIMIT = 5;
 const askedAt = new Map<string, number>();
 
@@ -19,28 +20,34 @@ interface Answer {
   duration: number;
 }
 
-export interface AskGuideModalProps {
-  tourId: string;
-  stop: Waypoint;
+/** What's being asked about: a tour stop, or a cuisine in a FoodStep city. */
+type Topic = { tourId: string; stop: Waypoint } | { foodStep: { city: FoodStepCity; cuisine: FoodStepCuisine } };
+
+export type AskGuideModalProps = Topic & {
   /** The walker's tour guide, picked first; another can be asked instead. */
   guide: GuideId;
+  /** The guides on offer (default: all of them). */
+  guideIds?: GuideId[];
   onClose: () => void;
-}
+};
 
 /**
  * "Ask your guide" (see server/guideAnswer.ts): type a question
  * at a stop and hear the guide answer it. The answer plays as soon as it's
  * ready, with its transcript below, and the sheet closes when it finishes.
  */
-export default function AskGuideModal({ tourId, stop, guide: tourGuide, onClose }: AskGuideModalProps) {
+export default function AskGuideModal(props: AskGuideModalProps) {
+  const { guide: tourGuide, guideIds, onClose } = props;
   const { t, language } = useLanguage();
+  const topic = askTopic(props, t);
+  const guides = guideIds ? GUIDES.filter((g) => guideIds.includes(g.id)) : GUIDES;
   const [guide, setGuide] = useState<GuideId>(tourGuide);
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
-  const [asked, setAsked] = useState(askedAt.get(stop.id) ?? 0);
+  const [asked, setAsked] = useState(askedAt.get(topic.limitKey) ?? 0);
   const player = useRef<AudioPlayer | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const name = getGuide(guide).name;
@@ -88,21 +95,21 @@ export default function AskGuideModal({ tourId, stop, guide: tourGuide, onClose 
     setProblem(null);
     setAnswer(null);
     try {
-      const res = await fetch(apiUrl("/api/guide-answer"), {
+      const res = await fetch(apiUrl(topic.endpoint), {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ question: q, currentStop: stop.order, tourId, guideId: guide, language }),
+        body: JSON.stringify({ ...topic.body, question: q, guideId: guide, language }),
       });
       const data = (await res.json().catch(() => null)) as (Answer & { error?: string; code?: string }) | null;
       if (res.status === 429 || data?.code === "limit") {
-        askedAt.set(stop.id, PER_STOP_LIMIT);
+        askedAt.set(topic.limitKey, PER_STOP_LIMIT);
         setAsked(PER_STOP_LIMIT);
-        setProblem(t("askGuide.limit"));
+        setProblem(topic.limitMessage);
         return;
       }
       if (!res.ok || !data?.transcript) throw new Error(data?.error ?? `HTTP ${res.status}`);
-      const count = (askedAt.get(stop.id) ?? 0) + 1;
-      askedAt.set(stop.id, count);
+      const count = (askedAt.get(topic.limitKey) ?? 0) + 1;
+      askedAt.set(topic.limitKey, count);
       setAsked(count);
       setAnswer(data);
       setQuestion("");
@@ -129,7 +136,7 @@ export default function AskGuideModal({ tourId, stop, guide: tourGuide, onClose 
           </View>
 
           <View style={styles.guides}>
-            {GUIDES.map((g) => (
+            {guides.map((g) => (
               <Pressable
                 key={g.id}
                 onPress={() => setGuide(g.id)}
@@ -150,7 +157,7 @@ export default function AskGuideModal({ tourId, stop, guide: tourGuide, onClose 
             style={styles.input}
             value={question}
             onChangeText={setQuestion}
-            placeholder={t("askGuide.placeholder", { stop: stop.name })}
+            placeholder={topic.placeholder}
             placeholderTextColor="#8A7F79"
             multiline
             maxLength={300}
@@ -168,7 +175,7 @@ export default function AskGuideModal({ tourId, stop, guide: tourGuide, onClose 
           >
             <Text style={styles.askButtonText}>{t("askGuide.ask", { guide: name })}</Text>
           </PressScale>
-          {left > 0 && <Text style={styles.small}>{t("askGuide.remaining", { count: left })}</Text>}
+          {left > 0 && <Text style={styles.small}>{topic.remaining(left)}</Text>}
 
           {loading && (
             <View style={styles.loading} role="status">
@@ -203,6 +210,30 @@ export default function AskGuideModal({ tourId, stop, guide: tourGuide, onClose 
       </View>
     </Modal>
   );
+}
+
+/** Where a question goes and how it's worded, for a tour stop or a FoodStep cuisine. */
+function askTopic(topic: Topic, t: ReturnType<typeof useLanguage>["t"]) {
+  if ("foodStep" in topic) {
+    const { city, cuisine } = topic.foodStep;
+    const names = { city: city.name, cuisine: cuisine.name };
+    return {
+      endpoint: "/api/foodstep-question",
+      body: { cityId: city.id, cuisineId: cuisine.id },
+      limitKey: `food:${city.id}:${cuisine.id}`,
+      placeholder: t("askGuide.foodPlaceholder", names),
+      limitMessage: t("askGuide.foodLimit"),
+      remaining: (count: number) => t("askGuide.foodRemaining", { count }),
+    };
+  }
+  return {
+    endpoint: "/api/guide-answer",
+    body: { currentStop: topic.stop.order, tourId: topic.tourId },
+    limitKey: topic.stop.id,
+    placeholder: t("askGuide.placeholder", { stop: topic.stop.name }),
+    limitMessage: t("askGuide.limit"),
+    remaining: (count: number) => t("askGuide.remaining", { count }),
+  };
 }
 
 const styles = StyleSheet.create({
