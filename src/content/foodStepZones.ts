@@ -31,8 +31,11 @@ const ZONES: Record<string, FoodStepZone[]> = {
     {
       id: "city-centre",
       name: "City Centre",
-      description: "The shopping streets around the Arndale and Exchange Square",
-      outline: [[-2.2465, 53.4865], [-2.238, 53.4858], [-2.238, 53.4826], [-2.24, 53.4812], [-2.244, 53.4808], [-2.2462, 53.483]],
+      description: "The shopping streets around the Arndale, Exchange Square, King Street and Spring Gardens",
+      outline: [
+        [-2.2465, 53.4865], [-2.238, 53.4858], [-2.238, 53.4826], [-2.24, 53.4812], [-2.2385, 53.4797],
+        [-2.2412, 53.4797], [-2.244, 53.4808], [-2.2462, 53.483],
+      ],
     },
     {
       id: "piccadilly",
@@ -40,7 +43,7 @@ const ZONES: Record<string, FoodStepZone[]> = {
       description: "The gardens, Portland Street and the station approach",
       outline: [
         [-2.24, 53.4812], [-2.238, 53.4826], [-2.2366, 53.4822], [-2.2348, 53.4814], [-2.23, 53.4804],
-        [-2.2296, 53.48], [-2.23, 53.4768], [-2.234, 53.479], [-2.2385, 53.4797],
+        [-2.2296, 53.48], [-2.23, 53.4768], [-2.234, 53.479], [-2.2368, 53.4776], [-2.2385, 53.4797],
       ],
     },
     {
@@ -61,7 +64,7 @@ const ZONES: Record<string, FoodStepZone[]> = {
       description: "Big-name restaurants and grand old halls along Deansgate",
       outline: [
         [-2.2465, 53.4865], [-2.2462, 53.483], [-2.244, 53.4808], [-2.2412, 53.4797], [-2.24, 53.477],
-        [-2.2445, 53.4765], [-2.2497, 53.4778], [-2.2486, 53.48], [-2.2478, 53.483], [-2.2478, 53.486],
+        [-2.2445, 53.4765], [-2.25, 53.477], [-2.2497, 53.4778], [-2.2486, 53.48], [-2.2478, 53.483], [-2.2478, 53.486],
       ],
     },
     {
