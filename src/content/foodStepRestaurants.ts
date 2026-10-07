@@ -1,7 +1,7 @@
 /** Restaurants on FoodStep's maps, per city and cuisine. Only Manchester's
  * Mexican so far, as the pattern to copy for the rest.
  *
- * Checked in October 2026 against TripAdvisor's Mexican list, Manchester's
+ * Mexican: checked in October 2026 against TripAdvisor's Mexican list, Manchester's
  * Finest (March 2026), The Manc (June 2026) and That's Up (March 2026), and
  * kept to places with 2026 evidence that they're open (closed ones like
  * El Taquero and Liquor & Burn left out). City centre only, so they all sit
@@ -9,7 +9,11 @@
  * are from OpenStreetMap where it has the restaurant, otherwise the
  * restaurant's published address; the Arndale and Kampus ones are placed by
  * hand inside their building. Descriptions are our own. No ratings yet:
- * TripAdvisor's and Google's can only be shown through their licensed APIs. */
+ * TripAdvisor's and Google's can only be shown through their licensed APIs.
+ *
+ * Italian: picked the same way in October 2026, mostly from TripAdvisor's
+ * Italian list (city-centre ones), plus Manchester's Finest and other 2026
+ * guides for Purezza, Ciaooo, Honest Crust, Onda and Sicilian NQ. */
 
 export interface FoodStepRestaurant {
   id: string;
@@ -265,6 +269,245 @@ const RESTAURANTS: Record<string, FoodStepRestaurant[]> = {
       lat: 53.47242,
       lng: -2.2402,
       description: "A colourful, casual spot for burritos and Tex-Mex classics, with bright murals on the walls.",
+    },
+  ],
+  "manchester/italian": [
+    // Northern Quarter
+    {
+      id: "purezza",
+      zone: "northern-quarter",
+      name: "Purezza",
+      style: "Vegan Italian",
+      address: "75–77 High Street, M4 1FS",
+      lat: 53.48445,
+      lng: -2.23762,
+      description: "The UK's original plant-based pizzeria: sourdough pizzas with vegan cheeses made in-house, in a big Northern Quarter space.",
+    },
+    {
+      id: "sicilian-nq",
+      zone: "northern-quarter",
+      name: "Sicilian NQ",
+      style: "Sicilian",
+      address: "14 Turner Street, M4 1DZ",
+      lat: 53.48382,
+      lng: -2.23773,
+      description: "A small, family-style Sicilian bistro known for its arancini, cannoli and tiramisu.",
+    },
+    // Mackie Mayor & Smithfield
+    {
+      id: "noi-quattro",
+      zone: "mackie-mayor",
+      name: "Noi Quattro",
+      style: "Pizza",
+      address: "120 High Street, M4 1HQ",
+      lat: 53.48507,
+      lng: -2.23543,
+      description: "Naples-style pizza with light, fluffy bases, run by four Italian friends. Good gluten-free options too.",
+    },
+    {
+      id: "pasta-factory",
+      zone: "mackie-mayor",
+      name: "The Pasta Factory",
+      style: "Italian",
+      address: "77 Shudehill, M4 4AN",
+      lat: 53.48571,
+      lng: -2.23726,
+      description: "Fresh pasta made in-house every day by a team from Turin, with inventive fillings and classic sauces.",
+    },
+    {
+      id: "honest-crust",
+      zone: "mackie-mayor",
+      name: "Honest Crust",
+      style: "Pizza",
+      address: "Mackie Mayor, 1 Eagle Street, M4 5BU",
+      lat: 53.48555,
+      lng: -2.23465,
+      description: "Wood-fired sourdough pizza from 48-hour dough, with specials built around small producers, in the Mackie Mayor food hall.",
+    },
+    {
+      id: "ciaooo",
+      zone: "mackie-mayor",
+      name: "Ciaooo",
+      style: "Pizza",
+      address: "62–64 Swan Street, M4 5JU",
+      lat: 53.48608,
+      lng: -2.2353,
+      description: "A cult-favourite Neapolitan pizzeria famous for its huge crusts and deep-fried lasagne.",
+    },
+    // City Centre
+    {
+      id: "salvis",
+      zone: "city-centre",
+      name: "Salvi's",
+      style: "Italian",
+      address: "The Corn Exchange, Hanging Ditch, M4 3TR",
+      lat: 53.48474,
+      lng: -2.24307,
+      description: "A family-run Neapolitan kitchen with buffalo mozzarella from its own farm near Naples.",
+    },
+    {
+      id: "riva-blu",
+      zone: "city-centre",
+      name: "Riva Blu",
+      style: "Italian",
+      address: "The Corn Exchange, 37 Hanging Ditch, M4 3TR",
+      lat: 53.48491,
+      lng: -2.24259,
+      description: "A glamorous Italian restaurant and bar in the Corn Exchange, known for attentive service.",
+    },
+    {
+      id: "double-zero",
+      zone: "city-centre",
+      name: "Double Zero",
+      style: "Pizza",
+      address: "55 Spring Gardens, M2 2BY",
+      lat: 53.48023,
+      lng: -2.24133,
+      description: "Neapolitan-style pizza that's among the city's highest rated, in the heart of the business district.",
+    },
+    {
+      id: "san-carlo-bottega",
+      zone: "city-centre",
+      name: "San Carlo Bottega",
+      style: "Italian",
+      address: "Selfridges, 1 Exchange Square, M3 1BD",
+      lat: 53.48395,
+      lng: -2.24377,
+      description: "San Carlo's Milanese-style bar and restaurant on the second floor of Selfridges.",
+    },
+    // Piccadilly
+    {
+      id: "rudys-portland-street",
+      zone: "piccadilly",
+      name: "Rudy's (Portland Street)",
+      style: "Pizza",
+      address: "30 Portland Street, M1 4GS",
+      lat: 53.4792,
+      lng: -2.2378,
+      description: "Manchester-born Neapolitan pizza: soft, blistered crusts and short, simple menus. Book ahead.",
+    },
+    {
+      id: "bravissimi",
+      zone: "piccadilly",
+      name: "Bravissimi",
+      style: "Italian",
+      address: "Piccadilly Station Approach, M1 2GH",
+      lat: 53.47877,
+      lng: -2.23218,
+      description: "A small, friendly spot for traditional Italian food near the station.",
+    },
+    {
+      id: "franco-manca-piccadilly",
+      zone: "piccadilly",
+      name: "Franco Manca",
+      style: "Pizza",
+      address: "12–14 Mosley Street, M2 3AG",
+      lat: 53.48093,
+      lng: -2.23928,
+      description: "Sourdough pizza at good prices from the London-born chain, just off Piccadilly Gardens.",
+    },
+    // Deansgate & St Peter's
+    {
+      id: "vincenzo",
+      zone: "deansgate-st-peters",
+      name: "Vincenzo Trattoria",
+      style: "Italian",
+      address: "34 St Ann Street, M2 7LE",
+      lat: 53.48166,
+      lng: -2.24505,
+      description: "TripAdvisor's top-rated Italian in Manchester: fritto misto, lobster ravioli and classic desserts, tucked between Deansgate and Cross Street.",
+    },
+    {
+      id: "gios",
+      zone: "deansgate-st-peters",
+      name: "Gio's Ristorante",
+      style: "Italian",
+      address: "5–7 Lower Mosley Street, M2 3WS",
+      lat: 53.47712,
+      lng: -2.24422,
+      description: "A family-friendly Italian with pizza and pasta, handy for the Bridgewater Hall.",
+    },
+    {
+      id: "don-giovanni",
+      zone: "deansgate-st-peters",
+      name: "Don Giovanni",
+      style: "Italian",
+      address: "Oxford Street, M1 5AE",
+      lat: 53.47692,
+      lng: -2.24349,
+      description: "A multi-award-winning Italian that's been going for more than 35 years. The ragù is the one to order.",
+    },
+    {
+      id: "rudys-peter-street",
+      zone: "deansgate-st-peters",
+      name: "Rudy's (Peter Street)",
+      style: "Pizza",
+      address: "31 Peter Street, M2 5QJ",
+      lat: 53.47818,
+      lng: -2.24752,
+      description: "Rudy's Neapolitan pizza by St Peter's Square, great before a show.",
+    },
+    {
+      id: "piccolino",
+      zone: "deansgate-st-peters",
+      name: "Piccolino",
+      style: "Italian",
+      address: "8 Clarence Street, M2 4DW",
+      lat: 53.48,
+      lng: -2.24445,
+      description: "A lavish flagship with an oyster bar, salumeria and gelato counter alongside classic Italian dishes.",
+    },
+    {
+      id: "italiana-fifty-five",
+      zone: "deansgate-st-peters",
+      name: "Italiana Fifty Five",
+      style: "Italian",
+      address: "Great Northern, M3 4EN",
+      lat: 53.47761,
+      lng: -2.24907,
+      description: "A busy Italian in the Great Northern warehouse with big portions of pizza and pasta. The garlic bread gets rave reviews.",
+    },
+    // Spinningfields
+    {
+      id: "san-carlo",
+      zone: "spinningfields",
+      name: "San Carlo",
+      style: "Italian",
+      address: "40 King Street West, M3 2WY",
+      lat: 53.48148,
+      lng: -2.24861,
+      description: "The glamorous flagship of the Italian group: contemporary classics, seafood and an upmarket crowd.",
+    },
+    {
+      id: "capris",
+      zone: "spinningfields",
+      name: "Capri's Cucina Italiana",
+      style: "Italian",
+      address: "118–124 Deansgate, M3 2GQ",
+      lat: 53.48143,
+      lng: -2.24835,
+      description: "A warm, family-run Italian on Deansgate serving pizza and pasta.",
+    },
+    // Oxford Street
+    {
+      id: "onda",
+      zone: "oxford-street",
+      name: "Onda",
+      style: "Pasta",
+      address: "Circle Square, 3 Symphony Park, M1 7FS",
+      lat: 53.47314,
+      lng: -2.23901,
+      description: "A pop-up turned restaurant: fresh pasta made in the dining room by a Michelin-trained chef, and a famous tiramisu scooped from a drawer.",
+    },
+    {
+      id: "giorgios",
+      zone: "oxford-street",
+      name: "Giorgio's",
+      style: "Italian",
+      address: "131–133 Portland Street, M1 4PY",
+      lat: 53.47618,
+      lng: -2.24208,
+      description: "A long-running, traditional Italian restaurant with pizza and pasta near Oxford Street.",
     },
   ],
 };
