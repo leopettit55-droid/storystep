@@ -1,5 +1,5 @@
 /** Neighbourhood zones on FoodStep's maps, so walkers can see what's near
- * what. Only Manchester so far: copy its shape for other cities.
+ * what. Manchester and Oxford so far: copy their shape for other cities.
  *
  * Outlines are approximate, drawn along the main streets that bound each
  * area (these neighbourhoods have no official edges). Points are [lng, lat]. */
@@ -85,6 +85,70 @@ const ZONES: Record<string, FoodStepZone[]> = {
       name: "Curry Mile (Rusholme)",
       description: "Wilmslow Road's famous strip of curry houses, grills and sweet shops, a bus ride south",
       outline: [[-2.2275, 53.4595], [-2.2235, 53.4595], [-2.2225, 53.452], [-2.2265, 53.452]],
+    },
+  ],
+  oxford: [
+    {
+      id: "cornmarket",
+      name: "Cornmarket & St Giles",
+      description: "The main shopping street, Carfax, Beaumont Street and St Giles",
+      // The notch on the east side is the Covered Market.
+      outline: [
+        [-1.26, 51.748], [-1.26, 51.7528], [-1.2598, 51.7548], [-1.264, 51.755], [-1.264, 51.7575],
+        [-1.2574, 51.7575], [-1.2574, 51.7531], [-1.2582, 51.7531], [-1.2582, 51.7523], [-1.2574, 51.7523], [-1.2574, 51.746],
+      ],
+    },
+    {
+      id: "covered-market",
+      name: "Covered Market",
+      description: "Oxford's 18th-century market hall of butchers, bakers, cafés and food counters",
+      outline: [[-1.2582, 51.7523], [-1.2556, 51.7523], [-1.2556, 51.7531], [-1.2582, 51.7531]],
+    },
+    {
+      id: "high-street",
+      name: "High Street & Broad Street",
+      description: "Colleges, old coffee houses and historic pubs from Broad Street down to Magdalen Bridge",
+      // The notch on the west side is the Covered Market.
+      outline: [
+        [-1.2574, 51.746], [-1.2574, 51.7523], [-1.2556, 51.7523], [-1.2556, 51.7531], [-1.2574, 51.7531],
+        [-1.2574, 51.7575], [-1.251, 51.7575], [-1.247, 51.7522], [-1.247, 51.75], [-1.2545, 51.749], [-1.255, 51.7458],
+      ],
+    },
+    {
+      id: "george-street",
+      name: "George Street & Gloucester Green",
+      description: "Busy restaurants, theatres and the open-air market at Gloucester Green",
+      outline: [[-1.2598, 51.7548], [-1.264, 51.755], [-1.264, 51.7528], [-1.26, 51.7528]],
+    },
+    {
+      id: "westgate",
+      name: "Westgate & Castle",
+      description: "The Westgate centre's rooftop and food court, Oxford Castle and the streets towards the station",
+      outline: [[-1.26, 51.7528], [-1.264, 51.7528], [-1.2685, 51.7535], [-1.2685, 51.748], [-1.26, 51.748]],
+    },
+    {
+      id: "jericho",
+      name: "Jericho & North Parade",
+      description: "Neighbourhood bistros and canal-side pubs along Walton Street, up to North Parade",
+      outline: [
+        [-1.264, 51.7575], [-1.259, 51.7575], [-1.259, 51.766], [-1.264, 51.766], [-1.2725, 51.763],
+        [-1.272, 51.757], [-1.264, 51.757],
+      ],
+    },
+    {
+      id: "summertown",
+      name: "Summertown & North Oxford",
+      description: "North Oxford's village high street and the river at the Cherwell Boathouse",
+      outline: [[-1.2725, 51.766], [-1.252, 51.766], [-1.252, 51.7815], [-1.2725, 51.7815]],
+    },
+    {
+      id: "cowley-road",
+      name: "Cowley Road & St Clement's",
+      description: "Oxford's independent high street east of Magdalen Bridge, full of cafés, bars and global food",
+      outline: [
+        [-1.2465, 51.7525], [-1.238, 51.7522], [-1.2265, 51.7455], [-1.2265, 51.7395], [-1.239, 51.7395],
+        [-1.244, 51.746], [-1.2468, 51.7495],
+      ],
     },
   ],
 };
