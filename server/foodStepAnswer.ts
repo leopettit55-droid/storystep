@@ -4,17 +4,18 @@
  * reads the answer out. The same set-up as Ask your guide on tours
  * (server/guideAnswer.ts), whose voice, cache and limit code this reuses.
  *
- *   POST /api/foodstep-question  { question, cityId, cuisineId, guideId, language? }
+ *   POST /api/foodstep-question  { question, cityId, cuisineId, restaurantId?, guideId, language? }
  *     -> { audioUrl, transcript, duration, source, cached }
  *
  * Secrets: ANTHROPIC_API_KEY, GOOGLE_TTS_API_KEY (the same ones). Answers are
  * cached for a month and questions limited to 5 per visitor per city and
- * cuisine per hour, in KV (PHOTOS, "qa:food:" keys). Every question logs one
+ * cuisine per hour (questions about one restaurant, from its card: 5 per
+ * zone and cuisine per hour), in KV (PHOTOS, "qa:food:" keys). Every question logs one
  * "foodstep-answer" line for latency and cost (`wrangler pages deployment tail`).
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { getFoodStepCity, getFoodStepCuisine, type FoodStepCity, type FoodStepCuisine } from "../src/content/foodStep";
-import { restaurantsFor } from "../src/content/foodStepRestaurants";
+import { restaurantsFor, type FoodStepRestaurant } from "../src/content/foodStepRestaurants";
 import { zonesFor } from "../src/content/foodStepZones";
 import { isNarrationLanguage } from "../src/guides/voices";
 import { GUIDES, hash, normalise, reply, speak, type Cached, type Source } from "./guideAnswer";
@@ -44,10 +45,18 @@ export async function answerFoodStepQuestion(
   const language = typeof body?.language === "string" && isNarrationLanguage(body.language) ? body.language : "en";
   if (question.length < 3) return error(400, "Ask a question first");
   if (!city || !cuisine) return error(404, "Unknown city or cuisine");
+  // Asked from a restaurant's card: the question is about that restaurant.
+  const restaurant =
+    typeof body?.restaurantId === "string"
+      ? restaurantsFor(city.id, cuisine.id).find((r) => r.id === body.restaurantId)
+      : undefined;
+  if (body?.restaurantId !== undefined && !restaurant) return error(404, "Unknown restaurant");
 
-  const log: Record<string, unknown> = { event: "foodstep-answer", city: city.id, cuisine: cuisine.id, guide: guideId, language, question };
+  const log: Record<string, unknown> = {
+    event: "foodstep-answer", city: city.id, cuisine: cuisine.id, restaurant: restaurant?.id, guide: guideId, language, question,
+  };
   const ip = req.headers.get("cf-connecting-ip") ?? "unknown";
-  const rateKey = `qa:food:rate:${ip}:${city.id}:${cuisine.id}`;
+  const rateKey = `qa:food:rate:${ip}:${city.id}:${cuisine.id}${restaurant ? `:zone:${restaurant.zone}` : ""}`;
   try {
     const asked = Number((await env.PHOTOS.get(rateKey)) ?? 0);
     if (asked >= PER_PLACE_LIMIT) {
@@ -60,7 +69,7 @@ export async function answerFoodStepQuestion(
     log.rateLimitError = e instanceof Error ? e.message : String(e);
   }
 
-  const cacheKey = `qa:food:answer:${city.id}:${cuisine.id}:${guideId}${language === "en" ? "" : `:${language}`}:${await hash(normalise(question))}`;
+  const cacheKey = `qa:food:answer:${city.id}:${cuisine.id}${restaurant ? `:r:${restaurant.id}` : ""}:${guideId}${language === "en" ? "" : `:${language}`}:${await hash(normalise(question))}`;
   const cached = await env.PHOTOS.get<Cached>(cacheKey, "json").catch((e: unknown) => {
     log.cacheError = e instanceof Error ? e.message : String(e);
     return null;
@@ -72,7 +81,7 @@ export async function answerFoodStepQuestion(
   }
 
   const started = Date.now();
-  const { text: transcript, source } = await writeAnswer(env, city, cuisine, guideId, language, question, log);
+  const { text: transcript, source } = await writeAnswer(env, city, cuisine, restaurant, guideId, language, question, log);
   log.claudeMs = Date.now() - started;
   const ttsStarted = Date.now();
   const audio = await speak(env, transcript, guideId, language, log);
@@ -96,6 +105,7 @@ async function writeAnswer(
   env: Env,
   city: FoodStepCity,
   cuisine: FoodStepCuisine,
+  restaurant: FoodStepRestaurant | undefined,
   guideId: string,
   language: string,
   question: string,
@@ -117,7 +127,13 @@ async function writeAnswer(
           return `${r.name} (${r.style})${area ? `, in ${area}` : ""}, ${r.address}: ${r.description}`;
         })
         .join("\n") +
-      `\n</restaurants>\n\nDon't name any other restaurants, cafes or addresses, and don't invent details about these beyond what's above. `
+      `\n</restaurants>\n\nDon't name any other restaurants, cafes or addresses, and don't invent details about these beyond what's above. ` +
+      (restaurant
+        ? `They've opened ${restaurant.name}'s card on the map and are asking about it, so "here" or "this place" means ${restaurant.name}. ` +
+          `Answer about ${restaurant.name} only; mention other restaurants only if they ask for alternatives. ` +
+          `You only know what's written about it above, not its menu, prices or opening hours: for those, say you're not sure and ` +
+          `suggest checking ${restaurant.name}'s own menu or website, then share what you do know about it, or what's typical of ${cuisine.name} food in ${city.name}. `
+        : "")
     : `Don't name specific restaurants, cafes or addresses; FoodStep doesn't have its restaurant listings here yet, ` +
       `so talk about areas, dishes and habits instead, and if they ask for a particular place, say you'll be able to show them soon. `;
   try {
@@ -137,7 +153,12 @@ async function writeAnswer(
         (language === "es" ? `Answer in Spanish as spoken in Spain, using informal tú, whatever language the question is in. ` : "") +
         `If the question has nothing to do with food or eating out in ${city.name}, or isn't suitable for a family audience, ` +
         `gently bring them back to ${cuisine.name} food.`,
-      messages: [{ role: "user", content: `${question}\n\nCity: ${city.name}. Cuisine: ${cuisine.name}.` }],
+      messages: [
+        {
+          role: "user",
+          content: `${question}\n\nCity: ${city.name}. Cuisine: ${cuisine.name}.${restaurant ? ` Asking about: ${restaurant.name}.` : ""}`,
+        },
+      ],
     });
     log.inputTokens = response.usage.input_tokens;
     log.outputTokens = response.usage.output_tokens;
