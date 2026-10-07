@@ -33,7 +33,7 @@ const RATE_WINDOW_S = 60 * 60;
 const CACHE_TTL_S = 30 * 24 * 60 * 60;
 
 /** Each guide's character. Their voices are in src/guides/voices.ts. */
-const GUIDES: Record<string, { name: string; persona: string }> = {
+export const GUIDES: Record<string, { name: string; persona: string }> = {
   scout: { name: "Scout", persona: "the StoryStep original, warm, inviting and friendly" },
   pip: { name: "Pip", persona: "a cheerful penguin, upbeat and bubbly" },
   hoot: { name: "Professor Hoot", persona: "a wise old owl, measured, authoritative and scholarly" },
@@ -41,8 +41,8 @@ const GUIDES: Record<string, { name: string; persona: string }> = {
 };
 
 type Stop = TourMeta["stops"][number];
-type Source = "claude" | "fallback";
-interface Cached {
+export type Source = "claude" | "fallback";
+export interface Cached {
   transcript: string;
   audio: string | null;
 }
@@ -111,7 +111,7 @@ export async function answerGuideQuestion(
   return json(answer);
 }
 
-function reply({ transcript, audio }: Cached, source: Source, cached: boolean) {
+export function reply({ transcript, audio }: Cached, source: Source, cached: boolean) {
   return {
     audioUrl: audio ? `data:audio/mpeg;base64,${audio}` : null,
     transcript,
@@ -187,7 +187,7 @@ function fallbackAnswer(stop: Stop, language = "en"): string {
 }
 
 /** The answer as MP3 (base64), or null if text-to-speech isn't set up or fails. */
-async function speak(env: Env, text: string, guideId: string, language: string, log: Record<string, unknown>): Promise<string | null> {
+export async function speak(env: Env, text: string, guideId: string, language: string, log: Record<string, unknown>): Promise<string | null> {
   if (!env.GOOGLE_TTS_API_KEY) {
     log.ttsError = "no key";
     return null;
@@ -231,9 +231,9 @@ function mp3Seconds(base64: string): number {
   return 0;
 }
 
-const normalise = (q: string) => q.toLowerCase().replace(/[^a-z0-9 ]+/g, "").replace(/\s+/g, " ").trim();
+export const normalise = (q: string) => q.toLowerCase().replace(/[^a-z0-9 ]+/g, "").replace(/\s+/g, " ").trim();
 
-async function hash(text: string): Promise<string> {
+export async function hash(text: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
   return [...new Uint8Array(digest).slice(0, 12)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
