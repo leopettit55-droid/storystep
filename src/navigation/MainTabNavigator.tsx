@@ -6,6 +6,9 @@ import ExploreMapScreen from "../screens/ExploreMapScreen";
 import AreaSelectScreen from "../screens/AreaSelectScreen";
 import AccountScreen from "../screens/AccountScreen";
 import HelpScreen from "../screens/HelpScreen";
+import FoodStepScreen from "../screens/FoodStepScreen";
+import FoodStepCityScreen from "../screens/FoodStepCityScreen";
+import FoodStepMapScreen from "../screens/FoodStepMapScreen";
 import { useLanguage } from "../i18n/LanguageContext";
 import { useTheme } from "../ThemeContext";
 import { DESKTOP_BREAKPOINT } from "../theme";
@@ -14,12 +17,17 @@ import type { MainTabParamList } from "./types";
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
+const HIDDEN_TAB = { tabBarItemStyle: { display: "none" as const } };
+
 const ICONS: Record<keyof MainTabParamList, keyof typeof Ionicons.glyphMap> = {
   Home: "home",
   Map: "globe",
   Tours: "list",
   Account: "person",
   Help: "help-circle",
+  FoodStep: "restaurant",
+  FoodStepCity: "restaurant",
+  FoodStepMap: "restaurant",
 };
 
 const LABEL_KEYS: Record<keyof MainTabParamList, string> = {
@@ -28,6 +36,9 @@ const LABEL_KEYS: Record<keyof MainTabParamList, string> = {
   Tours: "nav.tours",
   Account: "nav.account",
   Help: "nav.help",
+  FoodStep: "foodStep.title",
+  FoodStepCity: "foodStep.title",
+  FoodStepMap: "foodStep.title",
 };
 
 export default function MainTabNavigator() {
@@ -69,6 +80,10 @@ export default function MainTabNavigator() {
       <Tab.Screen name="Tours" component={AreaSelectScreen} />
       <Tab.Screen name="Account" component={AccountScreen} />
       <Tab.Screen name="Help" component={HelpScreen} />
+      {/* FoodStep has no tabs of its own: it's reached from the landing podium and the top bar. */}
+      <Tab.Screen name="FoodStep" component={FoodStepScreen} options={HIDDEN_TAB} />
+      <Tab.Screen name="FoodStepCity" component={FoodStepCityScreen} options={HIDDEN_TAB} />
+      <Tab.Screen name="FoodStepMap" component={FoodStepMapScreen} options={HIDDEN_TAB} />
     </Tab.Navigator>
   );
 }
