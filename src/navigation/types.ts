@@ -14,7 +14,8 @@ export type MainTabParamList = {
   /** A FoodStep city's cuisines. */
   FoodStepCity: { cityId: string };
   /** A cuisine in a FoodStep city, on the 3D map. */
-  FoodStepMap: { cityId: string; cuisineId: string };
+  /** demo: "1" puts "you" at a fixed spot in the city, for testing GPS from elsewhere. */
+  FoodStepMap: { cityId: string; cuisineId: string; demo?: string };
 };
 
 export type RootStackParamList = {

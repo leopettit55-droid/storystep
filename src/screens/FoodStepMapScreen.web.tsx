@@ -10,6 +10,7 @@ import {
 } from "maplibre-gl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import AskGuideModal from "../components/AskGuideModal";
 import BackButton from "../components/BackButton";
 import FoodStepGuide from "../components/FoodStepGuide";
 import Skeleton from "../components/Skeleton";
@@ -19,6 +20,7 @@ import { zoneContains, zonesFor, type FoodStepZone } from "../content/foodStepZo
 import { FOODSTEP_GREEN } from "../content/sisterProducts";
 import { useLanguage } from "../i18n/LanguageContext";
 import { EXPLORE_MAP_CREDIT, exploreMapStyle } from "../map/exploreMapStyle";
+import { distanceKm, makeUserMarker, useUserLocation, type UserLocation } from "../map/userLocation.web";
 import type { MainTabParamList, TabScreenNav } from "../navigation/types";
 import { useTheme } from "../ThemeContext";
 import { DESKTOP_BREAKPOINT, type ThemeColors } from "../theme";
@@ -76,6 +78,21 @@ function zonePaint(zoneId: string | null) {
   };
 }
 
+/** Where "you" are in demo mode (?demo=1), for trying the GPS features from
+ * outside the city: Piccadilly Gardens (inside a zone, unlike Albert Square
+ * just west of it), or the city's food area elsewhere. */
+function demoLocationFor(city: FoodStepCity): UserLocation {
+  if (city.id === "manchester") return { latitude: 53.481, longitude: -2.237, heading: 0 };
+  return { latitude: city.center[1], longitude: city.center[0], heading: 0 };
+}
+
+/** "350 m" up to a kilometre, then "1.2 km". */
+function formatDistance(km: number, t: ReturnType<typeof useLanguage>["t"]): string {
+  return km < 1
+    ? t("foodStep.distanceM", { m: Math.max(10, Math.round((km * 1000) / 10) * 10) })
+    : t("foodStep.distanceKm", { km: km.toFixed(1) });
+}
+
 /** Points to frame: a zone's outline, or the restaurants. */
 function pointsOf(zone: FoodStepZone | null, restaurants: FoodStepRestaurant[]): [number, number][] {
   return zone ? zone.outline : restaurants.map((r) => [r.lng, r.lat]);
@@ -103,6 +120,8 @@ export default function FoodStepMapScreen() {
     [city, cuisine]
   );
   const [selected, setSelected] = useState<FoodStepRestaurant | null>(null);
+  /** The restaurant whose card's "Ask Scout" was tapped. */
+  const [askingAbout, setAskingAbout] = useState<FoodStepRestaurant | null>(null);
   const dotsRef = useRef<Record<string, HTMLDivElement>>({});
   // Neighbourhoods: always faintly on the map; picking one shows only its restaurants.
   const zones = useMemo(() => (city ? zonesFor(city.id) : []), [city]);
@@ -113,6 +132,13 @@ export default function FoodStepMapScreen() {
     [zone, restaurants]
   );
   const zoneName = (id: string) => zones.find((z) => z.id === id)?.name;
+
+  // Where the visitor is: live GPS, or a fixed spot in demo mode (?demo=1).
+  const demo = params.demo === "1";
+  const gps = useUserLocation(!demo);
+  const here = demo && city ? demoLocationFor(city) : gps.location;
+  const hereZone = here ? zones.find((z) => zoneContains(z, here.longitude, here.latitude)) : undefined;
+  const userMarkerRef = useRef<{ marker: Marker; arrow: HTMLDivElement } | null>(null);
 
   // Initialize the map once; it stays mounted while people move between cities.
   useEffect(() => {
@@ -276,6 +302,44 @@ export default function FoodStepMapScreen() {
     });
   }, [selected, shown]);
 
+  // "You are here": a blue dot (with an arrow once you're walking) that follows the GPS.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady || !here) return;
+    if (!userMarkerRef.current) {
+      const { root, arrow } = makeUserMarker();
+      const marker = new Marker({ element: root, rotationAlignment: "map", pitchAlignment: "viewport" }).setLngLat([here.longitude, here.latitude]).addTo(map);
+      userMarkerRef.current = { marker, arrow };
+    }
+    const { marker, arrow } = userMarkerRef.current;
+    marker.setLngLat([here.longitude, here.latitude]);
+    marker.setRotation(here.heading ?? 0);
+    arrow.style.display = here.heading === undefined ? "none" : "block";
+  }, [here?.latitude, here?.longitude, here?.heading, mapReady]);
+
+  useEffect(
+    () => () => {
+      userMarkerRef.current?.marker.remove();
+      userMarkerRef.current = null;
+    },
+    []
+  );
+
+  const flyToHere = () => {
+    if (here) mapRef.current?.flyTo({ center: [here.longitude, here.latitude], zoom: 16.5, duration: 1200 });
+  };
+
+  // Walking directions in Google Maps, from where you are when we know it.
+  const getThere = (r: FoodStepRestaurant) => {
+    const params = new URLSearchParams({
+      api: "1",
+      destination: `${r.name}, ${r.address}, ${city?.name ?? ""}`,
+      travelmode: "walking",
+    });
+    if (here) params.set("origin", `${here.latitude},${here.longitude}`);
+    window.open(`https://www.google.com/maps/dir/?${params.toString()}`, "_blank", "noopener");
+  };
+
   const toCities = () => navigation.navigate("FoodStep");
   const toCuisines = () => city && navigation.navigate("FoodStepCity", { cityId: city.id });
 
@@ -404,7 +468,61 @@ export default function FoodStepMapScreen() {
               <Text style={styles.placeAddress}>{selected.address}</Text>
             </View>
             <Text style={styles.placeDescription}>{selected.description}</Text>
+            {here && (
+              <Text style={styles.placeDistance}>
+                {formatDistance(distanceKm(here, { latitude: selected.lat, longitude: selected.lng }), t)}
+              </Text>
+            )}
+            <View style={styles.cardActions}>
+              <Pressable
+                style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => [
+                  styles.cardButton,
+                  styles.getThere,
+                  (pressed || hovered) && styles.getThereActive,
+                ]}
+                onPress={() => getThere(selected)}
+              >
+                <Ionicons name="navigate" size={16} color="#FFFFFF" />
+                <Text style={styles.getThereText}>{t("foodStep.getThere")}</Text>
+              </Pressable>
+              {/* Scout answers about this restaurant (orange, like StoryStep's own guide). */}
+              <Pressable
+                style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => [
+                  styles.cardButton,
+                  { backgroundColor: colors.primary },
+                  (pressed || hovered) && styles.askActive,
+                ]}
+                onPress={() => setAskingAbout(selected)}
+              >
+                <Ionicons name="chatbubble-ellipses" size={16} color="#FFFFFF" />
+                <Text style={styles.getThereText}>{t("foodStep.askScout")}</Text>
+              </Pressable>
+            </View>
           </View>
+        )}
+
+        {askingAbout && city && cuisine && (
+          <AskGuideModal
+            foodStep={{ city, cuisine, restaurant: askingAbout }}
+            guide="scout"
+            guideIds={["scout"]}
+            onClose={() => setAskingAbout(null)}
+          />
+        )}
+
+        {/* Which zone you're in; tap to fly to yourself. */}
+        {mapReady && (here || gps.error) && !(compact && selected) && (
+          <Pressable style={[styles.herePill, compact ? styles.herePillCompact : styles.herePillWide]} onPress={flyToHere} disabled={!here}>
+            <Ionicons name={here ? "locate" : "location-outline"} size={14} color={here ? "#0084FF" : colors.textDim} />
+            <Text style={styles.herePillText}>
+              {!here
+                ? t("foodStep.locationOff")
+                : hereZone
+                  ? t("foodStep.youAreIn", { zone: hereZone.name })
+                  : t("foodStep.outsideZones")}
+              {demo ? ` (${t("foodStep.demoLocation")})` : ""}
+            </Text>
+          </Pressable>
         )}
 
         <Text style={styles.attribution} pointerEvents="none">
@@ -489,6 +607,41 @@ function createStyles(colors: ThemeColors) {
     placeAddressRow: { flexDirection: "row", alignItems: "center", gap: 4 },
     placeAddress: { flex: 1, fontSize: 12.5, color: colors.textMid },
     placeDescription: { fontSize: 13.5, lineHeight: 19, color: colors.text },
+    placeDistance: { fontSize: 12.5, fontWeight: "700", color: colors.textMid },
+    cardActions: { flexDirection: "row", gap: 8, marginTop: 4 },
+    cardButton: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      paddingVertical: 10,
+      paddingHorizontal: 10,
+      borderRadius: 8,
+    },
+    getThere: { backgroundColor: FOODSTEP_GREEN },
+    getThereActive: { backgroundColor: "#2DA03E" },
+    askActive: { opacity: 0.85 },
+    getThereText: { color: "#FFFFFF", fontSize: 14, fontWeight: "600" },
+    herePill: {
+      position: "absolute",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      maxWidth: 230,
+      paddingVertical: 7,
+      paddingHorizontal: 12,
+      borderRadius: 18,
+      backgroundColor: colors.background,
+      shadowColor: "#000",
+      shadowOpacity: 0.25,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 2 },
+    },
+    // On a phone Scout fills the bottom, so it sits top-left (hidden while a card is open there).
+    herePillCompact: { top: 12, left: 12 },
+    herePillWide: { right: 12, bottom: 26 },
+    herePillText: { flexShrink: 1, fontSize: 12.5, fontWeight: "600", color: colors.text },
     attribution: {
       position: "absolute",
       bottom: 6,

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import type { Waypoint } from "../content";
 import type { FoodStepCity, FoodStepCuisine } from "../content/foodStep";
+import type { FoodStepRestaurant } from "../content/foodStepRestaurants";
 import { getGuide, GUIDES, type GuideId } from "../guides/guides";
 import { useLanguage } from "../i18n/LanguageContext";
 import { apiUrl } from "../social/api";
@@ -20,8 +21,11 @@ interface Answer {
   duration: number;
 }
 
-/** What's being asked about: a tour stop, or a cuisine in a FoodStep city. */
-type Topic = { tourId: string; stop: Waypoint } | { foodStep: { city: FoodStepCity; cuisine: FoodStepCuisine } };
+/** What's being asked about: a tour stop, or a cuisine in a FoodStep city
+ * (and maybe one of its restaurants, asked from the restaurant's card). */
+type Topic =
+  | { tourId: string; stop: Waypoint }
+  | { foodStep: { city: FoodStepCity; cuisine: FoodStepCuisine; restaurant?: FoodStepRestaurant } };
 
 export type AskGuideModalProps = Topic & {
   /** The walker's tour guide, picked first; another can be asked instead. */
@@ -129,11 +133,13 @@ export default function AskGuideModal(props: AskGuideModalProps) {
       <View style={styles.sheet} pointerEvents="box-none">
         <View style={styles.card}>
           <View style={styles.header}>
-            <Text style={styles.title}>{t("askGuide.title")}</Text>
+            <Text style={styles.title}>{topic.title ?? t("askGuide.title")}</Text>
             <Pressable onPress={onClose} hitSlop={10} aria-label={t("askGuide.close")}>
               <Ionicons name="close" size={24} color="#201613" />
             </Pressable>
           </View>
+
+          {topic.hint && <Text style={styles.hint}>{topic.hint}</Text>}
 
           <View style={styles.guides}>
             {guides.map((g) => (
@@ -212,11 +218,36 @@ export default function AskGuideModal(props: AskGuideModalProps) {
   );
 }
 
+interface AskTopic {
+  endpoint: string;
+  body: Record<string, unknown>;
+  limitKey: string;
+  /** Instead of "Ask your guide", and a line of example questions under it. */
+  title?: string;
+  hint?: string;
+  placeholder: string;
+  limitMessage: string;
+  remaining: (count: number) => string;
+}
+
 /** Where a question goes and how it's worded, for a tour stop or a FoodStep cuisine. */
-function askTopic(topic: Topic, t: ReturnType<typeof useLanguage>["t"]) {
+function askTopic(topic: Topic, t: ReturnType<typeof useLanguage>["t"]): AskTopic {
   if ("foodStep" in topic) {
-    const { city, cuisine } = topic.foodStep;
+    const { city, cuisine, restaurant } = topic.foodStep;
     const names = { city: city.name, cuisine: cuisine.name };
+    if (restaurant) {
+      // The server limits these per zone, so this count does too.
+      return {
+        endpoint: "/api/foodstep-question",
+        body: { cityId: city.id, cuisineId: cuisine.id, restaurantId: restaurant.id },
+        limitKey: `food:${city.id}:${cuisine.id}:zone:${restaurant.zone}`,
+        title: t("askGuide.restaurantTitle", { restaurant: restaurant.name }),
+        hint: t("askGuide.restaurantHint"),
+        placeholder: t("askGuide.restaurantPlaceholder"),
+        limitMessage: t("askGuide.foodLimit"),
+        remaining: (count: number) => t("askGuide.foodRemaining", { count }),
+      };
+    }
     return {
       endpoint: "/api/foodstep-question",
       body: { cityId: city.id, cuisineId: cuisine.id },
@@ -250,7 +281,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  title: { fontSize: 20, fontWeight: "800", color: "#201613" },
+  title: { flex: 1, fontSize: 20, fontWeight: "800", color: "#201613" },
+  hint: { marginTop: -6, fontSize: 13, color: "#8A7F79" },
   guides: { flexDirection: "row", gap: 8 },
   guideChip: {
     flex: 1,
