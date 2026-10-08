@@ -5,6 +5,8 @@ export interface FoodStepCuisine {
   id: string;
   name: string;
   description: string;
+  /** Its pins' and card label's colour on the map (default FoodStep green). */
+  color?: string;
 }
 
 export interface FoodStepCity {
@@ -75,12 +77,16 @@ export const FOODSTEP_CITIES: FoodStepCity[] = [
     // Buenos Aires' own food, without the shared cuisines.
     ownCuisinesOnly: true,
     cuisines: [
-      { id: "empanadas", name: "Empanadas", description: "Baked or fried, in every province's style" },
-      { id: "milanesa", name: "Milanesa", description: "Breaded, golden and topped napolitana-style" },
-      { id: "gelato", name: "Gelato", description: "Helado, the Italian-Argentine way" },
-      { id: "parrilla", name: "Parrilla", description: "The asado, grilled over wood and charcoal" },
-      { id: "panaderia", name: "Panadería", description: "Sweet treats: medialunas, facturas and cakes" },
-      { id: "fish", name: "Fish Restaurants", description: "Seafood from the Atlantic and the River Plate" },
+      { id: "empanadas", name: "Empanadas", description: "Baked or fried, in every province's style", color: "#CD853F" },
+      { id: "milanesa", name: "Milanesa", description: "Breaded, golden and topped napolitana-style", color: "#B5651D" },
+      { id: "gelato", name: "Gelato", description: "Helado, the Italian-Argentine way", color: "#E07BA5" },
+      { id: "parrilla", name: "Parrilla", description: "The asado, grilled over wood and charcoal", color: "#D2691E" },
+      { id: "panaderia", name: "Panadería", description: "Sweet treats: medialunas, facturas and cakes", color: "#C9963F" },
+      { id: "fish", name: "Fish Restaurants", description: "Seafood from the Atlantic and the River Plate", color: "#2F80ED" },
+      { id: "vegan", name: "Vegan", description: "Plant-based, from vegan parrillas to fine dining", color: "#7FBC00" },
+      { id: "gluten-friendly", name: "Gluten-Friendly", description: "Sin TACC: 100% gluten-free kitchens and bakeries", color: "#F4A261" },
+      { id: "up-and-coming", name: "Up & Coming", description: "New openings from 2025 and 2026", color: "#E63946" },
+      { id: "student-friendly", name: "Student-Friendly", description: "Cheap and filling: classic pizzerias and bodegones", color: "#2A9D8F" },
     ],
   },
 ];
