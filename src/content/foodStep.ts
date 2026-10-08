@@ -16,8 +16,10 @@ export interface FoodStepCity {
   description: string;
   /** Where the 3D map opens, [lng, lat]: the heart of the city's food scene. */
   center: [number, number];
-  /** Only this city's; every city also has SHARED_CUISINES. */
+  /** Only this city's; every city also has SHARED_CUISINES, unless ownCuisinesOnly. */
   cuisines: FoodStepCuisine[];
+  /** Just this city's own cuisines, without the shared ones. */
+  ownCuisinesOnly?: boolean;
 }
 
 /** Every city has these. */
@@ -68,12 +70,17 @@ export const FOODSTEP_CITIES: FoodStepCity[] = [
     id: "buenos-aires",
     name: "Buenos Aires",
     country: "Argentina",
-    description: "Steakhouses, empanadas and Latin fusion",
+    description: "Parrillas, empanadas, helado and sweet treats",
     center: [-58.4322, -34.5883],
+    // Buenos Aires' own food, without the shared cuisines.
+    ownCuisinesOnly: true,
     cuisines: [
-      { id: "steakhouse", name: "Argentine Steakhouse", description: "Parrillas and the asado" },
-      { id: "empanadas", name: "Empanadas", description: "Baked, fried and filled every way" },
-      { id: "latin-fusion", name: "Fusion Latin", description: "Nikkei, criollo and new Latin cooking" },
+      { id: "empanadas", name: "Empanadas", description: "Baked or fried, in every province's style" },
+      { id: "milanesa", name: "Milanesa", description: "Breaded, golden and topped napolitana-style" },
+      { id: "gelato", name: "Gelato", description: "Helado, the Italian-Argentine way" },
+      { id: "parrilla", name: "Parrilla", description: "The asado, grilled over wood and charcoal" },
+      { id: "panaderia", name: "Panadería", description: "Sweet treats: medialunas, facturas and cakes" },
+      { id: "fish", name: "Fish Restaurants", description: "Seafood from the Atlantic and the River Plate" },
     ],
   },
 ];
@@ -82,9 +89,9 @@ export function getFoodStepCity(id: string): FoodStepCity | undefined {
   return FOODSTEP_CITIES.find((c) => c.id === id);
 }
 
-/** Shared ones first, then the city's own. */
+/** Shared ones first, then the city's own (or just the city's own). */
 export function cuisinesFor(city: FoodStepCity): FoodStepCuisine[] {
-  return [...SHARED_CUISINES, ...city.cuisines];
+  return city.ownCuisinesOnly ? city.cuisines : [...SHARED_CUISINES, ...city.cuisines];
 }
 
 export function getFoodStepCuisine(city: FoodStepCity, id: string): FoodStepCuisine | undefined {

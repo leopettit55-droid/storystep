@@ -1,5 +1,5 @@
 /** Neighbourhood zones on FoodStep's maps, so walkers can see what's near
- * what. Manchester and Oxford so far: copy their shape for other cities.
+ * what. Manchester, Oxford and Buenos Aires so far: copy their shape for other cities.
  *
  * Outlines are approximate, drawn along the main streets that bound each
  * area (these neighbourhoods have no official edges). Points are [lng, lat]. */
@@ -149,6 +149,52 @@ const ZONES: Record<string, FoodStepZone[]> = {
         [-1.2465, 51.7525], [-1.238, 51.7522], [-1.2265, 51.7455], [-1.2265, 51.7395], [-1.239, 51.7395],
         [-1.244, 51.746], [-1.2468, 51.7495],
       ],
+    },
+  ],
+  "buenos-aires": [
+    {
+      id: "palermo",
+      name: "Palermo",
+      description: "Soho, Hollywood and Botánico: Buenos Aires' busiest food neighbourhood, from parrillas to bakeries",
+      outline: [[-58.448, -34.562], [-58.4, -34.57], [-58.414, -34.599], [-58.448, -34.599]],
+    },
+    {
+      id: "recoleta",
+      name: "Recoleta & Barrio Norte",
+      description: "Grand avenues, old-school empanada houses and the famous cemetery",
+      outline: [
+        [-58.4, -34.57], [-58.378, -34.578], [-58.38, -34.582], [-58.3935, -34.599], [-58.3935, -34.6],
+        [-58.4145, -34.6], [-58.414, -34.599],
+      ],
+    },
+    {
+      id: "centro",
+      name: "Centro & Retiro",
+      description: "Downtown: Avenida Corrientes, the Obelisco and classic city-centre spots",
+      outline: [[-58.38, -34.582], [-58.37, -34.582], [-58.369, -34.613], [-58.3935, -34.613], [-58.3935, -34.599]],
+    },
+    {
+      id: "puerto-madero",
+      name: "Puerto Madero",
+      description: "Restored docks with waterside restaurants",
+      outline: [[-58.3688, -34.595], [-58.359, -34.595], [-58.359, -34.623], [-58.3688, -34.623]],
+    },
+    {
+      id: "san-telmo",
+      name: "San Telmo",
+      description: "Cobbled streets, antiques and the city's oldest bodegones and parrillas",
+      // The notch, reached by a hair-thin channel from the east edge, is the Mercado de San Telmo.
+      outline: [
+        [-58.379, -34.613], [-58.369, -34.613], [-58.369, -34.6191], [-58.3718, -34.6191], [-58.3718, -34.61865],
+        [-58.3733, -34.61865], [-58.3733, -34.6196], [-58.3718, -34.6196], [-58.3718, -34.61911], [-58.369, -34.61911],
+        [-58.369, -34.626], [-58.379, -34.626],
+      ],
+    },
+    {
+      id: "mercado-san-telmo",
+      name: "Mercado de San Telmo",
+      description: "The 1897 iron-and-glass market hall: choripán, empanadas, grills and pastries under one roof",
+      outline: [[-58.3733, -34.61865], [-58.3718, -34.61865], [-58.3718, -34.6196], [-58.3733, -34.6196]],
     },
   ],
 };
