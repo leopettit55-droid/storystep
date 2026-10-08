@@ -7,12 +7,12 @@
  *     -> { text, audioUrl, duration, cached }
  *
  * Only known cities and cuisines are spoken, so there's a fixed, small set of
- * clips: each is made once and kept in KV (PHOTOS, "food:intro:" keys).
+ * clips: each is made once per Scout voice and kept in KV (PHOTOS, "food:intro:" keys).
  * Secret: GOOGLE_TTS_API_KEY. Without it, or if it fails, audioUrl is null.
  */
 import { getFoodStepCity, getFoodStepCuisine } from "../src/content/foodStep";
 import en from "../src/i18n/translations/en";
-import { reply, speak, type Cached } from "./guideAnswer";
+import { reply, speak, voiceTag, type Cached } from "./guideAnswer";
 import { error, json, type Env } from "./social";
 
 export async function foodStepIntro(env: Env, req: Request, waitUntil: (p: Promise<unknown>) => void): Promise<Response> {
@@ -22,7 +22,7 @@ export async function foodStepIntro(env: Env, req: Request, waitUntil: (p: Promi
   if (!city || !cuisine) return error(404, "Unknown city or cuisine");
 
   const text = en.foodStep.welcome.replaceAll("{{city}}", city.name).replaceAll("{{cuisine}}", cuisine.name);
-  const cacheKey = `food:intro:${city.id}:${cuisine.id}`;
+  const cacheKey = `food:intro:${voiceTag("scout", "en")}:${city.id}:${cuisine.id}`;
   const log: Record<string, unknown> = { event: "foodstep-intro", city: city.id, cuisine: cuisine.id };
 
   const cached = await env.PHOTOS.get<Cached>(cacheKey, "json").catch(() => null);

@@ -18,7 +18,7 @@ import { getFoodStepCity, getFoodStepCuisine, type FoodStepCity, type FoodStepCu
 import { restaurantsFor, type FoodStepRestaurant } from "../src/content/foodStepRestaurants";
 import { zonesFor } from "../src/content/foodStepZones";
 import { isNarrationLanguage } from "../src/guides/voices";
-import { GUIDES, hash, normalise, reply, speak, type Cached, type Source } from "./guideAnswer";
+import { GUIDES, hash, normalise, reply, speak, voiceTag, type Cached, type Source } from "./guideAnswer";
 import { error, json, type Env } from "./social";
 
 /** Haiku for speed and cost, like Ask your guide on tours: answers are short. */
@@ -69,7 +69,7 @@ export async function answerFoodStepQuestion(
     log.rateLimitError = e instanceof Error ? e.message : String(e);
   }
 
-  const cacheKey = `qa:food:answer:${city.id}:${cuisine.id}${restaurant ? `:r:${restaurant.id}` : ""}:${guideId}${language === "en" ? "" : `:${language}`}:${await hash(normalise(question))}`;
+  const cacheKey = `qa:food:answer:${city.id}:${cuisine.id}${restaurant ? `:r:${restaurant.id}` : ""}:${guideId}${language === "en" ? "" : `:${language}`}:${voiceTag(guideId, language)}:${await hash(normalise(question))}`;
   const cached = await env.PHOTOS.get<Cached>(cacheKey, "json").catch((e: unknown) => {
     log.cacheError = e instanceof Error ? e.message : String(e);
     return null;
