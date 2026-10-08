@@ -12,7 +12,8 @@ export default function FoodStepCityScreen() {
   const { params } = useRoute<RouteProp<MainTabParamList, "FoodStepCity">>();
   const { t } = useLanguage();
   const city = getFoodStepCity(params.cityId);
-  const backToCities = () => navigation.navigate("FoodStep");
+  // Back to the landing podium; the cities are a tap away there, and in the top bar.
+  const backToPodium = () => navigation.navigate("Home", { intro: true });
 
   // A mistyped address: show the empty list, with the way back.
   if (!city) {
@@ -22,7 +23,7 @@ export default function FoodStepCityScreen() {
         subtitle={t("foodStep.cityNotFound")}
         sectionTitle=""
         items={[]}
-        onBack={backToCities}
+        onBack={backToPodium}
       />
     );
   }
@@ -32,7 +33,7 @@ export default function FoodStepCityScreen() {
       title={t("foodStep.cuisinesTitle", { city: city.name })}
       subtitle={t("foodStep.cuisinesSubtitle")}
       sectionTitle={t("foodStep.cuisinesSection")}
-      onBack={backToCities}
+      onBack={backToPodium}
       items={cuisinesFor(city).map((cuisine) => ({
         id: cuisine.id,
         title: cuisine.name,

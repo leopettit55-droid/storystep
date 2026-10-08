@@ -21,9 +21,7 @@ export default function FoodStepMapScreen() {
       subtitle={t("foodStep.mapAppOnly")}
       sectionTitle=""
       items={[]}
-      onBack={() =>
-        city ? navigation.navigate("FoodStepCity", { cityId: city.id }) : navigation.navigate("FoodStep")
-      }
+      onBack={() => navigation.navigate("Home", { intro: true })}
     />
   );
 }

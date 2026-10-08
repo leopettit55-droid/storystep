@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import { LngLatBounds, Map as MapLibreMap, Marker } from "maplibre-gl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import BackButton from "../components/BackButton";
 import Skeleton from "../components/Skeleton";
 import { areas } from "../content";
 import { EXPLORE_MAP_CREDIT, exploreMapStyle } from "../map/exploreMapStyle";
@@ -188,6 +189,7 @@ export default function ExploreMapScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.overlayTop}>
+        <BackButton variant="inline" toPodium />
         <Text style={styles.title}>{t("map.title")}</Text>
         <Text style={styles.subtitle}>{t("map.subtitle")}</Text>
 

@@ -31,7 +31,7 @@ export default function FoodStepList({ title, subtitle, sectionTitle, items, onB
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <BackButton variant="inline" style={styles.back} onPress={onBack} />
+        <BackButton variant="inline" style={styles.back} onPress={onBack} toPodium />
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.subtitle}>{subtitle}</Text>
       </View>

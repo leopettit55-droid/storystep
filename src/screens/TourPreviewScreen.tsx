@@ -76,7 +76,7 @@ export default function TourPreviewScreen() {
   if (!area) {
     return (
       <SafeAreaView style={styles.container}>
-        <BackButton variant="inline" style={styles.notFoundBack} />
+        <BackButton variant="inline" style={styles.notFoundBack} toPodium />
         <Text style={styles.title}>{t("tourPreview.areaNotFound")}</Text>
       </SafeAreaView>
     );
@@ -150,7 +150,7 @@ export default function TourPreviewScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BackButton />
+      <BackButton toPodium />
       <RouteMap
         style={styles.map}
         region={{

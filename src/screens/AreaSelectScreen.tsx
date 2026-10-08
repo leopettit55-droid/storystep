@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import {
   Image,
   Pressable,
+  Platform,
   SafeAreaView,
   SectionList,
   StyleSheet,
@@ -11,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { useAccountStore } from "../account/accountStore";
+import BackButton from "../components/BackButton";
 import PressScale from "../components/PressScale";
 import { useOfflineStore } from "../offline/offlineStore";
 import { areas } from "../content";
@@ -141,6 +143,8 @@ export default function AreaSelectScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        {/* Back to the landing podium. The app has no podium, so web only. */}
+        {Platform.OS === "web" && <BackButton variant="inline" style={styles.back} toPodium />}
         <View style={styles.titleRow}>
           <Text style={styles.title}>{t("tours.title")}</Text>
           <PressScale style={styles.photosButton} scaleTo={0.95} onPress={() => navigation.navigate("MyPhotos")}>
@@ -170,6 +174,7 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     header: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 4, width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
+    back: { marginBottom: 12 },
     title: { fontSize: 32, fontWeight: "700", color: colors.primary },
     subtitle: { fontSize: 14, color: colors.textMid, marginTop: 4 },
     list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32, width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
