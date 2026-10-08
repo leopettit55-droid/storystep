@@ -36,7 +36,7 @@ function cameraFor(city: FoodStepCity) {
 /** A restaurant's pin: a FoodStep-green dot. MapLibre owns the outer
  * element's transform (to place it), so the dot inside is what grows when
  * it's picked. */
-function makePin(restaurant: FoodStepRestaurant): { root: HTMLDivElement; dot: HTMLDivElement } {
+function makePin(restaurant: FoodStepRestaurant, color: string): { root: HTMLDivElement; dot: HTMLDivElement } {
   const root = document.createElement("div");
   root.style.cursor = "pointer";
   root.style.padding = "6px";
@@ -47,7 +47,7 @@ function makePin(restaurant: FoodStepRestaurant): { root: HTMLDivElement; dot: H
   dot.style.width = "18px";
   dot.style.height = "18px";
   dot.style.borderRadius = "50%";
-  dot.style.background = FOODSTEP_GREEN;
+  dot.style.background = color;
   dot.style.border = "3px solid #FFFFFF";
   dot.style.boxShadow = "0 2px 6px rgba(0,0,0,0.45)";
   dot.style.transition = "transform 150ms ease";
@@ -93,9 +93,11 @@ function formatDistance(km: number, t: ReturnType<typeof useLanguage>["t"]): str
     : t("foodStep.distanceKm", { km: km.toFixed(1) });
 }
 
-/** Points to frame: a zone's outline, or the restaurants. */
-function pointsOf(zone: FoodStepZone | null, restaurants: FoodStepRestaurant[]): [number, number][] {
-  return zone ? zone.outline : restaurants.map((r) => [r.lng, r.lat]);
+/** Points to frame: the restaurants on show, or a picked zone's outline when
+ * it has none (big zones, like Palermo with its parks, would otherwise leave
+ * the pins small in a corner). */
+function pointsOf(zone: FoodStepZone | null, shown: FoodStepRestaurant[]): [number, number][] {
+  return zone && shown.length === 0 ? zone.outline : shown.map((r) => [r.lng, r.lat]);
 }
 
 /** A FoodStep cuisine in a city: StoryStep's 3D explore map with a pin for
@@ -115,6 +117,8 @@ export default function FoodStepMapScreen() {
 
   const city = getFoodStepCity(params.cityId);
   const cuisine = city && getFoodStepCuisine(city, params.cuisineId);
+  // Pins and the card's cuisine label in the cuisine's own colour, if it has one.
+  const accent = cuisine?.color ?? FOODSTEP_GREEN;
   const restaurants = useMemo(
     () => (city && cuisine ? restaurantsFor(city.id, cuisine.id) : []),
     [city, cuisine]
@@ -128,7 +132,7 @@ export default function FoodStepMapScreen() {
   const [zoneId, setZoneId] = useState<string | null>(null);
   const zone = zones.find((z) => z.id === zoneId) ?? null;
   const shown = useMemo(
-    () => (zone ? restaurants.filter((r) => zoneContains(zone, r.lng, r.lat)) : restaurants),
+    () => (zone ? restaurants.filter((r) => r.zone === zone.id) : restaurants),
     [zone, restaurants]
   );
   const zoneName = (id: string) => zones.find((z) => z.id === id)?.name;
@@ -183,7 +187,7 @@ export default function FoodStepMapScreen() {
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !city || !mapReady) return;
-    const points = pointsOf(zone, restaurants);
+    const points = pointsOf(zone, shown);
     if (points.length === 0) {
       map.flyTo({ ...cameraFor(city), duration: 1400 });
       return;
@@ -281,7 +285,7 @@ export default function FoodStepMapScreen() {
     if (!map || !mapReady) return;
     setSelected((s) => (s && shown.some((r) => r.id === s.id) ? s : null));
     const markers = shown.map((r) => {
-      const { root, dot } = makePin(r);
+      const { root, dot } = makePin(r, accent);
       root.addEventListener("click", (e) => {
         e.stopPropagation();
         setSelected(r);
@@ -293,7 +297,7 @@ export default function FoodStepMapScreen() {
       markers.forEach((m) => m.remove());
       dotsRef.current = {};
     };
-  }, [shown, mapReady]);
+  }, [shown, mapReady, accent]);
 
   // The picked restaurant's pin stands out.
   useEffect(() => {
@@ -395,7 +399,7 @@ export default function FoodStepMapScreen() {
               </Pressable>
               {zones.map((z) => {
                 const active = z.id === zoneId;
-                const count = restaurants.filter((r) => zoneContains(z, r.lng, r.lat)).length;
+                const count = restaurants.filter((r) => r.zone === z.id).length;
                 return (
                   <Pressable
                     key={z.id}
@@ -451,8 +455,9 @@ export default function FoodStepMapScreen() {
                 <Ionicons name="close" size={20} color={colors.textMid} />
               </Pressable>
             </View>
-            <Text style={styles.placeStyle}>
+            <Text style={[styles.placeStyle, { color: accent }]}>
               {selected.style}
+              {selected.priceRange ? ` · ${selected.priceRange}` : ""}
               {selected.rating
                 ? ` · ★ ${selected.rating.score}/${selected.rating.outOf} (${selected.rating.source})`
                 : ""}
