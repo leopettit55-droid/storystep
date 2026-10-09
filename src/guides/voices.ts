@@ -14,6 +14,8 @@ export interface GuideVoice {
   languageCode: string;
   name: string;
   speakingRate: number;
+  /** Semitones up (+) or down (-). Chirp voices don't take one. */
+  pitch?: number;
   recordsTours: boolean;
 }
 
@@ -23,8 +25,9 @@ export type NarrationLanguage = (typeof NARRATION_LANGUAGES)[number];
 
 export const GUIDE_VOICES: Record<NarrationLanguage, Record<GuideId, GuideVoice>> = {
   en: {
-    scout: { languageCode: "en-GB", name: "en-GB-Wavenet-B", speakingRate: 1, recordsTours: true },
-    pip: { languageCode: "en-GB", name: "en-GB-Wavenet-C", speakingRate: 1, recordsTours: true },
+    // Picked by ear from Google's voices (October 2026): brighter and younger than before.
+    scout: { languageCode: "en-AU", name: "en-AU-Chirp3-HD-Callirrhoe", speakingRate: 1.1, recordsTours: true },
+    pip: { languageCode: "en-AU", name: "en-AU-News-E", speakingRate: 1.1, pitch: 2, recordsTours: true },
     // Tours: the original narration voice. This one is only for his "Ask your guide" answers.
     hoot: { languageCode: "en-GB", name: "en-GB-Standard-A", speakingRate: 1, recordsTours: false },
     ollie: { languageCode: "en-GB", name: "en-GB-Wavenet-B", speakingRate: 1.1, recordsTours: true },

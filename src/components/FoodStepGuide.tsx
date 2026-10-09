@@ -5,6 +5,7 @@ import type { FoodStepCity, FoodStepCuisine } from "../content/foodStep";
 import { FOODSTEP_GREEN } from "../content/sisterProducts";
 import { getGuide, type GuideId } from "../guides/guides";
 import { useLanguage } from "../i18n/LanguageContext";
+import { apiUrl } from "../social/api";
 import AskGuideModal from "./AskGuideModal";
 import Mascot from "./Mascot";
 import PressScale from "./PressScale";
@@ -21,7 +22,8 @@ interface Props {
 
 /**
  * Scout on the FoodStep map: welcomes the visitor to the city and cuisine in a
- * speech bubble (styled like the tour stops'), with "Ask your guide" below.
+ * speech bubble (styled like the tour stops'), saying it out loud in his tour
+ * voice, with "Ask your guide" below.
  * Floats over the bottom of the map; the map still pans, tilts and zooms
  * around it, and it can be tucked away to a small button.
  */
@@ -32,6 +34,65 @@ export default function FoodStepGuide({ city, cuisine, compact }: Props) {
   const [asking, setAsking] = useState(false);
   const enter = useRef(new Animated.Value(0)).current;
   const bubble = useRef(new Animated.Value(0)).current;
+  const voice = useRef<HTMLAudioElement | null>(null);
+  const hiddenRef = useRef(hidden);
+  hiddenRef.current = hidden;
+  const [voiced, setVoiced] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+
+  useEffect(() => {
+    const player = new Audio();
+    player.onplay = () => setSpeaking(true);
+    player.onpause = () => setSpeaking(false);
+    player.onended = () => setSpeaking(false);
+    voice.current = player;
+    return () => {
+      player.pause();
+      player.removeAttribute("src");
+    };
+  }, []);
+
+  // Scout says the welcome out loud: again for each new city or cuisine.
+  useEffect(() => {
+    const player = voice.current;
+    if (!player) return;
+    player.pause();
+    setVoiced(false);
+    const request = new AbortController();
+    fetch(apiUrl("/api/foodstep-intro"), {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ cityId: city.id, cuisineId: cuisine.id }),
+      signal: request.signal,
+    })
+      .then((res) => (res.ok ? (res.json() as Promise<{ audioUrl: string | null }>) : null))
+      .then((data) => {
+        if (!data?.audioUrl) return;
+        player.src = data.audioUrl;
+        setVoiced(true);
+        // Browsers only start sound by itself once the visitor has tapped the
+        // page (picking the cuisine does it); otherwise it waits for the button.
+        if (!hiddenRef.current) player.play().catch(() => {});
+      })
+      .catch(() => {});
+    return () => request.abort();
+  }, [city.id, cuisine.id]);
+
+  const toggleVoice = () => {
+    const player = voice.current;
+    if (!player) return;
+    if (!player.paused) return player.pause();
+    if (player.ended) player.currentTime = 0;
+    player.play().catch(() => {});
+  };
+  const hide = () => {
+    voice.current?.pause();
+    setHidden(true);
+  };
+  const ask = () => {
+    voice.current?.pause();
+    setAsking(true);
+  };
 
   // Scout springs in, then the welcome pops up; again for each new city or cuisine.
   useEffect(() => {
@@ -89,18 +150,30 @@ export default function FoodStepGuide({ city, cuisine, compact }: Props) {
           <View style={styles.bubbleTail} />
           <Pressable
             style={styles.hideButton}
-            onPress={() => setHidden(true)}
+            onPress={hide}
             hitSlop={10}
             aria-label={t("foodStep.hideGuide", { guide: guide.name })}
           >
             <Ionicons name="close" size={16} color="#6B605A" />
           </Pressable>
-          <Text style={[styles.bubbleText, compact && styles.bubbleTextCompact]}>
-            {t("foodStep.welcome", { city: city.name, cuisine: cuisine.name })}
-          </Text>
+          <View style={styles.bubbleRow}>
+            {voiced && (
+              <Pressable
+                style={styles.voiceButton}
+                onPress={toggleVoice}
+                hitSlop={8}
+                aria-label={speaking ? t("foodStep.pauseGuide", { guide: guide.name }) : t("foodStep.playGuide", { guide: guide.name })}
+              >
+                <Ionicons name={speaking ? "pause" : "volume-high"} size={15} color="#FFFFFF" />
+              </Pressable>
+            )}
+            <Text style={[styles.bubbleText, compact && styles.bubbleTextCompact]}>
+              {t("foodStep.welcome", { city: city.name, cuisine: cuisine.name })}
+            </Text>
+          </View>
         </Animated.View>
 
-        <PressScale style={styles.askButton} scaleTo={0.94} onPress={() => setAsking(true)}>
+        <PressScale style={styles.askButton} scaleTo={0.94} onPress={ask}>
           <Ionicons name="chatbubble-ellipses" size={18} color="#FFFFFF" />
           <Text style={styles.askText}>{t("askGuide.button")}</Text>
         </PressScale>
@@ -152,7 +225,16 @@ const styles = StyleSheet.create({
     borderBottomColor: "#2F9BFF",
   },
   hideButton: { position: "absolute", top: 6, right: 6 },
-  bubbleText: { color: "#201613", fontSize: 15, fontWeight: "600", textAlign: "center", lineHeight: 21 },
+  bubbleRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  voiceButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: FOODSTEP_GREEN,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  bubbleText: { flexShrink: 1, color: "#201613", fontSize: 15, fontWeight: "600", textAlign: "center", lineHeight: 21 },
   bubbleTextCompact: { fontSize: 13.5, lineHeight: 19 },
   askButton: {
     marginTop: 12,

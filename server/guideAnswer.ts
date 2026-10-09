@@ -79,7 +79,8 @@ export async function answerGuideQuestion(
     log.rateLimitError = e instanceof Error ? e.message : String(e);
   }
 
-  const cacheKey = `qa:answer:${tour.id}:${stop.id}:${guideId}${language === "en" ? "" : `:${language}`}:${await hash(normalise(question))}`;
+  // The voice is in the key, so a new voice doesn't replay answers recorded in the old one.
+  const cacheKey = `qa:answer:${tour.id}:${stop.id}:${guideId}${language === "en" ? "" : `:${language}`}:${voiceTag(guideId, language)}:${await hash(normalise(question))}`;
   const cached = await env.PHOTOS.get<Cached>(cacheKey, "json").catch((e: unknown) => {
     log.cacheError = e instanceof Error ? e.message : String(e);
     return null;
@@ -186,6 +187,12 @@ function fallbackAnswer(stop: Stop, language = "en"): string {
   return `Good question! I can't look that up right now, but here's something about ${stop.name}: ${opening}`.trim();
 }
 
+/** Which voice a guide has now, for cache keys. */
+export function voiceTag(guideId: string, language: string): string {
+  const voice = guideVoice(language, guideId as Parameters<typeof guideVoice>[1]);
+  return `${voice.name}@${voice.speakingRate}${voice.pitch ? `^${voice.pitch}` : ""}`;
+}
+
 /** The answer as MP3 (base64), or null if text-to-speech isn't set up or fails. */
 export async function speak(env: Env, text: string, guideId: string, language: string, log: Record<string, unknown>): Promise<string | null> {
   if (!env.GOOGLE_TTS_API_KEY) {
@@ -200,7 +207,7 @@ export async function speak(env: Env, text: string, guideId: string, language: s
       body: JSON.stringify({
         input: { text },
         voice: { languageCode: voice.languageCode, name: voice.name },
-        audioConfig: { audioEncoding: "MP3", speakingRate: voice.speakingRate },
+        audioConfig: { audioEncoding: "MP3", speakingRate: voice.speakingRate, ...(voice.pitch ? { pitch: voice.pitch } : {}) },
       }),
     });
     if (!res.ok) {

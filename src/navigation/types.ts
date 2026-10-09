@@ -1,4 +1,4 @@
-import type { CompositeNavigationProp } from "@react-navigation/native";
+import type { CompositeNavigationProp, NavigatorScreenParams } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -19,7 +19,7 @@ export type MainTabParamList = {
 };
 
 export type RootStackParamList = {
-  MainTabs: undefined;
+  MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   TourPreview: { areaId: string };
   /** resume: continue from progress already loaded into the tour store. */
   ActiveTour: { areaId: string; resume?: boolean; duo?: string };

@@ -351,7 +351,7 @@ export default function FoodStepMapScreen() {
     <View style={styles.container}>
       <View style={styles.overlayTop}>
         <View style={styles.crumbRow}>
-          <BackButton variant="inline" onPress={city ? toCuisines : toCities} />
+          <BackButton variant="inline" toPodium />
           {/* FoodStep › Manchester › Mexican: each step back is a tap away. */}
           <View style={styles.crumbs}>
             <Pressable onPress={toCities}>

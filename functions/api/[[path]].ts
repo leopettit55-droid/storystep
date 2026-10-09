@@ -9,10 +9,12 @@
  *   *    /api/duo/...        server/duo.ts (Walk with a friend)
  *   POST /api/guide-answer   server/guideAnswer.ts (Ask your guide)
  *   POST /api/foodstep-question  server/foodStepAnswer.ts (FoodStep's Ask your guide)
+ *   POST /api/foodstep-intro  server/foodStepIntro.ts (Scout's spoken welcome on a FoodStep map)
  */
 import { recordCompletion } from "../../server/completions";
 import { handleDuo } from "../../server/duo";
 import { answerFoodStepQuestion } from "../../server/foodStepAnswer";
+import { foodStepIntro } from "../../server/foodStepIntro";
 import { answerGuideQuestion } from "../../server/guideAnswer";
 import { getLeaderboard } from "../../server/leaderboard";
 import { handlePhotos } from "../../server/photos";
@@ -46,6 +48,9 @@ export const onRequest: PagesFunction<Env> = async ({ request, env, waitUntil })
     }
     if (route === "foodstep-question" && rest.length === 0) {
       return request.method === "POST" ? answerFoodStepQuestion(env, request, waitUntil) : error(405, "Use POST");
+    }
+    if (route === "foodstep-intro" && rest.length === 0) {
+      return request.method === "POST" ? foodStepIntro(env, request, waitUntil) : error(405, "Use POST");
     }
     return error(404, "Not found");
   } catch (e) {

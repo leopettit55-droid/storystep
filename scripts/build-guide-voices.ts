@@ -68,7 +68,8 @@ function apiKey(): string {
 /** What a recording was made from: when this changes, it's remade. */
 function fingerprint(job: Job): string {
   const voice = GUIDE_VOICES[job.language][job.guide];
-  return crypto.createHash("sha256").update(`${voice.name}|${voice.speakingRate}|${job.text}`).digest("hex").slice(0, 16);
+  const pitch = voice.pitch ? `|pitch ${voice.pitch}` : "";
+  return crypto.createHash("sha256").update(`${voice.name}|${voice.speakingRate}${pitch}|${job.text}`).digest("hex").slice(0, 16);
 }
 
 async function synthesize(key: string, job: Job): Promise<Buffer> {
@@ -80,7 +81,7 @@ async function synthesize(key: string, job: Job): Promise<Buffer> {
       body: JSON.stringify({
         input: { text: job.text },
         voice: { languageCode: voice.languageCode, name: voice.name },
-        audioConfig: { audioEncoding: "MP3", speakingRate: voice.speakingRate },
+        audioConfig: { audioEncoding: "MP3", speakingRate: voice.speakingRate, ...(voice.pitch ? { pitch: voice.pitch } : {}) },
       }),
     });
     if (res.ok) {
