@@ -17,11 +17,10 @@ import { setPendingPurchase } from "./entitlements";
  *   https://<your-app-url>/?purchase=monthly
  *
  * The single-tour link must charge the same as `price.singleTour` in the tour
- * files (£0.99). The old £4.99 link (buy.stripe.com/28E9AT2nkfdS3eD6UQ6Vq00) was
- * removed so nobody is charged more than the price the app shows.
+ * files (£0.99). It replaced the old £4.99 link (buy.stripe.com/28E9AT2nkfdS3eD6UQ6Vq00).
  */
 export const STRIPE_LINKS = {
-  singleTour: "",
+  singleTour: "https://buy.stripe.com/fZueVd3ro9Ty3eD4MI6Vq03",
   weekly: "https://buy.stripe.com/dRmdR99PM3vaaH51Aw6Vq01",
   monthly: "https://buy.stripe.com/cNi3cvd1Y5Di4iH0ws6Vq02",
 };
