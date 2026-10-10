@@ -13,5 +13,5 @@ export const cityOfLondon: Area = {
   startingPoint: { lat: 51.5133, lng: -0.0886, label: "Bank Underground Station" },
   route: [],
   image: null,
-  price: { singleTour: 4.99 },
+  price: { singleTour: 0.99 },
 };

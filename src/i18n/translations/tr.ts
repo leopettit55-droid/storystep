@@ -261,7 +261,7 @@ const tr: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep: Londra, Paris ve Oxford'da yapay zekâ anlatımlı yürüyüş turları",
-    tour: "{{tour}}: {{city}} ücretsiz sesli yürüyüş turu | StoryStep",
+    tour: "{{tour}}: {{city}} sesli yürüyüş turu | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -277,8 +277,8 @@ const tr: PartialTranslationDict = {
     iWalked: "Yürüdüm",
     stops: "{{count}} durak",
     distance: "{{km}} km",
-    tagline: "Ücretsiz sesli yürüyüş turları",
-    shareText: "StoryStep ile {{city}} şehrinde {{tour}} turunu yürüdüm; ücretsiz bir sesli yürüyüş turu.",
+    tagline: "Sesli yürüyüş turları",
+    shareText: "StoryStep ile {{city}} şehrinde {{tour}} turunu yürüdüm; bir sesli yürüyüş turu.",
     downloadedCopied: "Görsel kaydedildi ve bağlantı kopyalandı.",
     downloaded: "Görsel kaydedildi.",
     copied: "Bağlantı kopyalandı.",

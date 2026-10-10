@@ -13,5 +13,5 @@ export const marylebone: Area = {
   startingPoint: { lat: 51.5226, lng: -0.1571, label: "Baker Street Underground Station" },
   route: [],
   image: null,
-  price: { singleTour: 4.99 },
+  price: { singleTour: 0.99 },
 };

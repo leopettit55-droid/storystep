@@ -261,7 +261,7 @@ const fr: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep : visites à pied narrées par IA à Londres, Paris et Oxford",
-    tour: "{{tour}} : visite audio à pied gratuite de {{city}} | StoryStep",
+    tour: "{{tour}} : visite audio à pied de {{city}} | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -277,8 +277,8 @@ const fr: PartialTranslationDict = {
     iWalked: "J'ai parcouru",
     stops: "{{count}} étapes",
     distance: "{{km}} km",
-    tagline: "Visites audio à pied gratuites",
-    shareText: "J'ai parcouru {{tour}} à {{city}} avec StoryStep, une visite audio à pied gratuite.",
+    tagline: "Visites audio à pied",
+    shareText: "J'ai parcouru {{tour}} à {{city}} avec StoryStep, une visite audio à pied.",
     downloadedCopied: "Image enregistrée, et le lien est copié.",
     downloaded: "Image enregistrée.",
     copied: "Lien copié.",

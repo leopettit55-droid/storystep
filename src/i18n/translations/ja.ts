@@ -261,7 +261,7 @@ const ja: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep：AIが語るロンドン・パリ・オックスフォードの徒歩ツアー",
-    tour: "{{tour}}：{{city}}の無料オーディオ徒歩ツアー | StoryStep",
+    tour: "{{tour}}：{{city}}のオーディオ徒歩ツアー | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -277,8 +277,8 @@ const ja: PartialTranslationDict = {
     iWalked: "歩きました",
     stops: "{{count}}スポット",
     distance: "{{km}} km",
-    tagline: "無料のオーディオ徒歩ツアー",
-    shareText: "StoryStepで{{city}}の「{{tour}}」を歩きました。無料のオーディオ徒歩ツアーです。",
+    tagline: "オーディオ徒歩ツアー",
+    shareText: "StoryStepで{{city}}の「{{tour}}」を歩きました。オーディオ徒歩ツアーです。",
     downloadedCopied: "画像を保存し、リンクをコピーしました。",
     downloaded: "画像を保存しました。",
     copied: "リンクをコピーしました。",

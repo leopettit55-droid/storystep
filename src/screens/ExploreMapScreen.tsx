@@ -42,7 +42,7 @@ export default function ExploreMapScreen() {
                   <Text style={styles.meta}>
                     {area.scannerOnly
                       ? t("tourPreview.useScanner")
-                      : t("common.free")}
+                      : `£${area.price.singleTour.toFixed(2)}`}
                   </Text>
                 </View>
               </Pressable>

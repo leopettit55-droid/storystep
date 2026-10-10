@@ -13,7 +13,7 @@ export const coventGarden: Area = {
   isContentComplete: true,
   enableInteractiveGuide: true,
   image: require("../../../assets/tours/covent-garden.jpg"),
-  price: { singleTour: 4.99 },
+  price: { singleTour: 0.99 },
   startingPoint: {
     lat: 51.5129,
     lng: -0.1243,

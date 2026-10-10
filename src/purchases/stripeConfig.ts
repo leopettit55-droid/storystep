@@ -6,7 +6,7 @@ import { setPendingPurchase } from "./entitlements";
  * These are public checkout URLs, not secret keys — safe to keep in the app.
  *
  * You need three:
- *  1. A one-off £4.99 "Single tour" price → its Payment Link
+ *  1. A one-off £0.99 "Single tour" price → its Payment Link
  *  2. A recurring £14.99/week "Weekly unlimited" price → its Payment Link
  *  3. A recurring £19.99/month "Monthly unlimited" price → its Payment Link
  *
@@ -15,9 +15,13 @@ import { setPendingPurchase } from "./entitlements";
  *   https://<your-app-url>/?purchase=tour
  *   https://<your-app-url>/?purchase=weekly
  *   https://<your-app-url>/?purchase=monthly
+ *
+ * The single-tour link must charge the same as `price.singleTour` in the tour
+ * files (£0.99). The old £4.99 link (buy.stripe.com/28E9AT2nkfdS3eD6UQ6Vq00) was
+ * removed so nobody is charged more than the price the app shows.
  */
 export const STRIPE_LINKS = {
-  singleTour: "https://buy.stripe.com/28E9AT2nkfdS3eD6UQ6Vq00",
+  singleTour: "",
   weekly: "https://buy.stripe.com/dRmdR99PM3vaaH51Aw6Vq01",
   monthly: "https://buy.stripe.com/cNi3cvd1Y5Di4iH0ws6Vq02",
 };
