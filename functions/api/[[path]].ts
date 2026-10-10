@@ -10,6 +10,7 @@
  *   POST /api/guide-answer   server/guideAnswer.ts (Ask your guide)
  *   POST /api/foodstep-question  server/foodStepAnswer.ts (FoodStep's Ask your guide)
  *   POST /api/foodstep-intro  server/foodStepIntro.ts (Scout's spoken welcome on a FoodStep map)
+ *   GET  /api/purchase       server/purchases.ts (confirms a paid tour with Stripe)
  */
 import { recordCompletion } from "../../server/completions";
 import { handleDuo } from "../../server/duo";
@@ -18,6 +19,7 @@ import { foodStepIntro } from "../../server/foodStepIntro";
 import { answerGuideQuestion } from "../../server/guideAnswer";
 import { getLeaderboard } from "../../server/leaderboard";
 import { handlePhotos } from "../../server/photos";
+import { confirmPurchase } from "../../server/purchases";
 import { cleanName, createUser, error, json, preflight, type Env } from "../../server/social";
 
 async function register(env: Env, req: Request): Promise<Response> {
@@ -51,6 +53,9 @@ export const onRequest: PagesFunction<Env> = async ({ request, env, waitUntil })
     }
     if (route === "foodstep-intro" && rest.length === 0) {
       return request.method === "POST" ? foodStepIntro(env, request, waitUntil) : error(405, "Use POST");
+    }
+    if (route === "purchase" && rest.length === 0) {
+      return request.method === "GET" ? confirmPurchase(env, request) : error(405, "Use GET");
     }
     return error(404, "Not found");
   } catch (e) {

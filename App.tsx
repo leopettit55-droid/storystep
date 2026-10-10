@@ -39,22 +39,42 @@ import { localizedAreaText } from "./src/i18n/areaTranslations";
 import { localizedCityName } from "./src/i18n/cityNames";
 import { notifySuccess } from "./src/haptics";
 import { consumePendingPurchase, grantSubscription, grantTourPurchase } from "./src/purchases/entitlements";
-import { consumePurchaseReturnParam } from "./src/purchases/stripeConfig";
+import { checkTourPayment, consumePurchaseReturnParam } from "./src/purchases/stripeConfig";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const navigationRef = createNavigationContainerRef<RootStackParamList>();
+
+/** Alert.alert does nothing on the web build, so the website uses the browser's own. */
+function showMessage(title: string, body: string) {
+  if (Platform.OS === "web") window.alert(`${title}\n\n${body}`);
+  else Alert.alert(title, body);
+}
 
 async function handlePurchaseReturn(t: (key: string, vars?: Record<string, string | number>) => string) {
   const result = consumePurchaseReturnParam();
   if (!result) return;
 
   if (result.kind === "tour") {
-    const tourId = await consumePendingPurchase();
-    if (!tourId) return;
+    // The tour this browser sent to checkout, used when Stripe can't be asked.
+    let tourId = await consumePendingPurchase();
+    if (result.sessionId) {
+      const check = await checkTourPayment(result.sessionId);
+      if (check.status === "unpaid") {
+        showMessage(t("purchase.notConfirmedTitle"), t("purchase.notConfirmedBody"));
+        return;
+      }
+      // Stripe's record of which tour was paid for wins: the buyer may have come
+      // back in a different browser, or started checkout on another tour since.
+      if (check.status === "paid" && check.tourId && getAreaById(check.tourId)) tourId = check.tourId;
+    }
+    if (!tourId) {
+      showMessage(t("purchase.unknownTourTitle"), t("purchase.unknownTourBody"));
+      return;
+    }
     await grantTourPurchase(tourId);
     notifySuccess();
     const area = getAreaById(tourId);
-    Alert.alert(
+    showMessage(
       t("purchase.completeTitle"),
       t("purchase.completeBody", { name: area?.name ?? t("purchase.thisTour") })
     );
@@ -66,7 +86,7 @@ async function handlePurchaseReturn(t: (key: string, vars?: Record<string, strin
 
   await grantSubscription(result.kind);
   notifySuccess();
-  Alert.alert(
+  showMessage(
     t("purchase.subscriptionActiveTitle"),
     result.kind === "weekly" ? t("purchase.weeklyActiveBody") : t("purchase.monthlyActiveBody")
   );
