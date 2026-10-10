@@ -16,6 +16,8 @@ export interface Env {
   /** "Ask your guide" (server/guideAnswer.ts). Secrets, set with `wrangler pages secret put`. */
   ANTHROPIC_API_KEY?: string;
   GOOGLE_TTS_API_KEY?: string;
+  /** Confirms tour payments (server/purchases.ts). Secret, like the keys above. */
+  STRIPE_SECRET_KEY?: string;
 }
 
 export interface TourMeta {

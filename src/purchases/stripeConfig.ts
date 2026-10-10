@@ -1,4 +1,5 @@
 import { Linking, Platform } from "react-native";
+import { api, ApiError } from "../social/api";
 import { setPendingPurchase } from "./entitlements";
 
 /**
@@ -12,7 +13,7 @@ import { setPendingPurchase } from "./entitlements";
  *
  * For each Payment Link, set "After payment" → "Redirect customers to a
  * website" to this app's URL with the matching query param, e.g.
- *   https://<your-app-url>/?purchase=tour
+ *   https://<your-app-url>/?purchase=tour&session_id={CHECKOUT_SESSION_ID}
  *   https://<your-app-url>/?purchase=weekly
  *   https://<your-app-url>/?purchase=monthly
  *
@@ -52,7 +53,28 @@ export function openCustomerPortal(): void {
 export async function openTourCheckout(tourId: string): Promise<void> {
   if (!stripeIsConfigured.singleTour) return;
   await setPendingPurchase(tourId);
-  Linking.openURL(STRIPE_LINKS.singleTour);
+  // Stripe keeps this on the checkout session, so the tour can be read back
+  // from the payment itself even if the buyer returns in a different browser.
+  Linking.openURL(`${STRIPE_LINKS.singleTour}?client_reference_id=${encodeURIComponent(tourId)}`);
+}
+
+export type PaymentCheck =
+  | { status: "paid"; tourId: string | null }
+  | { status: "unpaid" }
+  | { status: "unknown" };
+
+/** Asks the server whether Stripe has this checkout as paid (server/purchases.ts).
+ * "unknown" means it couldn't say: offline, or no Stripe key on the server. */
+export async function checkTourPayment(sessionId: string): Promise<PaymentCheck> {
+  try {
+    const { tourId } = await api<{ tourId: string | null }>(
+      `/api/purchase?session_id=${encodeURIComponent(sessionId)}`
+    );
+    return { status: "paid", tourId };
+  } catch (e) {
+    if (e instanceof ApiError && [400, 402, 404].includes(e.status)) return { status: "unpaid" };
+    return { status: "unknown" };
+  }
 }
 
 export async function openSubscriptionCheckout(plan: "weekly" | "monthly"): Promise<void> {
@@ -62,24 +84,28 @@ export async function openSubscriptionCheckout(plan: "weekly" | "monthly"): Prom
 }
 
 export type PurchaseReturn =
-  | { kind: "tour" }
+  | { kind: "tour"; sessionId: string | null }
   | { kind: "weekly" }
   | { kind: "monthly" }
   | null;
 
 /** Reads the `?purchase=` param Stripe redirects back with (web only) and
- * strips it from the URL so it isn't reprocessed on refresh. */
+ * strips it from the URL so it isn't reprocessed on refresh. A single-tour
+ * return also carries `session_id` when the Payment Link's redirect includes
+ * {CHECKOUT_SESSION_ID}. */
 export function consumePurchaseReturnParam(): PurchaseReturn {
   if (Platform.OS !== "web" || typeof window === "undefined") return null;
   const params = new URLSearchParams(window.location.search);
   const purchase = params.get("purchase");
   if (purchase !== "tour" && purchase !== "weekly" && purchase !== "monthly") return null;
 
+  const sessionId = params.get("session_id");
   params.delete("purchase");
+  params.delete("session_id");
   const newSearch = params.toString();
   const newUrl =
     window.location.pathname + (newSearch ? `?${newSearch}` : "") + window.location.hash;
   window.history.replaceState({}, "", newUrl);
 
-  return { kind: purchase };
+  return purchase === "tour" ? { kind: "tour", sessionId } : { kind: purchase };
 }
