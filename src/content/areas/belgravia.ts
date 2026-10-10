@@ -13,5 +13,5 @@ export const belgravia: Area = {
   startingPoint: { lat: 51.4924, lng: -0.1565, label: "Sloane Square Underground Station" },
   route: [],
   image: null,
-  price: { singleTour: 4.99 },
+  price: { singleTour: 0.99 },
 };

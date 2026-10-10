@@ -13,7 +13,7 @@ export const parisLouvre: Area = {
   isContentComplete: true,
   enableInteractiveGuide: true,
   image: require("../../../assets/tours/paris-louvre.jpg"),
-  price: { singleTour: 4.99 },
+  price: { singleTour: 0.99 },
   startingPoint: {
     lat: 48.8635,
     lng: 2.3355,

@@ -111,7 +111,7 @@ export default function AreaSelectScreen() {
                     {t("common.km")} · {t(DIFFICULTY_KEYS[item.difficulty])}
                   </Text>
                   <Text style={styles.cardPrice}>
-                    {t("common.free")}
+                    £{item.price.singleTour.toFixed(2)}
                   </Text>
                 </>
               )}

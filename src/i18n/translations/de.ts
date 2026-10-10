@@ -261,7 +261,7 @@ const de: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep: KI-erzählte Stadtspaziergänge durch London, Paris & Oxford",
-    tour: "{{tour}}: kostenloser Audio-Stadtspaziergang durch {{city}} | StoryStep",
+    tour: "{{tour}}: Audio-Stadtspaziergang durch {{city}} | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -277,8 +277,8 @@ const de: PartialTranslationDict = {
     iWalked: "Ich bin gelaufen:",
     stops: "{{count}} Stationen",
     distance: "{{km}} km",
-    tagline: "Kostenlose Audio-Stadtspaziergänge",
-    shareText: "Ich bin {{tour}} in {{city}} mit StoryStep gelaufen, einem kostenlosen Audio-Stadtspaziergang.",
+    tagline: "Audio-Stadtspaziergänge",
+    shareText: "Ich bin {{tour}} in {{city}} mit StoryStep gelaufen, einem Audio-Stadtspaziergang.",
     downloadedCopied: "Bild gespeichert und Link kopiert.",
     downloaded: "Bild gespeichert.",
     copied: "Link kopiert.",

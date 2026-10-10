@@ -261,7 +261,7 @@ const sv: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep: AI-berättade stadsvandringar i London, Paris och Oxford",
-    tour: "{{tour}}: gratis ljudvandring i {{city}} | StoryStep",
+    tour: "{{tour}}: ljudvandring i {{city}} | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -277,8 +277,8 @@ const sv: PartialTranslationDict = {
     iWalked: "Jag gick",
     stops: "{{count}} stopp",
     distance: "{{km}} km",
-    tagline: "Gratis ljudvandringar",
-    shareText: "Jag gick {{tour}} i {{city}} med StoryStep, en gratis ljudvandring.",
+    tagline: "Ljudvandringar",
+    shareText: "Jag gick {{tour}} i {{city}} med StoryStep, en ljudvandring.",
     downloadedCopied: "Bilden sparad och länken kopierad.",
     downloaded: "Bilden sparad.",
     copied: "Länken kopierad.",
