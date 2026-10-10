@@ -18,7 +18,7 @@ export const mayfair: Area = {
   isContentComplete: true,
   enableInteractiveGuide: true,
   image: require("../../../assets/tours/mayfair.jpg"),
-  price: { singleTour: 0.99 },
+  price: { singleTour: 4.99 },
   startingPoint: {
     lat: 51.5067,
     lng: -0.1428,

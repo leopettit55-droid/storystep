@@ -261,7 +261,7 @@ const ko: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep: AI가 들려주는 런던·파리·옥스퍼드 도보 투어",
-    tour: "{{tour}}: {{city}} 오디오 도보 투어 | StoryStep",
+    tour: "{{tour}}: {{city}} 무료 오디오 도보 투어 | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -277,8 +277,8 @@ const ko: PartialTranslationDict = {
     iWalked: "걸었어요",
     stops: "정류장 {{count}}곳",
     distance: "{{km}} km",
-    tagline: "오디오 도보 투어",
-    shareText: "StoryStep으로 {{city}}의 {{tour}}을(를) 걸었어요. 오디오 도보 투어예요.",
+    tagline: "무료 오디오 도보 투어",
+    shareText: "StoryStep으로 {{city}}의 {{tour}}을(를) 걸었어요. 무료 오디오 도보 투어예요.",
     downloadedCopied: "이미지를 저장하고 링크를 복사했어요.",
     downloaded: "이미지를 저장했어요.",
     copied: "링크를 복사했어요.",

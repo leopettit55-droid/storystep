@@ -13,7 +13,7 @@ export const parisEiffel: Area = {
   isContentComplete: true,
   enableInteractiveGuide: true,
   image: require("../../../assets/tours/paris-eiffel.jpg"),
-  price: { singleTour: 0.99 },
+  price: { singleTour: 4.99 },
   startingPoint: {
     lat: 48.8637,
     lng: 2.2874,

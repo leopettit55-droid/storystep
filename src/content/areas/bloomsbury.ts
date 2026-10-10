@@ -13,5 +13,5 @@ export const bloomsbury: Area = {
   startingPoint: { lat: 51.523, lng: -0.1244, label: "Russell Square Underground Station" },
   route: [],
   image: null,
-  price: { singleTour: 0.99 },
+  price: { singleTour: 4.99 },
 };
