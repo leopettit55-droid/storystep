@@ -36,10 +36,10 @@ export async function hasActiveSubscription(): Promise<boolean> {
   return (await getSubscription()) !== null;
 }
 
-export async function hasTourAccess(tourId: string): Promise<boolean> {
-  if (await hasActiveSubscription()) return true;
-  const purchased = await getPurchasedTourIds();
-  return purchased.includes(tourId);
+/** Every tour is free for everyone. The purchase and subscription code in this
+ * file is kept so paid tours can be switched back on by restoring the checks here. */
+export async function hasTourAccess(_tourId: string): Promise<boolean> {
+  return true;
 }
 
 export async function grantTourPurchase(tourId: string): Promise<void> {

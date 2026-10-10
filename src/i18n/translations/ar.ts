@@ -261,7 +261,7 @@ const ar: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep: جولات سير بصوت راوٍ بالذكاء الاصطناعي في لندن وباريس وأكسفورد",
-    tour: "{{tour}}: جولة سير صوتية في {{city}} | StoryStep",
+    tour: "{{tour}}: جولة سير صوتية مجانية في {{city}} | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -277,8 +277,8 @@ const ar: PartialTranslationDict = {
     iWalked: "مشيت",
     stops: "{{count}} محطات",
     distance: "{{km}} كم",
-    tagline: "جولات سير صوتية",
-    shareText: "مشيت {{tour}} في {{city}} مع StoryStep، جولة سير صوتية.",
+    tagline: "جولات سير صوتية مجانية",
+    shareText: "مشيت {{tour}} في {{city}} مع StoryStep، جولة سير صوتية مجانية.",
     downloadedCopied: "حُفظت الصورة ونُسخ الرابط.",
     downloaded: "حُفظت الصورة.",
     copied: "نُسخ الرابط.",

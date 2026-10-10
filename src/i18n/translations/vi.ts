@@ -261,7 +261,7 @@ const vi: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep: tour đi bộ có AI thuyết minh ở London, Paris và Oxford",
-    tour: "{{tour}}: tour đi bộ có thuyết minh tại {{city}} | StoryStep",
+    tour: "{{tour}}: tour đi bộ có thuyết minh miễn phí tại {{city}} | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -277,8 +277,8 @@ const vi: PartialTranslationDict = {
     iWalked: "Tôi đã đi",
     stops: "{{count}} điểm dừng",
     distance: "{{km}} km",
-    tagline: "Tour đi bộ có thuyết minh",
-    shareText: "Tôi đã đi {{tour}} ở {{city}} cùng StoryStep, một tour đi bộ có thuyết minh.",
+    tagline: "Tour đi bộ có thuyết minh miễn phí",
+    shareText: "Tôi đã đi {{tour}} ở {{city}} cùng StoryStep, một tour đi bộ có thuyết minh miễn phí.",
     downloadedCopied: "Đã lưu ảnh và sao chép liên kết.",
     downloaded: "Đã lưu ảnh.",
     copied: "Đã sao chép liên kết.",

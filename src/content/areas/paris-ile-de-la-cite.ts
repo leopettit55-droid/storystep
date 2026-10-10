@@ -13,7 +13,7 @@ export const parisIleDeLaCite: Area = {
   isContentComplete: true,
   enableInteractiveGuide: true,
   image: require("../../../assets/tours/paris-ile-de-la-cite.jpg"),
-  price: { singleTour: 0.99 },
+  price: { singleTour: 4.99 },
   startingPoint: {
     lat: 48.8555,
     lng: 2.3466,

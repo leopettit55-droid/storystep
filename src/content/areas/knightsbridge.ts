@@ -13,5 +13,5 @@ export const knightsbridge: Area = {
   startingPoint: { lat: 51.5015, lng: -0.1607, label: "Knightsbridge Underground Station" },
   route: [],
   image: null,
-  price: { singleTour: 0.99 },
+  price: { singleTour: 4.99 },
 };
