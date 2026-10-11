@@ -33,7 +33,6 @@ export const COMING_SOON_CITIES: ComingSoonCity[] = [
   { id: "stockholm", name: "Stockholm", country: "Sweden", lat: 59.3293, lng: 18.0686 },
   { id: "oslo", name: "Oslo", country: "Norway", lat: 59.9139, lng: 10.7522 },
   { id: "dublin", name: "Dublin", country: "Ireland", lat: 53.3498, lng: -6.2603 },
-  { id: "edinburgh", name: "Edinburgh", country: "United Kingdom", lat: 55.9533, lng: -3.1883 },
   { id: "athens", name: "Athens", country: "Greece", lat: 37.9838, lng: 23.7275 },
   { id: "istanbul", name: "Istanbul", country: "Türkiye", lat: 41.0082, lng: 28.9784 },
   { id: "moscow", name: "Moscow", country: "Russia", lat: 55.7558, lng: 37.6173 },
