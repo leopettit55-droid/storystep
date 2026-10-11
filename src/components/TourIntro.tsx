@@ -12,6 +12,7 @@ import {
 } from "../audio/guidePreview";
 import { getGuide, GUIDES, type GuideId } from "../guides/guides";
 import { useLanguage } from "../i18n/LanguageContext";
+import ARPhoneHint from "./ARPhoneHint";
 import Mascot from "./Mascot";
 import PressScale from "./PressScale";
 
@@ -39,6 +40,8 @@ const GREETING_AT = 600;
 const GREETING_MS = 3500;
 const HEADPHONES_AT = GREETING_AT + GREETING_MS + 300;
 const HEADPHONES_MS = 3200;
+/** Then "hold your phone up and look around" (once a visit). */
+const PHONE_HINT_AT = HEADPHONES_AT + HEADPHONES_MS;
 /** Farther than this from the start, offer walking directions. */
 const FAR_FROM_START_M = 80;
 
@@ -50,7 +53,7 @@ const TEAL = "#3FBFB6";
  * The tour's cinematic entry: while the map flies in from above, a panel
  * rises with the guides to choose from (swipe, arrows or dots). Once one is
  * chosen, that guide greets the walker by name and suggests headphones, then
- * the Start button appears. Tapping the panel early skips ahead.
+ * the Start button appears, and the "hold your phone up" hint shows over it. Tapping the panel early skips ahead.
  */
 type Phase = "arrive" | "choose" | "greet" | "ready";
 
@@ -77,6 +80,8 @@ export default function TourIntro({
   const [bubble, setBubble] = useState<string | null>(null);
   const bubbleAnim = useRef(new Animated.Value(0)).current;
   const [phase, setPhase] = useState<Phase>("arrive");
+  const [phoneHint, setPhoneHint] = useState(false);
+  const started = useRef(false);
   /** The voice preview playing (or loading) in the picker, if any. */
   const [preview, setPreview] = useState<{ guide: GuideId; state: PreviewState } | null>(null);
   useEffect(() => {
@@ -159,6 +164,9 @@ export default function TourIntro({
       showBubble(t("activeTour.introHeadphones"), HEADPHONES_MS);
       revealStart();
     });
+    at(PHONE_HINT_AT, () => {
+      if (!started.current) setPhoneHint(true);
+    });
   };
 
   // Tapping the panel early skips ahead: to the guides while it rises, to Start while the guide talks.
@@ -202,6 +210,8 @@ export default function TourIntro({
   const current = getGuide(guide);
 
   const handleStart = () => {
+    started.current = true;
+    setPhoneHint(false);
     onStart();
     Animated.timing(exit, { toValue: 1, duration: 600, easing: Easing.in(Easing.cubic), useNativeDriver: true }).start(onDone);
   };
@@ -340,6 +350,7 @@ export default function TourIntro({
           </Animated.View>
         </Pressable>
       </Animated.View>
+      <ARPhoneHint show={phoneHint} sessionKey="storystep.tourPhoneHintSeen" />
     </View>
   );
 }

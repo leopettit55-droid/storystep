@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import ARPhoneHint from "../components/ARPhoneHint";
 import LandmarkResultCard from "../components/LandmarkResultCard";
 import PressScale from "../components/PressScale";
 import { type Coordinates } from "../content";
@@ -153,6 +154,7 @@ export default function ARCameraScreen() {
   const [hud, setHud] = useState<HudInfo>({ distanceText: null, turnText: null, turnAngle: 0 });
   const [errorText, setErrorText] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const [hintShowing, setHintShowing] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [outcome, setOutcome] = useState<ScanOutcome | null>(null);
   const [scanError, setScanError] = useState<string | null>(null);
@@ -757,7 +759,7 @@ export default function ARCameraScreen() {
           )}
         </View>
 
-        {mode === "tour" && hud.turnText && (
+        {mode === "tour" && hud.turnText && !hintShowing && (
           <View style={styles.turnPrompt}>
             <Text style={[styles.turnArrow, { transform: [{ rotate: `${hud.turnAngle}deg` }] }]}>↑</Text>
             <Text style={styles.turnText}>{hud.turnText}</Text>
@@ -824,6 +826,9 @@ export default function ARCameraScreen() {
           </View>
         </View>
       </SafeAreaView>
+
+      {/* First time in AR this visit: hold the phone up and look around. */}
+      <ARPhoneHint show={ready && !errorText} onVisibleChange={setHintShowing} />
 
       {errorText && (
         <View style={styles.errorOverlay}>
