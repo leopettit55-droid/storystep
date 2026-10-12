@@ -263,7 +263,7 @@ function FeaturedCard({
               <Text style={styles.featuredMeta}>
                 {area.scannerOnly
                   ? t("tourPreview.useScanner")
-                  : `${area.estimatedDurationMin} ${t("common.min")} · £${area.price.singleTour.toFixed(2)}`}
+                  : `${area.estimatedDurationMin} ${t("common.min")} · ${t("common.free")}`}
               </Text>
             </View>
           </ImageBackground>

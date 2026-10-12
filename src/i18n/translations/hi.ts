@@ -261,7 +261,7 @@ const hi: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep: लंदन, पेरिस और ऑक्सफ़ोर्ड के AI-वर्णित पैदल टूर",
-    tour: "{{tour}}: {{city}} का ऑडियो पैदल टूर | StoryStep",
+    tour: "{{tour}}: {{city}} का मुफ़्त ऑडियो पैदल टूर | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -277,8 +277,8 @@ const hi: PartialTranslationDict = {
     iWalked: "मैंने पैदल घूमा",
     stops: "{{count}} पड़ाव",
     distance: "{{km}} किमी",
-    tagline: "ऑडियो पैदल टूर",
-    shareText: "मैंने StoryStep के साथ {{city}} में {{tour}} का पैदल टूर किया, एक ऑडियो पैदल टूर।",
+    tagline: "मुफ़्त ऑडियो पैदल टूर",
+    shareText: "मैंने StoryStep के साथ {{city}} में {{tour}} का पैदल टूर किया, एक मुफ़्त ऑडियो पैदल टूर।",
     downloadedCopied: "तस्वीर सहेजी गई और लिंक कॉपी हो गया।",
     downloaded: "तस्वीर सहेजी गई।",
     copied: "लिंक कॉपी हो गया।",

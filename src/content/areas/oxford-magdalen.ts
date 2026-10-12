@@ -148,7 +148,7 @@ export const oxfordMagdalen: Area = {
   },
   isContentComplete: true,
   image: require("../../../assets/tours/oxford-magdalen.jpg"),
-  price: { singleTour: 0.99 },
+  price: { singleTour: 4.99 },
   freeLandmarkScanner: true,
   sequentialStops: true,
   enableInteractiveGuide: true,

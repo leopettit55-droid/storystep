@@ -42,12 +42,11 @@ export const TERMS_SECTIONS: PolicySection[] = [
   {
     heading: "Pricing and access",
     body:
-      "Each StoryStep tour costs £0.99, a one-off payment that unlocks that tour with no subscription. The " +
-      "price is shown before you pay. Payments are handled by Stripe, and StoryStep never sees your card " +
-      "details. A purchase is saved on the device and browser you bought it on, so clearing that browser's " +
-      "data or switching device can lose access; email us with your Stripe receipt and we'll restore it. Some " +
-      "tours visit places that charge their own entry fee (for example, Magdalen College's visitor ticket); " +
-      "that fee is paid to the venue, not to StoryStep.",
+      "All StoryStep tours are currently free, with no account, purchase or subscription needed. Some tours " +
+      "visit places that charge their own entry fee (for example, Magdalen College's visitor ticket); that fee " +
+      "is paid to the venue, not to StoryStep. If we introduce paid tours or plans in future, the price will be " +
+      "shown before you pay, payments will be handled by Stripe (StoryStep never sees your card details), and " +
+      "we'll update these terms first.",
   },
   {
     heading: "Acceptable use",
