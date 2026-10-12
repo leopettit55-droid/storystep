@@ -261,7 +261,7 @@ const th: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep: ทัวร์เดินเท้าบรรยายโดย AI ในลอนดอน ปารีส และออกซ์ฟอร์ด",
-    tour: "{{tour}}: ทัวร์เดินเท้าพร้อมเสียงบรรยายฟรีใน{{city}} | StoryStep",
+    tour: "{{tour}}: ทัวร์เดินเท้าพร้อมเสียงบรรยายใน{{city}} | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -277,8 +277,8 @@ const th: PartialTranslationDict = {
     iWalked: "ฉันเดิน",
     stops: "{{count}} จุด",
     distance: "{{km}} กม.",
-    tagline: "ทัวร์เดินเท้าพร้อมเสียงบรรยายฟรี",
-    shareText: "ฉันเดิน {{tour}} ใน{{city}} กับ StoryStep ทัวร์เดินเท้าพร้อมเสียงบรรยายฟรี",
+    tagline: "ทัวร์เดินเท้าพร้อมเสียงบรรยาย",
+    shareText: "ฉันเดิน {{tour}} ใน{{city}} กับ StoryStep ทัวร์เดินเท้าพร้อมเสียงบรรยาย",
     downloadedCopied: "บันทึกรูปแล้ว และคัดลอกลิงก์แล้ว",
     downloaded: "บันทึกรูปแล้ว",
     copied: "คัดลอกลิงก์แล้ว",

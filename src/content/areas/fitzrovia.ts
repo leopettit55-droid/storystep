@@ -13,5 +13,5 @@ export const fitzrovia: Area = {
   startingPoint: { lat: 51.5205, lng: -0.1347, label: "Goodge Street Underground Station" },
   route: [],
   image: null,
-  price: { singleTour: 4.99 },
+  price: { singleTour: 0.99 },
 };

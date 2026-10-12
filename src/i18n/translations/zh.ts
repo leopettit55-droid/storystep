@@ -260,7 +260,7 @@ const zh: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep：AI讲解的伦敦、巴黎和牛津徒步导览",
-    tour: "{{tour}}：{{city}}免费语音徒步导览 | StoryStep",
+    tour: "{{tour}}：{{city}}语音徒步导览 | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -276,8 +276,8 @@ const zh: PartialTranslationDict = {
     iWalked: "我走过了",
     stops: "{{count}}站",
     distance: "{{km}}公里",
-    tagline: "免费语音徒步导览",
-    shareText: "我用StoryStep在{{city}}走完了{{tour}}，一个免费的语音徒步导览。",
+    tagline: "语音徒步导览",
+    shareText: "我用StoryStep在{{city}}走完了{{tour}}，一个语音徒步导览。",
     downloadedCopied: "图片已保存，链接已复制。",
     downloaded: "图片已保存。",
     copied: "链接已复制。",

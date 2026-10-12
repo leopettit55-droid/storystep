@@ -261,7 +261,7 @@ const ru: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep: пешие экскурсии с ИИ-рассказчиком по Лондону, Парижу и Оксфорду",
-    tour: "{{tour}}: бесплатная аудиоэкскурсия по городу {{city}} | StoryStep",
+    tour: "{{tour}}: аудиоэкскурсия по городу {{city}} | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -277,8 +277,8 @@ const ru: PartialTranslationDict = {
     iWalked: "Я прошёл",
     stops: "Остановок: {{count}}",
     distance: "{{km}} км",
-    tagline: "Бесплатные пешие аудиоэкскурсии",
-    shareText: "Я прошёл «{{tour}}» ({{city}}) со StoryStep — бесплатной пешей аудиоэкскурсией.",
+    tagline: "Пешие аудиоэкскурсии",
+    shareText: "Я прошёл «{{tour}}» ({{city}}) со StoryStep — пешей аудиоэкскурсией.",
     downloadedCopied: "Изображение сохранено, ссылка скопирована.",
     downloaded: "Изображение сохранено.",
     copied: "Ссылка скопирована.",
