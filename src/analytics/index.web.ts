@@ -1,5 +1,5 @@
 import posthog from "posthog-js";
-import { GA_MEASUREMENT_ID, POSTHOG_HOST, POSTHOG_KEY, type EventProps } from "./config";
+import { GA_MEASUREMENT_IDS, POSTHOG_HOST, POSTHOG_KEY, type EventProps } from "./config";
 
 /** Website analytics: PostHog plus Google Analytics 4. Both load only after
  * the visitor accepts tracking, and both count page changes on their own. */
@@ -10,7 +10,7 @@ type GaWindow = Window & { dataLayer?: unknown[]; gtag?: Gtag } & Record<string,
 let posthogStarted = false;
 let gaStarted = false;
 
-export const analyticsConfigured = POSTHOG_KEY !== "" || GA_MEASUREMENT_ID !== "";
+export const analyticsConfigured = POSTHOG_KEY !== "" || GA_MEASUREMENT_IDS.length > 0;
 
 function startPostHog() {
   if (!POSTHOG_KEY) return;
@@ -27,13 +27,13 @@ function startPostHog() {
 }
 
 function startGoogleAnalytics() {
-  if (!GA_MEASUREMENT_ID || typeof document === "undefined") return;
+  if (GA_MEASUREMENT_IDS.length === 0 || typeof document === "undefined") return;
   const w = window as unknown as GaWindow;
-  w[`ga-disable-${GA_MEASUREMENT_ID}`] = false;
+  for (const id of GA_MEASUREMENT_IDS) w[`ga-disable-${id}`] = false;
   if (gaStarted) return;
   const script = document.createElement("script");
   script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_IDS[0]}`;
   document.head.appendChild(script);
   w.dataLayer = w.dataLayer ?? [];
   w.gtag = function gtag() {
@@ -42,7 +42,8 @@ function startGoogleAnalytics() {
     w.dataLayer!.push(arguments);
   };
   w.gtag("js", new Date());
-  w.gtag("config", GA_MEASUREMENT_ID);
+  // One tag, every property: page views and events go to each.
+  for (const id of GA_MEASUREMENT_IDS) w.gtag("config", id);
   gaStarted = true;
 }
 
@@ -60,8 +61,8 @@ export function startAnalytics() {
 /** Called if the visitor declines or later turns tracking off. */
 export function stopAnalytics() {
   if (posthogStarted) posthog.opt_out_capturing();
-  if (GA_MEASUREMENT_ID && typeof window !== "undefined") {
-    (window as unknown as GaWindow)[`ga-disable-${GA_MEASUREMENT_ID}`] = true;
+  if (typeof window !== "undefined") {
+    for (const id of GA_MEASUREMENT_IDS) (window as unknown as GaWindow)[`ga-disable-${id}`] = true;
   }
 }
 
