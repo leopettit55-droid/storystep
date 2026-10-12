@@ -21,6 +21,7 @@ import { edinburghHarryPotter } from "./areas/edinburgh-harry-potter";
 import { edinburghBurns } from "./areas/edinburgh-burns";
 import { edinburghScott } from "./areas/edinburgh-scott";
 import { edinburghConanDoyle } from "./areas/edinburgh-conan-doyle";
+import { edinburghSomerville } from "./areas/edinburgh-somerville";
 import type { Area } from "./schema";
 
 // Oxford first (Magdalen College leading), then London, Paris and Edinburgh.
@@ -48,6 +49,7 @@ export const areas: Area[] = [
   edinburghBurns,
   edinburghScott,
   edinburghConanDoyle,
+  edinburghSomerville,
 ];
 
 export function getAreaById(id: string): Area | undefined {
