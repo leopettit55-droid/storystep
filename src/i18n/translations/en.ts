@@ -523,6 +523,8 @@ const en = {
   },
 
   arCamera: {
+    hintTitle: "Hold your phone up and look around",
+    hintBody: "Move your phone to explore the scene",
     photoSaveHint: "Choose “Save Image” to add it to your camera roll.",
     photoDownloaded: "Photo downloaded.",
     photoFailed: "Couldn't save the photo.",
