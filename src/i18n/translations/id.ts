@@ -261,7 +261,7 @@ const id: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep: tur jalan kaki dengan narasi AI di London, Paris & Oxford",
-    tour: "{{tour}}: tur audio jalan kaki di {{city}} | StoryStep",
+    tour: "{{tour}}: tur audio jalan kaki gratis di {{city}} | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -277,8 +277,8 @@ const id: PartialTranslationDict = {
     iWalked: "Aku berjalan",
     stops: "{{count}} perhentian",
     distance: "{{km}} km",
-    tagline: "Tur audio jalan kaki",
-    shareText: "Aku menjalani {{tour}} di {{city}} bersama StoryStep, tur audio jalan kaki.",
+    tagline: "Tur audio jalan kaki gratis",
+    shareText: "Aku menjalani {{tour}} di {{city}} bersama StoryStep, tur audio jalan kaki gratis.",
     downloadedCopied: "Gambar disimpan dan tautan disalin.",
     downloaded: "Gambar disimpan.",
     copied: "Tautan disalin.",

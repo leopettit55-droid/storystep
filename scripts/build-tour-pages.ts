@@ -64,7 +64,7 @@ function publishImage(area: Area): string | null {
   return `${SITE}/og/${name}`;
 }
 
-/** schema.org TouristTrip: the stops in order, and its Offer price. No ratings or reviews. */
+/** schema.org TouristTrip: the stops in order, and a free Offer. No ratings or reviews. */
 function structuredData(area: Area, imageUrl: string | null): string {
   const data = {
     "@context": "https://schema.org",
@@ -77,7 +77,7 @@ function structuredData(area: Area, imageUrl: string | null): string {
     provider: { "@type": "Organization", name: "StoryStep", url: `${SITE}/` },
     offers: {
       "@type": "Offer",
-      price: area.price.singleTour.toFixed(2),
+      price: "0",
       priceCurrency: "GBP",
       availability: "https://schema.org/InStock",
       url: tourUrl(area),
@@ -101,7 +101,7 @@ function structuredData(area: Area, imageUrl: string | null): string {
 }
 
 function tourPage(template: string, area: Area): string {
-  const title = `${area.name}: audio walking tour of ${area.city} | StoryStep`;
+  const title = `${area.name}: free audio walking tour of ${area.city} | StoryStep`;
   const description = area.description;
   const url = tourUrl(area);
   const imageUrl = publishImage(area);
