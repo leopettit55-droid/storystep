@@ -3,7 +3,7 @@ export interface PolicySection {
   body: string;
 }
 
-export const PRIVACY_POLICY_EFFECTIVE_DATE = "4 October 2026";
+export const PRIVACY_POLICY_EFFECTIVE_DATE = "6 October 2026";
 
 export const PRIVACY_POLICY_INTRO =
   "This policy explains what information StoryStep collects, why, and what control you have over it. " +
@@ -46,8 +46,12 @@ export const PRIVACY_POLICY_SECTIONS: PolicySection[] = [
       "Purchase and subscription status: when you buy a tour or subscription, checkout happens entirely on Stripe's " +
       "own hosted payment page — StoryStep never sees or stores your card number. We keep a local record on your " +
       "device of which tours you've unlocked and whether a subscription is active, so the app knows what to let you play.\n\n" +
-      "We do not currently use analytics, advertising, or tracking SDKs of any kind — we don't collect usage " +
-      "statistics, crash reports, or device identifiers beyond what the operating system requires to run the app.",
+      "Usage statistics (only if you agree): when you tap Accept on the \"Help us improve StoryStep\" message, we " +
+      "use PostHog and, on the website, Google Analytics to see how StoryStep is used: the pages and screens you open, " +
+      "the tours you start and finish, and general details such as your device type, browser, approximate area " +
+      "(city or country, worked out from your IP address) and how you found the website. If you have an account, " +
+      "this is linked to your account name and a scrambled code made from your email, never the email itself. " +
+      "If you tap No thanks, none of this is collected. We don't use advertising or crash-reporting tools.",
   },
   {
     heading: "How we use this information",
@@ -71,6 +75,10 @@ export const PRIVACY_POLICY_SECTIONS: PolicySection[] = [
       "to render the map. Governed by Google's Privacy Policy: policies.google.com/privacy\n\n" +
       "Stripe — processes all payments via its own hosted checkout page. Stripe receives your payment details " +
       "directly; we do not. Governed by Stripe's Privacy Policy: stripe.com/privacy\n\n" +
+      "PostHog — receives the usage statistics described above, only if you accept them. Stored in the EU. " +
+      "Governed by PostHog's Privacy Policy: posthog.com/privacy\n\n" +
+      "Google Analytics — receives website usage statistics, only if you accept them. Governed by Google's " +
+      "Privacy Policy: policies.google.com/privacy\n\n" +
       "Cloudflare — hosts the StoryStep website and stores the leaderboard and tour photo data described above. " +
       "Governed by Cloudflare's Privacy Policy: cloudflare.com/privacypolicy\n\n" +
       "Other StoryStep users — the leaderboards show your account name and your tour times and counts, and public " +
@@ -96,6 +104,8 @@ export const PRIVACY_POLICY_SECTIONS: PolicySection[] = [
       "Your photos: delete any photo you've shared at any time from Tours → Tour photos.\n" +
       "Leaderboards and photos aren't required: without an account, or if you don't share a photo, nothing about " +
       "your walks is sent to us. To have your leaderboard entries removed, contact us.\n" +
+      "Usage statistics: you choose on the \"Help us improve StoryStep\" message. To change your answer, clear the " +
+      "website's data in your browser or reinstall the app, and you'll be asked again.\n" +
       "Revoke permissions: turn off Location or Camera access for StoryStep any time in your phone's system settings.\n" +
       "Apple Health (iPhone app, only if you connect it): StoryStep reads your step count and walking distance for the " +
       "time you're on a tour, and saves each tour to Health as a walking workout. Only those two totals for each tour " +

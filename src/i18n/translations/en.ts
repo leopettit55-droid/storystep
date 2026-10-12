@@ -594,6 +594,13 @@ const en = {
     hootArrived: "Ah, a most fascinating location indeed.",
     ollieArrived: "Right then, here we are! Bet you didn't know this one.",
   },
+  consent: {
+    title: "Help us improve StoryStep",
+    body: "With your OK, we use PostHog and Google Analytics to see which tours people take and how they find us. We never sell your data.",
+    privacyLink: "Privacy Policy",
+    accept: "Accept",
+    decline: "No thanks",
+  },
 };
 
 export default en;

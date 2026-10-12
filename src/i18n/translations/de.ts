@@ -302,6 +302,14 @@ const de: PartialTranslationDict = {
     hootArrived: "Ah, ein höchst faszinierender Ort, in der Tat.",
     ollieArrived: "So, da wären wir! Wetten, das kanntest du noch nicht?",
   },
+
+  consent: {
+    title: "Hilf uns, StoryStep zu verbessern",
+    body: "Mit deiner Zustimmung nutzen wir PostHog und Google Analytics, um zu sehen, welche Touren gemacht werden und wie man uns findet. Wir verkaufen deine Daten nie.",
+    privacyLink: "Datenschutzerklärung",
+    accept: "Akzeptieren",
+    decline: "Nein danke",
+  },
 };
 
 export default de;

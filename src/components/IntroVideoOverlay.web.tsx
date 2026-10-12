@@ -1,7 +1,6 @@
 import { useNavigation, useRoute, type RouteProp } from "@react-navigation/native";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
-import { SISTER_PRODUCTS } from "../content/sisterProducts";
 import { useLanguage } from "../i18n/LanguageContext";
 import type { MainTabParamList, TabScreenNav } from "../navigation/types";
 import { useTheme } from "../ThemeContext";
@@ -13,7 +12,8 @@ const VIDEO_SRC = require("../../assets/video/globe-explore.mp4");
 /** Landing page shown once per session on Home: a looping, silent background
  * video with a single "Explore" call to action that takes the visitor
  * straight into the Tours list — this is the front door, not a skippable
- * splash screen, so there's no timer and no dismiss-without-choosing. */
+ * splash screen, so there's no timer and no dismiss-without-choosing.
+ * The video starts by itself. */
 export default function IntroVideoOverlay() {
   const navigation = useNavigation<TabScreenNav<"Home">>();
   const route = useRoute<RouteProp<MainTabParamList, "Home">>();
@@ -24,8 +24,8 @@ export default function IntroVideoOverlay() {
   const [dismissed, setDismissed] = useState(alreadySeen);
   const opacity = useRef(new Animated.Value(1)).current;
 
-  // Coming back from a sister product (FoodStep's back button) shows the
-  // podium again, even though it's already been seen this visit.
+  // Coming back from FoodStep's back button shows this landing page again,
+  // even though it's already been seen this visit.
   const reopen = route.params?.intro;
   useEffect(() => {
     if (!reopen) return;
@@ -34,7 +34,7 @@ export default function IntroVideoOverlay() {
     navigation.setParams({ intro: undefined });
   }, [reopen, navigation, opacity]);
 
-  const leaveTo = (tab: "Tours" | "FoodStep") => {
+  const leaveTo = (tab: "Tours") => {
     sessionStorage.setItem(SESSION_KEY, "1");
     Animated.timing(opacity, { toValue: 0, duration: 400, useNativeDriver: true }).start(() => {
       setDismissed(true);
@@ -43,23 +43,53 @@ export default function IntroVideoOverlay() {
   };
   const handleExplore = () => leaveTo("Tours");
 
+  // Phones only autoplay a video that is silent *as an HTML attribute*, which
+  // React doesn't write for `muted`, so set it by hand and start playback
+  // ourselves. If the phone still refuses (Low Power Mode, data saver), the
+  // first touch anywhere starts it, so nobody has to find a play button.
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || dismissed) return;
+    video.muted = true;
+    video.defaultMuted = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    const events = ["touchstart", "pointerdown", "click", "keydown"];
+    const start = () => video.play().then(() => true, () => false);
+    const unlock = () => {
+      void start().then((ok) => {
+        if (ok) removeUnlock();
+      });
+    };
+    const removeUnlock = () => events.forEach((e) => window.removeEventListener(e, unlock));
+    void start().then((ok) => {
+      if (!ok) events.forEach((e) => window.addEventListener(e, unlock, { passive: true }));
+    });
+    return removeUnlock;
+  }, [dismissed]);
+
   if (dismissed) return null;
 
   return (
     <Animated.View style={[styles.overlay, { opacity }]} pointerEvents={dismissed ? "none" : "auto"}>
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <video
+        ref={videoRef}
         autoPlay
         muted
         loop
         playsInline
+        preload="auto"
+        disablePictureInPicture
+        controls={false}
         style={{ width: "100%", height: "100%", objectFit: "cover" }}
         src={VIDEO_SRC}
       />
       <View style={styles.scrim} pointerEvents="none" />
 
-      {/* A podium: StoryStep in the middle, its sister products either side
-          below. BeerStep isn't live yet, so its button doesn't go anywhere. */}
+      {/* StoryStep and a single "Explore" button. */}
       <View style={styles.ctaWrap}>
         <Pressable onPress={handleExplore}>
           <Text style={styles.brand}>StoryStep</Text>
@@ -67,19 +97,6 @@ export default function IntroVideoOverlay() {
         <Pressable style={styles.exploreButton} onPress={handleExplore}>
           <Text style={styles.exploreButtonText}>{t("landing.exploreButton")}</Text>
         </Pressable>
-        <View style={styles.podium}>
-          {SISTER_PRODUCTS.map((p) => (
-            <View key={p.name} style={styles.product}>
-              <Text style={styles.brand}>{p.name}</Text>
-              <Pressable
-                style={[styles.exploreButton, styles.soonButton, { backgroundColor: p.color }]}
-                onPress={p.route ? () => leaveTo(p.route) : undefined}
-              >
-                <Text style={styles.exploreButtonText}>{t("landing.comingSoon")}</Text>
-              </Pressable>
-            </View>
-          ))}
-        </View>
       </View>
     </Animated.View>
   );
@@ -130,16 +147,5 @@ function createStyles(colors: ThemeColors) {
     paddingHorizontal: 48,
   },
   exploreButtonText: { color: colors.onPrimary, fontSize: 17, fontWeight: "800" },
-  podium: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 16,
-    marginTop: 28,
-    width: "100%",
-    maxWidth: 520,
-  },
-  product: { flex: 1, alignItems: "center", gap: 18 },
-  // Narrower padding than Explore so "Coming soon" fits two-up on a phone.
-  soonButton: { paddingHorizontal: 24 },
   });
 }
