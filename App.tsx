@@ -11,6 +11,9 @@ import { Alert, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ErrorBoundary from "./src/components/ErrorBoundary";
 import LanguageGate from "./src/components/LanguageGate";
+import CookieConsent from "./src/components/CookieConsent";
+import { trackScreen } from "./src/analytics";
+import { startAnalyticsWiring } from "./src/analytics/wiring";
 import { LanguageProvider, useLanguage } from "./src/i18n/LanguageContext";
 import { ThemeProvider, useTheme } from "./src/ThemeContext";
 import MainTabNavigator from "./src/navigation/MainTabNavigator";
@@ -148,6 +151,9 @@ function AppInner() {
     startCompletionSync();
     void useHealthStore.getState().load();
   }, []);
+  // Usage stats (PostHog, and Google Analytics on the website), only after
+  // the visitor accepts the banner.
+  useEffect(() => startAnalyticsWiring(), []);
   const { colors, isDark } = useTheme();
   const navTheme = isDark ? NavDarkTheme : NavDefaultTheme;
   return (
@@ -191,6 +197,12 @@ function AppInner() {
           },
         }}
         onReady={() => handlePurchaseReturn(t)}
+        onStateChange={() => {
+          const route = navigationRef.getCurrentRoute();
+          if (!route) return;
+          const areaId = (route.params as { areaId?: string } | undefined)?.areaId;
+          trackScreen(route.name, areaId ? { tour_id: areaId } : undefined);
+        }}
         theme={{
           ...navTheme,
           colors: { ...navTheme.colors, background: colors.background, card: colors.surface, text: colors.text, border: colors.border, primary: colors.primary },
@@ -224,6 +236,7 @@ function AppInner() {
         </Stack.Navigator>
       </NavigationContainer>
       <LanguageGate />
+      <CookieConsent onOpenPrivacy={() => navigationRef.isReady() && navigationRef.navigate("PrivacyPolicy")} />
     </GestureHandlerRootView>
   );
 }
