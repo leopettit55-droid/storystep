@@ -259,7 +259,7 @@ const en = {
 
   pageTitle: {
     home: "StoryStep: AI-narrated walking tours of London, Paris & Oxford",
-    tour: "{{tour}}: free audio walking tour of {{city}} | StoryStep",
+    tour: "{{tour}}: audio walking tour of {{city}} | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -472,8 +472,8 @@ const en = {
     iWalked: "I walked",
     stops: "{{count}} stops",
     distance: "{{km}} km",
-    tagline: "Free audio walking tours",
-    shareText: "I walked {{tour}} in {{city}} with StoryStep, a free audio walking tour.",
+    tagline: "Audio walking tours",
+    shareText: "I walked {{tour}} in {{city}} with StoryStep, an audio walking tour.",
     downloadedCopied: "Image saved, and the link is copied.",
     downloaded: "Image saved.",
     copied: "Link copied.",

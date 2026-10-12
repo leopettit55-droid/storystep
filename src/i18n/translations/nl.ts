@@ -261,7 +261,7 @@ const nl: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep: door AI vertelde wandeltours door Londen, Parijs & Oxford",
-    tour: "{{tour}}: gratis audiowandeltour door {{city}} | StoryStep",
+    tour: "{{tour}}: audiowandeltour door {{city}} | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -277,8 +277,8 @@ const nl: PartialTranslationDict = {
     iWalked: "Ik liep",
     stops: "{{count}} stops",
     distance: "{{km}} km",
-    tagline: "Gratis audiowandeltours",
-    shareText: "Ik liep {{tour}} in {{city}} met StoryStep, een gratis audiowandeltour.",
+    tagline: "Audiowandeltours",
+    shareText: "Ik liep {{tour}} in {{city}} met StoryStep, een audiowandeltour.",
     downloadedCopied: "Afbeelding opgeslagen en link gekopieerd.",
     downloaded: "Afbeelding opgeslagen.",
     copied: "Link gekopieerd.",

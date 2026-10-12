@@ -22,7 +22,7 @@ export const oxfordInklings: Area = {
   isContentComplete: true,
   enableInteractiveGuide: true,
   image: require("../../../assets/tours/oxford-inklings.jpg"),
-  price: { singleTour: 4.99 },
+  price: { singleTour: 0.99 },
   startingPoint: {
     lat: 51.7566,
     lng: -1.2601,
