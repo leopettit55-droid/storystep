@@ -1,0 +1,870 @@
+import type { Area } from "../schema";
+
+/**
+ * Charles Dickens's London: from 48 Doughty Street, where he became famous, through
+ * Gray's Inn, Furnival's Inn, Lincoln's Inn (Bleak House) and Fleet Street, to the
+ * Fleet Prison site, across Blackfriars Bridge to Lant Street, St George the Martyr,
+ * the Marshalsea wall, the George Inn and London Bridge. Researched October 2026.
+ *
+ * Dickens's own words about his childhood come from the autobiographical fragment
+ * printed in John Forster's Life of Charles Dickens (Project Gutenberg #25851): the
+ * blacking warehouse at Hungerford Stairs, the pots of blacking, six shillings a
+ * week, "My father and mother were quite satisfied", the back-attic in Lant Street,
+ * "No advice, no counsel...", Captain Porter, his father's advice on twenty pounds a
+ * year, London Bridge and the Marchioness, "I never afterwards forgot...". Also from
+ * Forster: Edward Blackmore's memory of him as a clerk (May 1827 - Nov 1828,
+ * 13s 6d then 15s a week), the dark letter-box in Fleet Street and Westminster Hall,
+ * the Fleet/Marshalsea line, the 1837 letter about the magistrate Laing. Novel
+ * quotations from Project Gutenberg: Pickwick (#580, Bob Sawyer's Lant Street),
+ * Bleak House (#1023, the fog), Little Dorrit (#963: the Marshalsea "a few doors
+ * short of the church of Saint George", the vestry, Tip and "the George", the 1857
+ * preface on finding the prison's remains). Other sources: Charles Dickens Museum
+ * and English Heritage (Doughty Street dates, Mary Hogarth), Wikipedia (Furnival's
+ * Inn, Fleet Prison), Great Ormond Street history pages (the 1858 speech), Gray's
+ * Inn (his desk), Southwark sources and Atlas Obscura (the Marshalsea wall, the £40
+ * 10s debt), CAMRA and the National Trust (the George Inn).
+ *
+ * Where sources disagree, the scripts avoid the detail or say so:
+ *  - Blackmore's office: Raymond Buildings or South Square (said in the script);
+ *    his first wage, 10s 6d or 13s 6d (Forster's 13s 6d, from Blackmore, is used).
+ *  - The "dark court": Johnson's Court or Gough Square (said in the script).
+ *  - Little Dorrit's wedding at St George's isn't used: the text available here
+ *    couldn't confirm it.
+ *  - The Old Curiosity Shop in Portsmouth Street is left out: its link to the novel
+ *    is doubtful. Cleveland Street workhouse (a suggested Oliver Twist model) and
+ *    Hungerford Stairs are off the route; Hungerford is described from Blackfriars
+ *    Bridge.
+ *
+ * Stops and the walking path come from OpenStreetMap (sites via Nominatim and
+ * Overpass; the path routed along OSM footways by the FOSSGIS foot router). Accurate
+ * to a few metres, not surveyed: walk the route once before promoting it.
+ *
+ * Narration: these recordings are TEMPORARY, made with Google text-to-speech in
+ * Professor Hoot's "Ask your guide" voice (en-GB-Standard-A). Replace them with the
+ * original narrator's ElevenLabs voice, same file names.
+ *
+ * Cover: Robert William Buss, "Dickens's Dream" (1875, unfinished), public domain.
+ */
+
+/**
+ * Doughty Street -> Gray's Inn Road -> High Holborn -> Chancery Lane -> Fleet Street
+ * -> Farringdon Street -> Blackfriars Bridge -> Southwark Street -> Lant Street ->
+ * Borough High Street -> Angel Place -> London Bridge. About 5.9 km.
+ */
+const path = [
+  { lat: 51.523524, lng: -0.116481 },
+  { lat: 51.522863, lng: -0.11593 },
+  { lat: 51.522806, lng: -0.115865 },
+  { lat: 51.522815, lng: -0.115739 },
+  { lat: 51.522871, lng: -0.115046 },
+  { lat: 51.522961, lng: -0.1146 },
+  { lat: 51.52294, lng: -0.114581 },
+  { lat: 51.522934, lng: -0.114576 },
+  { lat: 51.522943, lng: -0.114535 },
+  { lat: 51.522942, lng: -0.114517 },
+  { lat: 51.522935, lng: -0.114507 },
+  { lat: 51.522511, lng: -0.114177 },
+  { lat: 51.522362, lng: -0.11404 },
+  { lat: 51.522343, lng: -0.114022 },
+  { lat: 51.522329, lng: -0.114012 },
+  { lat: 51.522311, lng: -0.113998 },
+  { lat: 51.521954, lng: -0.113715 },
+  { lat: 51.521858, lng: -0.113657 },
+  { lat: 51.521646, lng: -0.113506 },
+  { lat: 51.521589, lng: -0.11347 },
+  { lat: 51.521581, lng: -0.113473 },
+  { lat: 51.521561, lng: -0.113523 },
+  { lat: 51.52154, lng: -0.113506 },
+  { lat: 51.521517, lng: -0.113489 },
+  { lat: 51.52147, lng: -0.113453 },
+  { lat: 51.521416, lng: -0.113412 },
+  { lat: 51.5214, lng: -0.113399 },
+  { lat: 51.521408, lng: -0.113352 },
+  { lat: 51.521401, lng: -0.113331 },
+  { lat: 51.521376, lng: -0.113312 },
+  { lat: 51.521355, lng: -0.1133 },
+  { lat: 51.521243, lng: -0.113234 },
+  { lat: 51.521141, lng: -0.113173 },
+  { lat: 51.520359, lng: -0.112673 },
+  { lat: 51.520185, lng: -0.112554 },
+  { lat: 51.519746, lng: -0.112278 },
+  { lat: 51.519644, lng: -0.112232 },
+  { lat: 51.519291, lng: -0.112048 },
+  { lat: 51.518836, lng: -0.111735 },
+  { lat: 51.518763, lng: -0.111685 },
+  { lat: 51.518424, lng: -0.111495 },
+  { lat: 51.518358, lng: -0.111483 },
+  { lat: 51.518326, lng: -0.111494 },
+  { lat: 51.518304, lng: -0.111517 },
+  { lat: 51.518308, lng: -0.111649 },
+  { lat: 51.518313, lng: -0.111795 },
+  { lat: 51.518321, lng: -0.112017 },
+  { lat: 51.518313, lng: -0.111795 },
+  { lat: 51.518308, lng: -0.111649 },
+  { lat: 51.518304, lng: -0.111517 },
+  { lat: 51.518304, lng: -0.11147 },
+  { lat: 51.518299, lng: -0.11138 },
+  { lat: 51.518291, lng: -0.111247 },
+  { lat: 51.518288, lng: -0.111222 },
+  { lat: 51.518277, lng: -0.111113 },
+  { lat: 51.518267, lng: -0.111013 },
+  { lat: 51.518252, lng: -0.110988 },
+  { lat: 51.518199, lng: -0.11067 },
+  { lat: 51.518197, lng: -0.110666 },
+  { lat: 51.518196, lng: -0.110663 },
+  { lat: 51.518189, lng: -0.110612 },
+  { lat: 51.518184, lng: -0.110565 },
+  { lat: 51.518185, lng: -0.11055 },
+  { lat: 51.518149, lng: -0.110492 },
+  { lat: 51.518106, lng: -0.109953 },
+  { lat: 51.518113, lng: -0.109951 },
+  { lat: 51.518189, lng: -0.109922 },
+  { lat: 51.51827, lng: -0.109899 },
+  { lat: 51.518277, lng: -0.110005 },
+  { lat: 51.51834, lng: -0.109994 },
+  { lat: 51.518277, lng: -0.110005 },
+  { lat: 51.51827, lng: -0.109899 },
+  { lat: 51.518189, lng: -0.109922 },
+  { lat: 51.518113, lng: -0.109951 },
+  { lat: 51.518106, lng: -0.109953 },
+  { lat: 51.518149, lng: -0.110492 },
+  { lat: 51.518185, lng: -0.11055 },
+  { lat: 51.518184, lng: -0.110565 },
+  { lat: 51.518189, lng: -0.110612 },
+  { lat: 51.518196, lng: -0.110663 },
+  { lat: 51.518197, lng: -0.110666 },
+  { lat: 51.518199, lng: -0.11067 },
+  { lat: 51.518252, lng: -0.110988 },
+  { lat: 51.518267, lng: -0.111013 },
+  { lat: 51.518277, lng: -0.111113 },
+  { lat: 51.51823, lng: -0.111126 },
+  { lat: 51.518198, lng: -0.111137 },
+  { lat: 51.518167, lng: -0.111147 },
+  { lat: 51.518139, lng: -0.111157 },
+  { lat: 51.518113, lng: -0.111165 },
+  { lat: 51.518075, lng: -0.111178 },
+  { lat: 51.518044, lng: -0.111188 },
+  { lat: 51.518061, lng: -0.111409 },
+  { lat: 51.518073, lng: -0.111579 },
+  { lat: 51.518075, lng: -0.111609 },
+  { lat: 51.517664, lng: -0.111649 },
+  { lat: 51.517601, lng: -0.111652 },
+  { lat: 51.517442, lng: -0.111667 },
+  { lat: 51.517434, lng: -0.111708 },
+  { lat: 51.51738, lng: -0.111846 },
+  { lat: 51.517259, lng: -0.112167 },
+  { lat: 51.517232, lng: -0.112142 },
+  { lat: 51.517006, lng: -0.11271 },
+  { lat: 51.516725, lng: -0.112461 },
+  { lat: 51.516318, lng: -0.112094 },
+  { lat: 51.51614, lng: -0.111968 },
+  { lat: 51.516159, lng: -0.1119 },
+  { lat: 51.516205, lng: -0.111583 },
+  { lat: 51.516159, lng: -0.1119 },
+  { lat: 51.51614, lng: -0.111968 },
+  { lat: 51.515965, lng: -0.111864 },
+  { lat: 51.515899, lng: -0.111825 },
+  { lat: 51.515878, lng: -0.111813 },
+  { lat: 51.515351, lng: -0.111514 },
+  { lat: 51.51533, lng: -0.111503 },
+  { lat: 51.515298, lng: -0.111486 },
+  { lat: 51.515018, lng: -0.111378 },
+  { lat: 51.514984, lng: -0.111366 },
+  { lat: 51.514956, lng: -0.111355 },
+  { lat: 51.514966, lng: -0.111341 },
+  { lat: 51.514977, lng: -0.111278 },
+  { lat: 51.515001, lng: -0.111074 },
+  { lat: 51.515021, lng: -0.110917 },
+  { lat: 51.515031, lng: -0.110672 },
+  { lat: 51.515066, lng: -0.110429 },
+  { lat: 51.515133, lng: -0.109956 },
+  { lat: 51.515137, lng: -0.109861 },
+  { lat: 51.515099, lng: -0.109678 },
+  { lat: 51.515091, lng: -0.109657 },
+  { lat: 51.515038, lng: -0.10968 },
+  { lat: 51.514935, lng: -0.109699 },
+  { lat: 51.514733, lng: -0.109703 },
+  { lat: 51.514567, lng: -0.109662 },
+  { lat: 51.514472, lng: -0.10963 },
+  { lat: 51.514356, lng: -0.109572 },
+  { lat: 51.514284, lng: -0.109567 },
+  { lat: 51.514227, lng: -0.109573 },
+  { lat: 51.514201, lng: -0.109581 },
+  { lat: 51.514203, lng: -0.109564 },
+  { lat: 51.514214, lng: -0.109464 },
+  { lat: 51.514224, lng: -0.109373 },
+  { lat: 51.514226, lng: -0.10936 },
+  { lat: 51.514206, lng: -0.109312 },
+  { lat: 51.514206, lng: -0.109288 },
+  { lat: 51.514209, lng: -0.109236 },
+  { lat: 51.514213, lng: -0.109184 },
+  { lat: 51.514222, lng: -0.109081 },
+  { lat: 51.51424, lng: -0.108848 },
+  { lat: 51.514263, lng: -0.108556 },
+  { lat: 51.514272, lng: -0.108213 },
+  { lat: 51.514281, lng: -0.107758 },
+  { lat: 51.514279, lng: -0.107393 },
+  { lat: 51.514278, lng: -0.107243 },
+  { lat: 51.514276, lng: -0.10712 },
+  { lat: 51.514268, lng: -0.106912 },
+  { lat: 51.51426, lng: -0.106521 },
+  { lat: 51.514258, lng: -0.106381 },
+  { lat: 51.514254, lng: -0.106137 },
+  { lat: 51.514252, lng: -0.105927 },
+  { lat: 51.514247, lng: -0.105683 },
+  { lat: 51.514252, lng: -0.105404 },
+  { lat: 51.514253, lng: -0.105214 },
+  { lat: 51.514252, lng: -0.105048 },
+  { lat: 51.514245, lng: -0.10469 },
+  { lat: 51.514244, lng: -0.104621 },
+  { lat: 51.514254, lng: -0.104594 },
+  { lat: 51.514266, lng: -0.104562 },
+  { lat: 51.514582, lng: -0.104624 },
+  { lat: 51.514616, lng: -0.104633 },
+  { lat: 51.51462, lng: -0.104588 },
+  { lat: 51.514623, lng: -0.104559 },
+  { lat: 51.514623, lng: -0.104554 },
+  { lat: 51.514633, lng: -0.104466 },
+  { lat: 51.514634, lng: -0.104463 },
+  { lat: 51.51465, lng: -0.104424 },
+  { lat: 51.515035, lng: -0.104506 },
+  { lat: 51.515222, lng: -0.104554 },
+  { lat: 51.515272, lng: -0.104562 },
+  { lat: 51.515281, lng: -0.104451 },
+  { lat: 51.515246, lng: -0.104445 },
+  { lat: 51.515202, lng: -0.10444 },
+  { lat: 51.515198, lng: -0.10444 },
+  { lat: 51.515153, lng: -0.104437 },
+  { lat: 51.515152, lng: -0.104422 },
+  { lat: 51.515168, lng: -0.104411 },
+  { lat: 51.515181, lng: -0.104389 },
+  { lat: 51.515197, lng: -0.104358 },
+  { lat: 51.515228, lng: -0.104299 },
+  { lat: 51.515258, lng: -0.104232 },
+  { lat: 51.515278, lng: -0.104168 },
+  { lat: 51.515297, lng: -0.104102 },
+  { lat: 51.515311, lng: -0.104027 },
+  { lat: 51.515323, lng: -0.103884 },
+  { lat: 51.515346, lng: -0.103871 },
+  { lat: 51.515473, lng: -0.103849 },
+  { lat: 51.515525, lng: -0.103829 },
+  { lat: 51.515473, lng: -0.103849 },
+  { lat: 51.515346, lng: -0.103871 },
+  { lat: 51.515323, lng: -0.103884 },
+  { lat: 51.515356, lng: -0.103855 },
+  { lat: 51.515359, lng: -0.103628 },
+  { lat: 51.515362, lng: -0.10331 },
+  { lat: 51.515309, lng: -0.103309 },
+  { lat: 51.515309, lng: -0.103198 },
+  { lat: 51.515289, lng: -0.103123 },
+  { lat: 51.515289, lng: -0.10312 },
+  { lat: 51.515273, lng: -0.103082 },
+  { lat: 51.515261, lng: -0.103101 },
+  { lat: 51.515229, lng: -0.103148 },
+  { lat: 51.515146, lng: -0.103259 },
+  { lat: 51.514999, lng: -0.103407 },
+  { lat: 51.514814, lng: -0.103562 },
+  { lat: 51.514772, lng: -0.103587 },
+  { lat: 51.51421, lng: -0.10359 },
+  { lat: 51.514211, lng: -0.103666 },
+  { lat: 51.514214, lng: -0.103795 },
+  { lat: 51.514229, lng: -0.10412 },
+  { lat: 51.51423, lng: -0.104141 },
+  { lat: 51.514218, lng: -0.104141 },
+  { lat: 51.51416, lng: -0.104142 },
+  { lat: 51.514115, lng: -0.104145 },
+  { lat: 51.514074, lng: -0.104146 },
+  { lat: 51.514067, lng: -0.104181 },
+  { lat: 51.514055, lng: -0.104215 },
+  { lat: 51.513748, lng: -0.104167 },
+  { lat: 51.513713, lng: -0.10416 },
+  { lat: 51.51369, lng: -0.104155 },
+  { lat: 51.513238, lng: -0.104084 },
+  { lat: 51.513088, lng: -0.10406 },
+  { lat: 51.513057, lng: -0.104063 },
+  { lat: 51.513029, lng: -0.104067 },
+  { lat: 51.513017, lng: -0.104068 },
+  { lat: 51.512996, lng: -0.10408 },
+  { lat: 51.512593, lng: -0.104075 },
+  { lat: 51.512375, lng: -0.104083 },
+  { lat: 51.512126, lng: -0.103982 },
+  { lat: 51.512014, lng: -0.10395 },
+  { lat: 51.511997, lng: -0.103938 },
+  { lat: 51.51197, lng: -0.103914 },
+  { lat: 51.511959, lng: -0.103904 },
+  { lat: 51.511949, lng: -0.103895 },
+  { lat: 51.51191, lng: -0.103861 },
+  { lat: 51.511877, lng: -0.103831 },
+  { lat: 51.511869, lng: -0.103825 },
+  { lat: 51.511852, lng: -0.10381 },
+  { lat: 51.511826, lng: -0.103864 },
+  { lat: 51.511813, lng: -0.103887 },
+  { lat: 51.511764, lng: -0.103953 },
+  { lat: 51.511693, lng: -0.104001 },
+  { lat: 51.511642, lng: -0.104015 },
+  { lat: 51.511581, lng: -0.104025 },
+  { lat: 51.511487, lng: -0.104035 },
+  { lat: 51.511478, lng: -0.104039 },
+  { lat: 51.511473, lng: -0.104039 },
+  { lat: 51.511454, lng: -0.10404 },
+  { lat: 51.511436, lng: -0.10404 },
+  { lat: 51.511427, lng: -0.104043 },
+  { lat: 51.511421, lng: -0.104044 },
+  { lat: 51.511395, lng: -0.1041 },
+  { lat: 51.511311, lng: -0.104118 },
+  { lat: 51.51113, lng: -0.104144 },
+  { lat: 51.51097, lng: -0.104146 },
+  { lat: 51.510944, lng: -0.104146 },
+  { lat: 51.510769, lng: -0.104158 },
+  { lat: 51.510521, lng: -0.104165 },
+  { lat: 51.510397, lng: -0.104169 },
+  { lat: 51.510048, lng: -0.104185 },
+  { lat: 51.509654, lng: -0.104199 },
+  { lat: 51.509205, lng: -0.104213 },
+  { lat: 51.508751, lng: -0.104227 },
+  { lat: 51.508597, lng: -0.10423 },
+  { lat: 51.508486, lng: -0.104234 },
+  { lat: 51.508408, lng: -0.104235 },
+  { lat: 51.508377, lng: -0.104234 },
+  { lat: 51.508173, lng: -0.104247 },
+  { lat: 51.508173, lng: -0.104283 },
+  { lat: 51.508172, lng: -0.104354 },
+  { lat: 51.508224, lng: -0.104358 },
+  { lat: 51.508317, lng: -0.104371 },
+  { lat: 51.508422, lng: -0.104394 },
+  { lat: 51.508437, lng: -0.104397 },
+  { lat: 51.508488, lng: -0.10446 },
+  { lat: 51.508555, lng: -0.104472 },
+  { lat: 51.5086, lng: -0.10447 },
+  { lat: 51.508555, lng: -0.104472 },
+  { lat: 51.508488, lng: -0.10446 },
+  { lat: 51.508437, lng: -0.104397 },
+  { lat: 51.508422, lng: -0.104394 },
+  { lat: 51.508317, lng: -0.104371 },
+  { lat: 51.508224, lng: -0.104358 },
+  { lat: 51.508172, lng: -0.104354 },
+  { lat: 51.508173, lng: -0.104283 },
+  { lat: 51.508173, lng: -0.104247 },
+  { lat: 51.508164, lng: -0.104248 },
+  { lat: 51.508126, lng: -0.104247 },
+  { lat: 51.508028, lng: -0.104216 },
+  { lat: 51.507264, lng: -0.104217 },
+  { lat: 51.507232, lng: -0.104218 },
+  { lat: 51.507202, lng: -0.104205 },
+  { lat: 51.50718, lng: -0.104186 },
+  { lat: 51.507158, lng: -0.104151 },
+  { lat: 51.507021, lng: -0.103845 },
+  { lat: 51.50672, lng: -0.103139 },
+  { lat: 51.506521, lng: -0.102609 },
+  { lat: 51.506524, lng: -0.102555 },
+  { lat: 51.506512, lng: -0.102522 },
+  { lat: 51.506489, lng: -0.102452 },
+  { lat: 51.506473, lng: -0.1024 },
+  { lat: 51.506462, lng: -0.10237 },
+  { lat: 51.506362, lng: -0.102067 },
+  { lat: 51.506083, lng: -0.101101 },
+  { lat: 51.506027, lng: -0.100889 },
+  { lat: 51.506023, lng: -0.100853 },
+  { lat: 51.506028, lng: -0.100815 },
+  { lat: 51.50602, lng: -0.100784 },
+  { lat: 51.50601, lng: -0.100733 },
+  { lat: 51.505992, lng: -0.100666 },
+  { lat: 51.505984, lng: -0.10063 },
+  { lat: 51.505961, lng: -0.100563 },
+  { lat: 51.505867, lng: -0.100219 },
+  { lat: 51.50568, lng: -0.099515 },
+  { lat: 51.505508, lng: -0.098635 },
+  { lat: 51.505395, lng: -0.098085 },
+  { lat: 51.505343, lng: -0.097783 },
+  { lat: 51.505306, lng: -0.09757 },
+  { lat: 51.505282, lng: -0.09743 },
+  { lat: 51.505252, lng: -0.097342 },
+  { lat: 51.505237, lng: -0.097261 },
+  { lat: 51.505225, lng: -0.097193 },
+  { lat: 51.505225, lng: -0.097161 },
+  { lat: 51.505208, lng: -0.09713 },
+  { lat: 51.505118, lng: -0.096573 },
+  { lat: 51.505115, lng: -0.096555 },
+  { lat: 51.505112, lng: -0.096533 },
+  { lat: 51.505113, lng: -0.096454 },
+  { lat: 51.505025, lng: -0.095843 },
+  { lat: 51.505001, lng: -0.095851 },
+  { lat: 51.504946, lng: -0.095869 },
+  { lat: 51.50489, lng: -0.095887 },
+  { lat: 51.504876, lng: -0.095892 },
+  { lat: 51.504869, lng: -0.095845 },
+  { lat: 51.504853, lng: -0.095809 },
+  { lat: 51.504834, lng: -0.095794 },
+  { lat: 51.504596, lng: -0.095788 },
+  { lat: 51.504446, lng: -0.095782 },
+  { lat: 51.504425, lng: -0.095781 },
+  { lat: 51.504063, lng: -0.095825 },
+  { lat: 51.504, lng: -0.095831 },
+  { lat: 51.503937, lng: -0.095831 },
+  { lat: 51.503935, lng: -0.095885 },
+  { lat: 51.503925, lng: -0.095883 },
+  { lat: 51.503911, lng: -0.095883 },
+  { lat: 51.503899, lng: -0.095882 },
+  { lat: 51.503886, lng: -0.095882 },
+  { lat: 51.503881, lng: -0.095848 },
+  { lat: 51.503851, lng: -0.095848 },
+  { lat: 51.503641, lng: -0.095877 },
+  { lat: 51.503536, lng: -0.095892 },
+  { lat: 51.503403, lng: -0.095908 },
+  { lat: 51.503347, lng: -0.095921 },
+  { lat: 51.503296, lng: -0.095936 },
+  { lat: 51.503232, lng: -0.095967 },
+  { lat: 51.503157, lng: -0.096019 },
+  { lat: 51.503105, lng: -0.096065 },
+  { lat: 51.503098, lng: -0.096047 },
+  { lat: 51.503076, lng: -0.095972 },
+  { lat: 51.503045, lng: -0.095862 },
+  { lat: 51.503038, lng: -0.095843 },
+  { lat: 51.503011, lng: -0.095868 },
+  { lat: 51.50299, lng: -0.09588 },
+  { lat: 51.50296, lng: -0.095886 },
+  { lat: 51.502921, lng: -0.095886 },
+  { lat: 51.502882, lng: -0.095872 },
+  { lat: 51.502811, lng: -0.095829 },
+  { lat: 51.502743, lng: -0.095784 },
+  { lat: 51.50272, lng: -0.095769 },
+  { lat: 51.502583, lng: -0.095671 },
+  { lat: 51.502566, lng: -0.095658 },
+  { lat: 51.502536, lng: -0.09564 },
+  { lat: 51.502514, lng: -0.095624 },
+  { lat: 51.502511, lng: -0.095622 },
+  { lat: 51.502343, lng: -0.095509 },
+  { lat: 51.502315, lng: -0.095484 },
+  { lat: 51.502285, lng: -0.095465 },
+  { lat: 51.502201, lng: -0.095373 },
+  { lat: 51.502072, lng: -0.095222 },
+  { lat: 51.50202, lng: -0.095147 },
+  { lat: 51.502013, lng: -0.095137 },
+  { lat: 51.502002, lng: -0.09512 },
+  { lat: 51.501978, lng: -0.09508 },
+  { lat: 51.501932, lng: -0.095002 },
+  { lat: 51.501885, lng: -0.09492 },
+  { lat: 51.501822, lng: -0.09475 },
+  { lat: 51.501781, lng: -0.094646 },
+  { lat: 51.501775, lng: -0.09463 },
+  { lat: 51.501761, lng: -0.094594 },
+  { lat: 51.501706, lng: -0.094636 },
+  { lat: 51.501726, lng: -0.094693 },
+  { lat: 51.501673, lng: -0.094726 },
+  { lat: 51.501662, lng: -0.094732 },
+  { lat: 51.501601, lng: -0.094765 },
+  { lat: 51.50152, lng: -0.094809 },
+  { lat: 51.501463, lng: -0.094838 },
+  { lat: 51.501387, lng: -0.094871 },
+  { lat: 51.501354, lng: -0.094891 },
+  { lat: 51.501315, lng: -0.094913 },
+  { lat: 51.501263, lng: -0.094955 },
+  { lat: 51.501066, lng: -0.095135 },
+  { lat: 51.501055, lng: -0.095145 },
+  { lat: 51.501038, lng: -0.095162 },
+  { lat: 51.501026, lng: -0.095111 },
+  { lat: 51.500933, lng: -0.094857 },
+  { lat: 51.500872, lng: -0.094728 },
+  { lat: 51.500849, lng: -0.094681 },
+  { lat: 51.500795, lng: -0.094566 },
+  { lat: 51.500668, lng: -0.094336 },
+  { lat: 51.500656, lng: -0.094317 },
+  { lat: 51.500668, lng: -0.094294 },
+  { lat: 51.500757, lng: -0.094133 },
+  { lat: 51.500877, lng: -0.093932 },
+  { lat: 51.501179, lng: -0.09347 },
+  { lat: 51.501167, lng: -0.09345 },
+  { lat: 51.501139, lng: -0.093403 },
+  { lat: 51.501108, lng: -0.093353 },
+  { lat: 51.501101, lng: -0.09334 },
+  { lat: 51.501061, lng: -0.093401 },
+  { lat: 51.501053, lng: -0.093388 },
+  { lat: 51.501038, lng: -0.093362 },
+  { lat: 51.50102, lng: -0.093334 },
+  { lat: 51.501002, lng: -0.093306 },
+  { lat: 51.501057, lng: -0.093221 },
+  { lat: 51.50107, lng: -0.093173 },
+  { lat: 51.501069, lng: -0.093134 },
+  { lat: 51.501053, lng: -0.093111 },
+  { lat: 51.501065, lng: -0.093068 },
+  { lat: 51.501079, lng: -0.093016 },
+  { lat: 51.501094, lng: -0.092963 },
+  { lat: 51.501098, lng: -0.092943 },
+  { lat: 51.501163, lng: -0.092991 },
+  { lat: 51.501185, lng: -0.093016 },
+  { lat: 51.501194, lng: -0.092999 },
+  { lat: 51.501209, lng: -0.092963 },
+  { lat: 51.501224, lng: -0.092927 },
+  { lat: 51.501232, lng: -0.092909 },
+  { lat: 51.501178, lng: -0.092698 },
+  { lat: 51.501114, lng: -0.092452 },
+  { lat: 51.501161, lng: -0.092025 },
+  { lat: 51.501176, lng: -0.092044 },
+  { lat: 51.501194, lng: -0.092066 },
+  { lat: 51.501252, lng: -0.092144 },
+  { lat: 51.501345, lng: -0.092267 },
+  { lat: 51.501392, lng: -0.092176 },
+  { lat: 51.501414, lng: -0.092134 },
+  { lat: 51.501454, lng: -0.092069 },
+  { lat: 51.501574, lng: -0.092038 },
+  { lat: 51.501607, lng: -0.091986 },
+  { lat: 51.501595, lng: -0.091787 },
+  { lat: 51.501587, lng: -0.091649 },
+  { lat: 51.501585, lng: -0.091607 },
+  { lat: 51.501643, lng: -0.091597 },
+  { lat: 51.501654, lng: -0.091595 },
+  { lat: 51.501658, lng: -0.091638 },
+  { lat: 51.501723, lng: -0.092274 },
+  { lat: 51.501775, lng: -0.092503 },
+  { lat: 51.502081, lng: -0.092336 },
+  { lat: 51.502091, lng: -0.09233 },
+  { lat: 51.502115, lng: -0.092315 },
+  { lat: 51.502178, lng: -0.092288 },
+  { lat: 51.502631, lng: -0.092045 },
+  { lat: 51.502799, lng: -0.091917 },
+  { lat: 51.50312, lng: -0.091676 },
+  { lat: 51.503142, lng: -0.091658 },
+  { lat: 51.503148, lng: -0.091654 },
+  { lat: 51.503151, lng: -0.091646 },
+  { lat: 51.503152, lng: -0.091635 },
+  { lat: 51.503149, lng: -0.091625 },
+  { lat: 51.503161, lng: -0.091618 },
+  { lat: 51.503175, lng: -0.091607 },
+  { lat: 51.503189, lng: -0.091597 },
+  { lat: 51.503197, lng: -0.09159 },
+  { lat: 51.503203, lng: -0.09161 },
+  { lat: 51.503315, lng: -0.091528 },
+  { lat: 51.503411, lng: -0.091454 },
+  { lat: 51.503581, lng: -0.091312 },
+  { lat: 51.50369, lng: -0.091229 },
+  { lat: 51.503753, lng: -0.09118 },
+  { lat: 51.503961, lng: -0.091005 },
+  { lat: 51.504043, lng: -0.090924 },
+  { lat: 51.504114, lng: -0.090831 },
+  { lat: 51.504232, lng: -0.090645 },
+  { lat: 51.504239, lng: -0.09063 },
+  { lat: 51.504253, lng: -0.090608 },
+  { lat: 51.504262, lng: -0.090594 },
+  { lat: 51.504268, lng: -0.090585 },
+  { lat: 51.50442, lng: -0.090353 },
+  { lat: 51.5044, lng: -0.090309 },
+  { lat: 51.504335, lng: -0.090168 },
+  { lat: 51.504285, lng: -0.090213 },
+  { lat: 51.504251, lng: -0.090103 },
+  { lat: 51.504212, lng: -0.089973 },
+  { lat: 51.504251, lng: -0.090103 },
+  { lat: 51.504285, lng: -0.090213 },
+  { lat: 51.504335, lng: -0.090168 },
+  { lat: 51.5044, lng: -0.090309 },
+  { lat: 51.50442, lng: -0.090353 },
+  { lat: 51.504596, lng: -0.090118 },
+  { lat: 51.504648, lng: -0.090051 },
+  { lat: 51.504828, lng: -0.089817 },
+  { lat: 51.504956, lng: -0.089643 },
+  { lat: 51.505011, lng: -0.089568 },
+  { lat: 51.505079, lng: -0.089476 },
+  { lat: 51.505089, lng: -0.089498 },
+  { lat: 51.505103, lng: -0.089525 },
+  { lat: 51.505118, lng: -0.089555 },
+  { lat: 51.50513, lng: -0.08958 },
+  { lat: 51.505147, lng: -0.089615 },
+  { lat: 51.505165, lng: -0.089652 },
+  { lat: 51.505174, lng: -0.089671 },
+  { lat: 51.505187, lng: -0.089664 },
+  { lat: 51.505204, lng: -0.089665 },
+  { lat: 51.505218, lng: -0.089678 },
+  { lat: 51.505225, lng: -0.08967 },
+  { lat: 51.505244, lng: -0.089644 },
+  { lat: 51.505262, lng: -0.089619 },
+  { lat: 51.505274, lng: -0.089602 },
+  { lat: 51.505268, lng: -0.089575 },
+  { lat: 51.505277, lng: -0.08955 },
+  { lat: 51.505333, lng: -0.089481 },
+  { lat: 51.505441, lng: -0.089344 },
+  { lat: 51.505702, lng: -0.089047 },
+  { lat: 51.505728, lng: -0.088976 },
+  { lat: 51.505872, lng: -0.088834 },
+  { lat: 51.506076, lng: -0.088668 },
+  { lat: 51.506087, lng: -0.08866 },
+  { lat: 51.50606, lng: -0.088574 },
+  { lat: 51.506079, lng: -0.088557 },
+  { lat: 51.506094, lng: -0.088526 },
+  { lat: 51.506107, lng: -0.088502 },
+  { lat: 51.506117, lng: -0.088484 },
+  { lat: 51.506133, lng: -0.08846 },
+  { lat: 51.506147, lng: -0.088437 },
+  { lat: 51.506161, lng: -0.088414 },
+  { lat: 51.506167, lng: -0.088398 },
+  { lat: 51.50617, lng: -0.088385 },
+  { lat: 51.506171, lng: -0.088369 },
+  { lat: 51.506165, lng: -0.088296 },
+  { lat: 51.506199, lng: -0.088271 },
+  { lat: 51.506236, lng: -0.088255 },
+  { lat: 51.50622, lng: -0.088169 },
+  { lat: 51.506208, lng: -0.088101 },
+  { lat: 51.506281, lng: -0.088076 },
+  { lat: 51.506371, lng: -0.088043 },
+  { lat: 51.506463, lng: -0.088011 },
+  { lat: 51.506608, lng: -0.087959 },
+];
+
+export const londonDickens: Area = {
+  id: "london-dickens",
+  name: "Dickens's London",
+  city: "London",
+  description:
+    "From the house where Charles Dickens became famous to the debtors' prison where his father was locked up: the boy who pasted labels in a rat-infested blacking warehouse, and how he turned that secret shame into novels that made Victorian England look at its poor.",
+  estimatedDurationMin: 105,
+  estimatedDistanceKm: 5.9,
+  difficulty: "moderate",
+  accessNote:
+    "A longer walk from Bloomsbury to Southwark. Gray's Inn and Lincoln's Inn are working Inns of Court whose gates may be closed at weekends; those stops play from the gateway.",
+  isContentComplete: true,
+  enableInteractiveGuide: true,
+  image: require("../../../assets/tours/london-dickens.jpg"),
+  price: { singleTour: 4.99 },
+  startingPoint: {
+    lat: 51.52355,
+    lng: -0.1164,
+    label: "48 Doughty Street (Charles Dickens Museum)",
+  },
+  route: [
+    {
+      id: "doughty-street",
+      order: 1,
+      name: "48 Doughty Street: the famous man and his secret",
+      coordinates: { lat: 51.52355, lng: -0.1164 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 74,
+        audioSource: require("../../../assets/audio/london-dickens/01-doughty-street.mp3"),
+        scriptText: `Good day, and welcome. This walk follows Charles Dickens across London, from the house where he became famous to the streets south of the river where, as a boy of twelve, he learned what poverty and shame really meant.
+
+Number 48 Doughty Street is the only one of his London homes still standing, and it's now the Charles Dickens Museum. He moved here in March 1837, aged twenty-five, and stayed until the end of 1839. Here he finished The Pickwick Papers and wrote Oliver Twist and Nicholas Nickleby. It was also here, in an upstairs room, that his young sister-in-law Mary Hogarth died, aged seventeen, a grief he carried all his life.
+
+He was already writing to expose cruelty. For Oliver Twist he needed a harsh police magistrate, so he based one on a real man, Mr Laing of Hatton Garden. In a letter from this house he wrote that Laing's "harshness and insolence" made him "a fit subject to be shown up."
+
+Just round the corner is Great Ormond Street Hospital. In 1858, when it was in financial trouble, Dickens made a speech and gave a reading for it that helped keep it going.
+
+But the famous man had a secret, and we'll find it on the other side of the river. First, follow the route south to Gray's Inn.`,
+      },
+    },
+    {
+      id: "grays-inn",
+      order: 2,
+      name: "Gray's Inn: the boy clerk",
+      coordinates: { lat: 51.5185, lng: -0.112 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 73,
+        audioSource: require("../../../assets/audio/london-dickens/02-grays-inn.mp3"),
+        scriptText: `Behind this gateway lies Gray's Inn, one of London's four Inns of Court, the ancient colleges of barristers. In May 1827, aged fifteen, Charles Dickens came to work here as a junior clerk for a solicitor, Edward Blackmore.
+
+Years later, Blackmore remembered him as "a bright, clever-looking youth." Dickens kept the office's petty-cash book, at a salary of thirteen shillings and sixpence a week, rising to fifteen. And Blackmore noticed something else: "Several incidents took place in the office of which he must have been a keen observer, as I recognized some of them in his Pickwick and Nickleby."
+
+He only stayed eighteen months. Dickens taught himself shorthand, became a court reporter, and then one of the best reporters in the press gallery of Parliament. Watching lawyers and politicians at close quarters left him with a lifelong impatience with both.
+
+Sources disagree about exactly where in Gray's Inn the office was, in Raymond Buildings or in what's now South Square. But his high clerk's desk survives. It's in the museum we've just left.
+
+The Inns' gates can be closed at weekends, so this stop works from the gateway. Now walk a few steps east along Holborn, to the great red-brick building opposite.`,
+      },
+    },
+    {
+      id: "furnivals-inn",
+      order: 3,
+      name: "Furnival's Inn: Pickwick and marriage",
+      coordinates: { lat: 51.51835, lng: -0.11015 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 68,
+        audioSource: require("../../../assets/audio/london-dickens/03-furnivals-inn.mp3"),
+        scriptText: `That huge red terracotta building is Holborn Bars, built for the Prudential insurance company. Before it, on this site, stood Furnival's Inn, a set of old chambers where young Dickens rented rooms from December 1834.
+
+It was here, in 1836, that he began The Pickwick Papers, the comic adventures of Mr Pickwick and his friends, published in monthly parts. Sales started slowly, but once Dickens introduced the Cockney servant Sam Weller, the parts sold in their tens of thousands. At twenty-four, he was the most talked-about writer in the country.
+
+That same spring he married Catherine Hogarth, the daughter of a newspaper editor, and the young couple set up home here in his rooms, before moving to Doughty Street the following year.
+
+In 1907, an admirer named Percy Fitzgerald arranged for a plaque on the new building, and gave a bust of Dickens to go with it. They're on the building today.
+
+From here, Dickens's career would rise and rise. But his novels kept returning to the people this kind of success left behind, and to the institutions that ground them down.
+
+Now walk on to Chancery Lane, and the gate of Lincoln's Inn.`,
+      },
+    },
+    {
+      id: "lincolns-inn",
+      order: 4,
+      name: "Lincoln's Inn: fog and Chancery",
+      coordinates: { lat: 51.51625, lng: -0.1116 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 68,
+        audioSource: require("../../../assets/audio/london-dickens/04-lincolns-inn.mp3"),
+        scriptText: `Inside Lincoln's Inn, just beyond this gate, is the Old Hall, where the Court of Chancery once sat. And it's here that Dickens opened one of his greatest novels, Bleak House, published from 1852.
+
+It begins in a November fog: "Fog everywhere. Fog up the river, where it flows among green aits and meadows; fog down the river, where it rolls defiled among the tiers of shipping and the waterside pollutions of a great (and dirty) city." And at the very heart of the fog, in Lincoln's Inn Hall, sits the Lord High Chancellor in his High Court of Chancery.
+
+The fog is Chancery itself. The novel follows an endless case called Jarndyce and Jarndyce, a fight over a will that drags on for generations, until the legal costs swallow the whole fortune and ruin everyone who waits for it.
+
+Dickens knew the lawyers' world from the inside, as a clerk and a court reporter, and from his own frustrating cases in Chancery against pirates who copied his books. Bleak House was his verdict on a system that served itself, not the people who needed it.
+
+These gates can be closed at weekends too. Now follow Chancery Lane down to Fleet Street, and turn left.`,
+      },
+    },
+    {
+      id: "dickens-fleet-street",
+      order: 5,
+      name: "Fleet Street: a dark letter-box",
+      coordinates: { lat: 51.51427, lng: -0.10856 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 61,
+        audioSource: require("../../../assets/audio/london-dickens/05-fleet-street.mp3"),
+        scriptText: `Fleet Street was the heart of London's newspapers and magazines, and up one of these narrow courts, in 1833, a twenty-one-year-old reporter took the biggest risk of his life.
+
+He had written a comic sketch, and, as he later described it, he dropped it "stealthily one evening at twilight, with fear and trembling, into a dark letter-box in a dark office up a dark court in Fleet Street." That court is usually said to be Johnson's Court, right here, though some say it was neighbouring Gough Square.
+
+The sketch was printed in the December issue of the Monthly Magazine, as A Dinner at Poplar Walk. He wasn't paid a penny. But when he saw it in print, he wrote: "I walked down to Westminster Hall, and turned into it for half an hour, because my eyes were so dimmed with joy and pride that they could not bear the street, and were not fit to be seen there."
+
+More sketches followed, signed with the nickname "Boz," and in 1836 they were collected as Sketches by Boz. Within weeks came Pickwick.
+
+Now continue east along Fleet Street, and turn left up Farringdon Street.`,
+      },
+    },
+    {
+      id: "fleet-prison",
+      order: 6,
+      name: "The Fleet Prison: Mr Pickwick inside",
+      coordinates: { lat: 51.51555, lng: -0.104 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 64,
+        audioSource: require("../../../assets/audio/london-dickens/06-fleet-prison.mp3"),
+        scriptText: `Under these modern offices lies the site of the Fleet Prison, one of London's oldest jails, founded in the twelfth century beside the River Fleet, which now runs in a tunnel beneath your feet. By Dickens's time it was mainly a prison for debtors. It closed in 1842 and was pulled down in 1846.
+
+In The Pickwick Papers, kind, comic Mr Pickwick refuses on principle to pay damages in a lawsuit, and is sent to the Fleet. The book suddenly turns serious. He finds whole families living in squalor, men who have been locked up for years because they owe money they can never earn while they're inside.
+
+Dickens wrote those scenes with a knowledge nobody guessed. Years later, he confided to his friend John Forster: "When I looked, with my mind's eye, into the Fleet prison during Mr. Pickwick's incarceration, I wonder whether half a dozen men were wanting from the Marshalsea crowd that came filing in again."
+
+The Marshalsea was another debtors' prison, across the river. And Dickens knew it, because his own father had been locked up there.
+
+Now follow the route south, down to Blackfriars Bridge.`,
+      },
+    },
+    {
+      id: "blackfriars-bridge",
+      order: 7,
+      name: "Blackfriars Bridge: the boy at the blacking warehouse",
+      coordinates: { lat: 51.5086, lng: -0.10445 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 63,
+        audioSource: require("../../../assets/audio/london-dickens/07-blackfriars-bridge.mp3"),
+        scriptText: `Stop on the bridge and look upriver, to the west. Just over a mile away, where Charing Cross station stands today, was Hungerford Stairs. And in 1824, just after his twelfth birthday, Charles Dickens was sent to work there, in a blacking warehouse, making polish for boots.
+
+He never forgot it. "It was a crazy, tumble-down old house, abutting of course on the river, and literally overrun with rats." His job was to cover pots of blacking, "first with a piece of oil-paper, and then with a piece of blue paper," tie them up, and paste on the labels, for six shillings a week.
+
+What hurt most was that nobody seemed to mind. A bright boy who had dreamed of becoming "a learned and distinguished man" was taken out of school and put to work. "My father and mother were quite satisfied," he wrote bitterly.
+
+The bridge you're on has been rebuilt since then, but the river is the one he knew. Every day, that boy walked between the warehouse and a lonely lodging in the Borough, on the south side.
+
+Now cross to the south bank, and follow the route to Lant Street.`,
+      },
+    },
+    {
+      id: "lant-street",
+      order: 8,
+      name: "Lant Street: a back-attic",
+      coordinates: { lat: 51.50085, lng: -0.09468 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 60,
+        audioSource: require("../../../assets/audio/london-dickens/08-lant-street.mp3"),
+        scriptText: `This quiet street in the Borough is where twelve-year-old Charles lived on his own. His father was in the Marshalsea, and the rest of the family had moved into the prison with him. Charles begged for a room nearby, and his father found him one: "a back-attic... at the house of an insolvent-court agent, who lived in Lant Street in the borough." The little window looked out on a timber-yard, and he said, "when I took possession of my new abode I thought it was a Paradise."
+
+He fed himself on what was left of his wages. He wrote: "No advice, no counsel, no encouragement, no consolation, no support, from any one that I can call to mind, so help me God."
+
+Lant Street appears in Pickwick too. The medical student Bob Sawyer lodges here: "Lant Street, Borough; it's near Guy's, and handy for me." And the kindly family who kept Charles's lodging, Dickens said, became the Garlands in The Old Curiosity Shop.
+
+Now walk to Borough High Street, and the church of St George the Martyr.`,
+      },
+    },
+    {
+      id: "st-george-the-martyr",
+      order: 9,
+      name: "St George the Martyr: Little Dorrit's church",
+      coordinates: { lat: 51.50128, lng: -0.09263 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 60,
+        audioSource: require("../../../assets/audio/london-dickens/09-st-george-the-martyr.mp3"),
+        scriptText: `This is St George the Martyr, and in Dickens's novel Little Dorrit, it's Little Dorrit's church. The book opens its story of the debtors' prison this way: "Thirty years ago there stood, a few doors short of the church of Saint George, in the borough of Southwark, on the left-hand side of the way going southward, the Marshalsea Prison."
+
+Little Dorrit is Amy Dorrit, born in the Marshalsea and raised there by a father who has been imprisoned for debt so long he's known as "the Father of the Marshalsea." One night, shut out of the prison after the gates have closed, she is taken in by a kindly old man at this church, who says: "Come into the vestry. You'll find a fire in the vestry."
+
+Dickens wrote Little Dorrit in the 1850s, but it's soaked in what he saw here as a boy. On Sundays he and his sister Fanny spent the whole day inside the prison with the family, and at night he walked back to his lodging, before the gates closed at ten.
+
+The prison wall still stands. Walk round to Angel Place, the narrow alley just beyond the churchyard.`,
+      },
+    },
+    {
+      id: "marshalsea",
+      order: 10,
+      name: "The Marshalsea wall",
+      coordinates: { lat: 51.50164, lng: -0.09158 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 67,
+        audioSource: require("../../../assets/audio/london-dickens/10-marshalsea.mp3"),
+        scriptText: `This long brick wall beside Angel Place is all that's left of the Marshalsea, the debtors' prison where John Dickens was locked up in 1824, owing a baker forty pounds and ten shillings.
+
+His son never forgot visiting him. His father cried, and gave him a piece of advice: "if a man had twenty pounds a year and spent nineteen pounds nineteen shillings and sixpence, he would be happy; but that a shilling spent the other way would make him wretched." Readers will know it: Dickens later gave those words, almost exactly, to Mr Micawber in David Copperfield.
+
+He even remembered being sent upstairs to borrow a knife and fork from another prisoner, Captain Porter, and finding "a very dirty lady in his little room; and two wan girls, his daughters, with shock heads of hair."
+
+After a few months, an inheritance freed his father, and Charles was eventually sent back to school. Decades later, in 1857, he came looking for the prison, and found some of its buildings still standing, preserving "the rooms that arose in my mind's eye when I became Little Dorrit's biographer."
+
+Now walk back to Borough High Street and head north, towards the George Inn.`,
+      },
+    },
+    {
+      id: "george-inn",
+      order: 11,
+      name: "The George Inn",
+      coordinates: { lat: 51.50419, lng: -0.08999 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 60,
+        audioSource: require("../../../assets/audio/london-dickens/11-george-inn.mp3"),
+        scriptText: `Through this archway is the George Inn, the last galleried coaching inn left in London. It was rebuilt in 1676 after a great fire in Southwark, and once had galleries on all sides of its yard, where coaches arrived and travellers slept in the rooms above. Since 1937 it has belonged to the National Trust.
+
+Dickens knew it well, and it slips into Little Dorrit. Amy's simple-minded friend Maggy describes how Little Dorrit's feckless brother Tip, when he wants money, "goes into the George and writes a letter," and sends her off to deliver it.
+
+Inns like this were where the Borough's business happened: carriers, coaches, deals and drinks. The young Dickens grew up among exactly these people, porters, clerks, landladies, prisoners and their families, and he never stopped writing about them. They became Sam Weller, Mr Micawber, the Garlands and the Marchioness.
+
+If you'd like to stop for a drink, it's a fine place to do it. When you're ready, continue north up Borough High Street to London Bridge.`,
+      },
+    },
+    {
+      id: "dickens-london-bridge",
+      order: 12,
+      name: "London Bridge: where a storyteller began",
+      coordinates: { lat: 51.5066, lng: -0.0879 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 76,
+        audioSource: require("../../../assets/audio/london-dickens/12-london-bridge.mp3"),
+        scriptText: `We end on London Bridge. When he was twelve, this was young Charles's lounging place in the early mornings, waiting for the prison gates to open so he could have breakfast with his family.
+
+He often met the family's maid here, an orphan girl from the workhouse, and while they waited, he told her "quite astonishing fictions about the wharves and the tower." "But I hope I believed them myself," he said later. The girl became the Marchioness in The Old Curiosity Shop.
+
+That was the storyteller beginning. And for the rest of his life, Dickens kept the secret of those months. He told only one person, his friend John Forster, in 1847. "From that hour until this," he wrote, "no word of that part of my childhood... has passed my lips to any human being." And he added: "I never afterwards forgot, I never shall forget, I never can forget, that my mother was warm for my being sent back" to the warehouse.
+
+The world only learned the truth after his death in 1870, when Forster published his Life of Dickens. By then, the boy from the blacking warehouse had made millions of readers care about workhouse children, debtors and the poor. Imprisonment for ordinary debt was largely abolished in 1869, the year before he died.
+
+Thank you for walking with me.`,
+      },
+    },
+  ],
+  path,
+};

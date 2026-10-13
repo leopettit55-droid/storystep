@@ -22,6 +22,12 @@ import { edinburghBurns } from "./areas/edinburgh-burns";
 import { edinburghScott } from "./areas/edinburgh-scott";
 import { edinburghConanDoyle } from "./areas/edinburgh-conan-doyle";
 import { edinburghSomerville } from "./areas/edinburgh-somerville";
+import { londonDickens } from "./areas/london-dickens";
+import { londonSherlock } from "./areas/london-sherlock";
+import { dublinJoyce } from "./areas/dublin-joyce";
+import { glasgowMackintosh } from "./areas/glasgow-mackintosh";
+import { glasgowTobaccoLords } from "./areas/glasgow-tobacco-lords";
+import { glasgowClydeShipbuilding } from "./areas/glasgow-clyde-shipbuilding";
 import type { Area } from "./schema";
 
 // Oxford first (Magdalen College leading), then London, Paris and Edinburgh.
@@ -50,6 +56,12 @@ export const areas: Area[] = [
   edinburghScott,
   edinburghConanDoyle,
   edinburghSomerville,
+  londonDickens,
+  londonSherlock,
+  dublinJoyce,
+  glasgowMackintosh,
+  glasgowTobaccoLords,
+  glasgowClydeShipbuilding,
 ];
 
 export function getAreaById(id: string): Area | undefined {
