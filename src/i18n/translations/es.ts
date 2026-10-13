@@ -267,7 +267,7 @@ const es: PartialTranslationDict = {
 
   pageTitle: {
     home: "StoryStep: recorridos a pie narrados con IA por Londres, París y Oxford",
-    tour: "{{tour}}: recorrido a pie gratuito con audio por {{city}} | StoryStep",
+    tour: "{{tour}}: recorrido a pie con audio por {{city}} | StoryStep",
     section: "{{section}} | StoryStep",
   },
 
@@ -283,8 +283,8 @@ const es: PartialTranslationDict = {
     iWalked: "He recorrido",
     stops: "{{count}} paradas",
     distance: "{{km}} km",
-    tagline: "Recorridos a pie gratuitos con audio",
-    shareText: "He recorrido {{tour}} en {{city}} con StoryStep, un recorrido a pie gratuito con audio.",
+    tagline: "Recorridos a pie con audio",
+    shareText: "He recorrido {{tour}} en {{city}} con StoryStep, un recorrido a pie con audio.",
     downloadedCopied: "Imagen guardada y enlace copiado.",
     downloaded: "Imagen guardada.",
     copied: "Enlace copiado.",
