@@ -1,0 +1,827 @@
+import type { Area } from "../schema";
+
+/**
+ * Barcelona 1992: the Calatrava communications tower, Palau Sant Jordi, the Olympic
+ * stadium, the Montjuïc diving pool, the Miramar lookout, the Columbus column and
+ * Port Vell, the Moll de la Fusta (Lichtenstein's Barcelona Head), Barceloneta
+ * beach, the Port Olímpic (the twin towers, Gehry's fish) and the Vila Olímpica.
+ * Researched October 2026.
+ *
+ * Sources: Wikipedia (1992 Summer Olympics: award on 17 October 1986, dates,
+ * participation, Rebollo's arrow, Cacho's 1,500 m; Estadi Olímpic Lluís Companys;
+ * Piscina Municipal de Montjuïc; Palau Sant Jordi; Montjuïc Communications Tower;
+ * Venues of the 1992 Summer Olympics); IOC / olympics.com (Barcelona 1992 legacy,
+ * coastline renewal); Catalan News (the coast before 1992, Bohigas and Maragall);
+ * Dezeen / architecture press (Solà-Morales and the Moll de la Fusta); COHRE,
+ * "Barcelona 1992: International Events and Housing Rights" (Sànchez, Plandiura,
+ * Valiño, 2007) as cited by No Boston 2024 / geographyfieldwork.com (more than 400
+ * families moved for the Village, ~200 for the ring roads; sale prices +139% and
+ * rents +145% 1986-93); tourism statistics (1.7 million overnight tourists 1990,
+ * 9.4 million 2019); The Local / betevé (Barceloneta protests, 2014); Domus /
+ * TravelPulse (June 2024 announcement on 10,101 tourist-flat licences by 2028).
+ *
+ * Corrections and flags:
+ *  - The brief listed Joan Miró Park, the Sagrada Família surroundings and La
+ *    Rambla renovations: none were Olympic projects, so they are not stops.
+ *    "Communications Tower": the Calatrava (Montjuïc) tower is used; Foster's
+ *    Collserola tower is on Tibidabo, off-route.
+ *  - The Dream Team played in Badalona, not on Montjuïc: not claimed.
+ *  - Displacement figures come from housing-rights researchers (COHRE) and are
+ *    attributed as such; no official total exists. "Sand from Egypt" stories are
+ *    not used.
+ *  - The often-quoted share of the budget spent on sport (e.g. "9%", Brunet) was
+ *    not confirmed from the original: the script says only that most investment
+ *    went on infrastructure.
+ *  - The tourist-flat licence phase-out is an announcement (June 2024) for 2028:
+ *    check its status before promoting.
+ *  - The route starts at the top of Montjuïc (bus 150 or funicular + cable car to
+ *    reach it) and is ~7.1 km, mostly downhill; the Telefèric del Port cable car
+ *    is suggested as a short cut from Montjuïc to the port.
+ *
+ * Stops and the walking path come from OpenStreetMap (Overpass and Nominatim; the
+ * path routed along OSM footways by the FOSSGIS foot router). Accurate to a few
+ * metres, not surveyed: walk the route once before promoting it.
+ *
+ * Narration: these recordings are TEMPORARY, made with Google text-to-speech in
+ * Professor Hoot's "Ask your guide" voice (en-GB-Standard-A). Replace them with the
+ * original narrator's ElevenLabs voice, same file names.
+ *
+ * Cover: "Monochrome Montjuïc tower", Biel Morro, via Unsplash (Wikimedia Commons,
+ * CC0), cropped.
+ */
+
+/**
+ * Anella Olímpica -> Avinguda de l'Estadi -> Avinguda de Miramar -> Jardins de
+ * Miramar -> Paral·lel -> Columbus -> Passeig de Colom -> Moll d'Espanya ->
+ * Barceloneta -> Passeig Marítim -> Port Olímpic -> Avinguda d'Icària. About 7.1 km.
+ */
+const path = [
+  { lat: 41.364417, lng: 2.150757 },
+  { lat: 41.364397, lng: 2.15079 },
+  { lat: 41.364346, lng: 2.150832 },
+  { lat: 41.364332, lng: 2.150841 },
+  { lat: 41.364344, lng: 2.150901 },
+  { lat: 41.364314, lng: 2.15129 },
+  { lat: 41.364314, lng: 2.151346 },
+  { lat: 41.364316, lng: 2.151459 },
+  { lat: 41.364305, lng: 2.151578 },
+  { lat: 41.364305, lng: 2.151687 },
+  { lat: 41.3643, lng: 2.151777 },
+  { lat: 41.364237, lng: 2.15302 },
+  { lat: 41.364233, lng: 2.153104 },
+  { lat: 41.364459, lng: 2.153274 },
+  { lat: 41.364459, lng: 2.153332 },
+  { lat: 41.36446, lng: 2.153485 },
+  { lat: 41.364523, lng: 2.153587 },
+  { lat: 41.36454, lng: 2.15359 },
+  { lat: 41.36456, lng: 2.153594 },
+  { lat: 41.365166, lng: 2.153595 },
+  { lat: 41.365176, lng: 2.153595 },
+  { lat: 41.365199, lng: 2.153595 },
+  { lat: 41.365199, lng: 2.1537 },
+  { lat: 41.3652, lng: 2.153927 },
+  { lat: 41.365272, lng: 2.15393 },
+  { lat: 41.365769, lng: 2.153957 },
+  { lat: 41.365994, lng: 2.15397 },
+  { lat: 41.365985, lng: 2.154004 },
+  { lat: 41.365983, lng: 2.154189 },
+  { lat: 41.365982, lng: 2.154589 },
+  { lat: 41.365992, lng: 2.154828 },
+  { lat: 41.366003, lng: 2.155252 },
+  { lat: 41.366016, lng: 2.155436 },
+  { lat: 41.366034, lng: 2.155539 },
+  { lat: 41.366078, lng: 2.155793 },
+  { lat: 41.366092, lng: 2.155879 },
+  { lat: 41.366101, lng: 2.156008 },
+  { lat: 41.366043, lng: 2.156236 },
+  { lat: 41.366089, lng: 2.156355 },
+  { lat: 41.366107, lng: 2.156394 },
+  { lat: 41.36612, lng: 2.156453 },
+  { lat: 41.366127, lng: 2.156503 },
+  { lat: 41.366159, lng: 2.156637 },
+  { lat: 41.366203, lng: 2.156776 },
+  { lat: 41.366218, lng: 2.156808 },
+  { lat: 41.366232, lng: 2.156851 },
+  { lat: 41.366301, lng: 2.157078 },
+  { lat: 41.366326, lng: 2.157112 },
+  { lat: 41.366392, lng: 2.157219 },
+  { lat: 41.36644, lng: 2.157242 },
+  { lat: 41.366476, lng: 2.157348 },
+  { lat: 41.366591, lng: 2.157643 },
+  { lat: 41.3666, lng: 2.157685 },
+  { lat: 41.366606, lng: 2.157732 },
+  { lat: 41.366657, lng: 2.157846 },
+  { lat: 41.366715, lng: 2.15797 },
+  { lat: 41.366744, lng: 2.158045 },
+  { lat: 41.366818, lng: 2.15819 },
+  { lat: 41.367197, lng: 2.158876 },
+  { lat: 41.367219, lng: 2.158916 },
+  { lat: 41.367279, lng: 2.15903 },
+  { lat: 41.367337, lng: 2.159128 },
+  { lat: 41.367387, lng: 2.15922 },
+  { lat: 41.367438, lng: 2.1593 },
+  { lat: 41.367841, lng: 2.159933 },
+  { lat: 41.368039, lng: 2.160244 },
+  { lat: 41.368076, lng: 2.160304 },
+  { lat: 41.368161, lng: 2.160448 },
+  { lat: 41.368176, lng: 2.160471 },
+  { lat: 41.368307, lng: 2.160648 },
+  { lat: 41.368466, lng: 2.160955 },
+  { lat: 41.368493, lng: 2.161068 },
+  { lat: 41.368613, lng: 2.161344 },
+  { lat: 41.368698, lng: 2.161643 },
+  { lat: 41.368762, lng: 2.16189 },
+  { lat: 41.368787, lng: 2.162034 },
+  { lat: 41.368815, lng: 2.162201 },
+  { lat: 41.368844, lng: 2.162339 },
+  { lat: 41.368868, lng: 2.162716 },
+  { lat: 41.368869, lng: 2.16304 },
+  { lat: 41.368918, lng: 2.163053 },
+  { lat: 41.368951, lng: 2.163055 },
+  { lat: 41.369015, lng: 2.163058 },
+  { lat: 41.36903, lng: 2.163058 },
+  { lat: 41.369016, lng: 2.164176 },
+  { lat: 41.369014, lng: 2.164422 },
+  { lat: 41.369034, lng: 2.164422 },
+  { lat: 41.369051, lng: 2.164423 },
+  { lat: 41.369092, lng: 2.164423 },
+  { lat: 41.369091, lng: 2.164453 },
+  { lat: 41.369091, lng: 2.164485 },
+  { lat: 41.369081, lng: 2.165461 },
+  { lat: 41.369081, lng: 2.165509 },
+  { lat: 41.369041, lng: 2.165509 },
+  { lat: 41.369021, lng: 2.165508 },
+  { lat: 41.368996, lng: 2.165508 },
+  { lat: 41.368993, lng: 2.165715 },
+  { lat: 41.369011, lng: 2.165897 },
+  { lat: 41.369079, lng: 2.166099 },
+  { lat: 41.369123, lng: 2.166235 },
+  { lat: 41.369312, lng: 2.166506 },
+  { lat: 41.369442, lng: 2.166702 },
+  { lat: 41.369591, lng: 2.166829 },
+  { lat: 41.369624, lng: 2.166858 },
+  { lat: 41.369708, lng: 2.16693 },
+  { lat: 41.36984, lng: 2.167081 },
+  { lat: 41.369903, lng: 2.167193 },
+  { lat: 41.369959, lng: 2.167288 },
+  { lat: 41.370007, lng: 2.167485 },
+  { lat: 41.370084, lng: 2.167869 },
+  { lat: 41.37031, lng: 2.169061 },
+  { lat: 41.370429, lng: 2.169687 },
+  { lat: 41.370493, lng: 2.169911 },
+  { lat: 41.370525, lng: 2.169938 },
+  { lat: 41.370556, lng: 2.169966 },
+  { lat: 41.370636, lng: 2.169946 },
+  { lat: 41.370671, lng: 2.169937 },
+  { lat: 41.370713, lng: 2.169927 },
+  { lat: 41.370731, lng: 2.169921 },
+  { lat: 41.370877, lng: 2.170587 },
+  { lat: 41.37092, lng: 2.17057 },
+  { lat: 41.3711, lng: 2.171537 },
+  { lat: 41.371113, lng: 2.171608 },
+  { lat: 41.371136, lng: 2.171736 },
+  { lat: 41.371155, lng: 2.171852 },
+  { lat: 41.371158, lng: 2.171909 },
+  { lat: 41.371146, lng: 2.171949 },
+  { lat: 41.37111, lng: 2.171986 },
+  { lat: 41.371029, lng: 2.172016 },
+  { lat: 41.370693, lng: 2.172126 },
+  { lat: 41.370615, lng: 2.172148 },
+  { lat: 41.370633, lng: 2.17225 },
+  { lat: 41.370639, lng: 2.172286 },
+  { lat: 41.370641, lng: 2.172297 },
+  { lat: 41.370621, lng: 2.172299 },
+  { lat: 41.370635, lng: 2.17238 },
+  { lat: 41.370547, lng: 2.172408 },
+  { lat: 41.370635, lng: 2.17238 },
+  { lat: 41.370621, lng: 2.172299 },
+  { lat: 41.370641, lng: 2.172297 },
+  { lat: 41.370659, lng: 2.172403 },
+  { lat: 41.370576, lng: 2.172428 },
+  { lat: 41.370528, lng: 2.172444 },
+  { lat: 41.370531, lng: 2.172473 },
+  { lat: 41.370457, lng: 2.172587 },
+  { lat: 41.370348, lng: 2.172624 },
+  { lat: 41.370331, lng: 2.172627 },
+  { lat: 41.370194, lng: 2.172791 },
+  { lat: 41.370187, lng: 2.172791 },
+  { lat: 41.370099, lng: 2.172875 },
+  { lat: 41.370067, lng: 2.172932 },
+  { lat: 41.370094, lng: 2.173043 },
+  { lat: 41.370226, lng: 2.172969 },
+  { lat: 41.370574, lng: 2.172932 },
+  { lat: 41.370582, lng: 2.173006 },
+  { lat: 41.370479, lng: 2.173038 },
+  { lat: 41.37044, lng: 2.173071 },
+  { lat: 41.370363, lng: 2.173114 },
+  { lat: 41.370286, lng: 2.173157 },
+  { lat: 41.370231, lng: 2.173194 },
+  { lat: 41.37024, lng: 2.173243 },
+  { lat: 41.370279, lng: 2.173234 },
+  { lat: 41.370477, lng: 2.173171 },
+  { lat: 41.370521, lng: 2.173177 },
+  { lat: 41.370529, lng: 2.173232 },
+  { lat: 41.370538, lng: 2.173282 },
+  { lat: 41.37055, lng: 2.173318 },
+  { lat: 41.370816, lng: 2.173253 },
+  { lat: 41.370822, lng: 2.173319 },
+  { lat: 41.371064, lng: 2.173331 },
+  { lat: 41.371239, lng: 2.173348 },
+  { lat: 41.371408, lng: 2.173366 },
+  { lat: 41.371585, lng: 2.173383 },
+  { lat: 41.371754, lng: 2.173401 },
+  { lat: 41.371936, lng: 2.173417 },
+  { lat: 41.372148, lng: 2.173435 },
+  { lat: 41.372196, lng: 2.173448 },
+  { lat: 41.372259, lng: 2.173466 },
+  { lat: 41.372152, lng: 2.173828 },
+  { lat: 41.372545, lng: 2.174022 },
+  { lat: 41.372507, lng: 2.174145 },
+  { lat: 41.372583, lng: 2.174192 },
+  { lat: 41.372595, lng: 2.1742 },
+  { lat: 41.37261, lng: 2.174209 },
+  { lat: 41.372648, lng: 2.174232 },
+  { lat: 41.372672, lng: 2.174165 },
+  { lat: 41.37271, lng: 2.174182 },
+  { lat: 41.372879, lng: 2.174258 },
+  { lat: 41.373198, lng: 2.174413 },
+  { lat: 41.373478, lng: 2.174555 },
+  { lat: 41.3736, lng: 2.174623 },
+  { lat: 41.373649, lng: 2.174646 },
+  { lat: 41.373895, lng: 2.174766 },
+  { lat: 41.373911, lng: 2.174773 },
+  { lat: 41.374474, lng: 2.175075 },
+  { lat: 41.374376, lng: 2.175356 },
+  { lat: 41.374437, lng: 2.17544 },
+  { lat: 41.374463, lng: 2.175477 },
+  { lat: 41.374482, lng: 2.175504 },
+  { lat: 41.374492, lng: 2.175516 },
+  { lat: 41.374501, lng: 2.175532 },
+  { lat: 41.374534, lng: 2.175573 },
+  { lat: 41.374565, lng: 2.175614 },
+  { lat: 41.374575, lng: 2.175629 },
+  { lat: 41.374603, lng: 2.175665 },
+  { lat: 41.374565, lng: 2.175705 },
+  { lat: 41.37455, lng: 2.175728 },
+  { lat: 41.374541, lng: 2.175852 },
+  { lat: 41.374588, lng: 2.176139 },
+  { lat: 41.374561, lng: 2.176346 },
+  { lat: 41.374559, lng: 2.176485 },
+  { lat: 41.37468, lng: 2.17663 },
+  { lat: 41.374668, lng: 2.176654 },
+  { lat: 41.374635, lng: 2.176725 },
+  { lat: 41.374613, lng: 2.176773 },
+  { lat: 41.374609, lng: 2.176782 },
+  { lat: 41.374595, lng: 2.176812 },
+  { lat: 41.374577, lng: 2.176849 },
+  { lat: 41.374539, lng: 2.176931 },
+  { lat: 41.37453, lng: 2.17695 },
+  { lat: 41.375223, lng: 2.177501 },
+  { lat: 41.375224, lng: 2.177502 },
+  { lat: 41.375257, lng: 2.17753 },
+  { lat: 41.375289, lng: 2.177558 },
+  { lat: 41.375311, lng: 2.177577 },
+  { lat: 41.375349, lng: 2.177615 },
+  { lat: 41.37535, lng: 2.177719 },
+  { lat: 41.375397, lng: 2.177838 },
+  { lat: 41.37543, lng: 2.177946 },
+  { lat: 41.375493, lng: 2.178038 },
+  { lat: 41.375566, lng: 2.17813 },
+  { lat: 41.375611, lng: 2.178163 },
+  { lat: 41.375624, lng: 2.178131 },
+  { lat: 41.375659, lng: 2.178061 },
+  { lat: 41.375697, lng: 2.177984 },
+  { lat: 41.375714, lng: 2.177951 },
+  { lat: 41.375723, lng: 2.177937 },
+  { lat: 41.375735, lng: 2.177915 },
+  { lat: 41.375749, lng: 2.177892 },
+  { lat: 41.375745, lng: 2.177889 },
+  { lat: 41.37574, lng: 2.177885 },
+  { lat: 41.375732, lng: 2.177875 },
+  { lat: 41.375727, lng: 2.177868 },
+  { lat: 41.375717, lng: 2.177852 },
+  { lat: 41.375709, lng: 2.177832 },
+  { lat: 41.375707, lng: 2.177828 },
+  { lat: 41.375702, lng: 2.177807 },
+  { lat: 41.3757, lng: 2.177784 },
+  { lat: 41.375701, lng: 2.177754 },
+  { lat: 41.375704, lng: 2.177734 },
+  { lat: 41.375706, lng: 2.177727 },
+  { lat: 41.375711, lng: 2.177712 },
+  { lat: 41.375713, lng: 2.177707 },
+  { lat: 41.375719, lng: 2.177694 },
+  { lat: 41.375728, lng: 2.177679 },
+  { lat: 41.375733, lng: 2.177673 },
+  { lat: 41.375741, lng: 2.177664 },
+  { lat: 41.375747, lng: 2.177659 },
+  { lat: 41.375741, lng: 2.177664 },
+  { lat: 41.375733, lng: 2.177673 },
+  { lat: 41.375728, lng: 2.177679 },
+  { lat: 41.375719, lng: 2.177694 },
+  { lat: 41.375713, lng: 2.177707 },
+  { lat: 41.375711, lng: 2.177712 },
+  { lat: 41.375706, lng: 2.177727 },
+  { lat: 41.375704, lng: 2.177734 },
+  { lat: 41.375701, lng: 2.177754 },
+  { lat: 41.3757, lng: 2.177784 },
+  { lat: 41.375702, lng: 2.177807 },
+  { lat: 41.375707, lng: 2.177828 },
+  { lat: 41.375709, lng: 2.177832 },
+  { lat: 41.375717, lng: 2.177852 },
+  { lat: 41.375727, lng: 2.177868 },
+  { lat: 41.375732, lng: 2.177875 },
+  { lat: 41.37574, lng: 2.177885 },
+  { lat: 41.375745, lng: 2.177889 },
+  { lat: 41.375749, lng: 2.177892 },
+  { lat: 41.375735, lng: 2.177915 },
+  { lat: 41.375723, lng: 2.177937 },
+  { lat: 41.375714, lng: 2.177951 },
+  { lat: 41.375697, lng: 2.177984 },
+  { lat: 41.375659, lng: 2.178061 },
+  { lat: 41.375624, lng: 2.178131 },
+  { lat: 41.375611, lng: 2.178163 },
+  { lat: 41.375655, lng: 2.178201 },
+  { lat: 41.375725, lng: 2.178229 },
+  { lat: 41.376029, lng: 2.178314 },
+  { lat: 41.376145, lng: 2.178363 },
+  { lat: 41.376195, lng: 2.178399 },
+  { lat: 41.376273, lng: 2.178475 },
+  { lat: 41.376298, lng: 2.178534 },
+  { lat: 41.37652, lng: 2.178791 },
+  { lat: 41.376663, lng: 2.178905 },
+  { lat: 41.376694, lng: 2.178983 },
+  { lat: 41.37728, lng: 2.179448 },
+  { lat: 41.377785, lng: 2.179857 },
+  { lat: 41.377938, lng: 2.17998 },
+  { lat: 41.379081, lng: 2.180904 },
+  { lat: 41.379191, lng: 2.180993 },
+  { lat: 41.379343, lng: 2.181116 },
+  { lat: 41.37939, lng: 2.181015 },
+  { lat: 41.379398, lng: 2.180997 },
+  { lat: 41.379409, lng: 2.181006 },
+  { lat: 41.379454, lng: 2.181043 },
+  { lat: 41.379564, lng: 2.181132 },
+  { lat: 41.37974, lng: 2.181271 },
+  { lat: 41.379895, lng: 2.181395 },
+  { lat: 41.380112, lng: 2.181573 },
+  { lat: 41.380203, lng: 2.181647 },
+  { lat: 41.380194, lng: 2.181663 },
+  { lat: 41.380183, lng: 2.181689 },
+  { lat: 41.380524, lng: 2.181973 },
+  { lat: 41.38054, lng: 2.182001 },
+  { lat: 41.380575, lng: 2.182063 },
+  { lat: 41.380671, lng: 2.182189 },
+  { lat: 41.380745, lng: 2.18235 },
+  { lat: 41.380779, lng: 2.182427 },
+  { lat: 41.380798, lng: 2.182488 },
+  { lat: 41.380805, lng: 2.182529 },
+  { lat: 41.380809, lng: 2.182608 },
+  { lat: 41.380804, lng: 2.182671 },
+  { lat: 41.380781, lng: 2.182812 },
+  { lat: 41.380729, lng: 2.182833 },
+  { lat: 41.380702, lng: 2.182848 },
+  { lat: 41.38068, lng: 2.182859 },
+  { lat: 41.380593, lng: 2.183108 },
+  { lat: 41.380608, lng: 2.183173 },
+  { lat: 41.380621, lng: 2.18323 },
+  { lat: 41.380636, lng: 2.183285 },
+  { lat: 41.380626, lng: 2.183347 },
+  { lat: 41.38062, lng: 2.183418 },
+  { lat: 41.380896, lng: 2.184694 },
+  { lat: 41.381429, lng: 2.185243 },
+  { lat: 41.38135, lng: 2.185415 },
+  { lat: 41.38134, lng: 2.185437 },
+  { lat: 41.381146, lng: 2.185859 },
+  { lat: 41.380851, lng: 2.186543 },
+  { lat: 41.380802, lng: 2.186647 },
+  { lat: 41.380736, lng: 2.186731 },
+  { lat: 41.380698, lng: 2.186778 },
+  { lat: 41.380604, lng: 2.186863 },
+  { lat: 41.380382, lng: 2.186977 },
+  { lat: 41.380256, lng: 2.187018 },
+  { lat: 41.380273, lng: 2.187095 },
+  { lat: 41.380276, lng: 2.187107 },
+  { lat: 41.380279, lng: 2.187119 },
+  { lat: 41.380285, lng: 2.187144 },
+  { lat: 41.380296, lng: 2.18719 },
+  { lat: 41.380324, lng: 2.187309 },
+  { lat: 41.380333, lng: 2.187352 },
+  { lat: 41.379645, lng: 2.187642 },
+  { lat: 41.379706, lng: 2.187928 },
+  { lat: 41.37946, lng: 2.188038 },
+  { lat: 41.379464, lng: 2.188058 },
+  { lat: 41.379469, lng: 2.188079 },
+  { lat: 41.379451, lng: 2.18808 },
+  { lat: 41.379451, lng: 2.1881 },
+  { lat: 41.379436, lng: 2.188108 },
+  { lat: 41.37941, lng: 2.188117 },
+  { lat: 41.379413, lng: 2.188143 },
+  { lat: 41.379431, lng: 2.188238 },
+  { lat: 41.379432, lng: 2.188262 },
+  { lat: 41.379437, lng: 2.188282 },
+  { lat: 41.379091, lng: 2.188422 },
+  { lat: 41.378999, lng: 2.188457 },
+  { lat: 41.378983, lng: 2.188476 },
+  { lat: 41.378988, lng: 2.188498 },
+  { lat: 41.379007, lng: 2.188572 },
+  { lat: 41.379015, lng: 2.188612 },
+  { lat: 41.379021, lng: 2.18865 },
+  { lat: 41.379031, lng: 2.188677 },
+  { lat: 41.379009, lng: 2.188685 },
+  { lat: 41.378989, lng: 2.188692 },
+  { lat: 41.379002, lng: 2.188745 },
+  { lat: 41.379002, lng: 2.188772 },
+  { lat: 41.379009, lng: 2.188805 },
+  { lat: 41.379017, lng: 2.188836 },
+  { lat: 41.379022, lng: 2.188855 },
+  { lat: 41.379039, lng: 2.188939 },
+  { lat: 41.379043, lng: 2.188967 },
+  { lat: 41.379051, lng: 2.189007 },
+  { lat: 41.379059, lng: 2.189029 },
+  { lat: 41.379067, lng: 2.189051 },
+  { lat: 41.379079, lng: 2.189128 },
+  { lat: 41.379087, lng: 2.18915 },
+  { lat: 41.379088, lng: 2.189175 },
+  { lat: 41.379099, lng: 2.189202 },
+  { lat: 41.379114, lng: 2.189268 },
+  { lat: 41.379114, lng: 2.189285 },
+  { lat: 41.379122, lng: 2.189323 },
+  { lat: 41.379131, lng: 2.18936 },
+  { lat: 41.379139, lng: 2.189363 },
+  { lat: 41.379186, lng: 2.18961 },
+  { lat: 41.3792, lng: 2.189669 },
+  { lat: 41.379213, lng: 2.189726 },
+  { lat: 41.379269, lng: 2.189966 },
+  { lat: 41.379279, lng: 2.18998 },
+  { lat: 41.379268, lng: 2.189989 },
+  { lat: 41.379274, lng: 2.190015 },
+  { lat: 41.37928, lng: 2.190045 },
+  { lat: 41.379291, lng: 2.190063 },
+  { lat: 41.379304, lng: 2.190126 },
+  { lat: 41.379305, lng: 2.190163 },
+  { lat: 41.379308, lng: 2.190184 },
+  { lat: 41.379317, lng: 2.190224 },
+  { lat: 41.379324, lng: 2.19025 },
+  { lat: 41.379345, lng: 2.190336 },
+  { lat: 41.379348, lng: 2.190359 },
+  { lat: 41.379359, lng: 2.190401 },
+  { lat: 41.379367, lng: 2.19042 },
+  { lat: 41.37938, lng: 2.1905 },
+  { lat: 41.379385, lng: 2.19053 },
+  { lat: 41.37939, lng: 2.19056 },
+  { lat: 41.379397, lng: 2.190575 },
+  { lat: 41.379415, lng: 2.190663 },
+  { lat: 41.379422, lng: 2.190704 },
+  { lat: 41.379431, lng: 2.190739 },
+  { lat: 41.379438, lng: 2.190757 },
+  { lat: 41.379455, lng: 2.190847 },
+  { lat: 41.379461, lng: 2.190878 },
+  { lat: 41.379467, lng: 2.190907 },
+  { lat: 41.379477, lng: 2.19092 },
+  { lat: 41.379476, lng: 2.190942 },
+  { lat: 41.379491, lng: 2.191016 },
+  { lat: 41.37948, lng: 2.191035 },
+  { lat: 41.379195, lng: 2.191146 },
+  { lat: 41.378817, lng: 2.191303 },
+  { lat: 41.378802, lng: 2.191311 },
+  { lat: 41.378809, lng: 2.191334 },
+  { lat: 41.378812, lng: 2.19135 },
+  { lat: 41.378835, lng: 2.191466 },
+  { lat: 41.378841, lng: 2.191495 },
+  { lat: 41.378852, lng: 2.191538 },
+  { lat: 41.378918, lng: 2.191863 },
+  { lat: 41.378922, lng: 2.191882 },
+  { lat: 41.378955, lng: 2.191987 },
+  { lat: 41.37899, lng: 2.192023 },
+  { lat: 41.378987, lng: 2.192047 },
+  { lat: 41.378969, lng: 2.192092 },
+  { lat: 41.378943, lng: 2.192155 },
+  { lat: 41.378936, lng: 2.192173 },
+  { lat: 41.378929, lng: 2.192186 },
+  { lat: 41.378909, lng: 2.192199 },
+  { lat: 41.378885, lng: 2.192208 },
+  { lat: 41.378849, lng: 2.1923 },
+  { lat: 41.378841, lng: 2.192319 },
+  { lat: 41.378811, lng: 2.192301 },
+  { lat: 41.378804, lng: 2.192322 },
+  { lat: 41.379165, lng: 2.192537 },
+  { lat: 41.379216, lng: 2.192568 },
+  { lat: 41.379265, lng: 2.192597 },
+  { lat: 41.379411, lng: 2.192687 },
+  { lat: 41.379762, lng: 2.192904 },
+  { lat: 41.379772, lng: 2.19291 },
+  { lat: 41.380013, lng: 2.193059 },
+  { lat: 41.380433, lng: 2.193311 },
+  { lat: 41.380756, lng: 2.193511 },
+  { lat: 41.380775, lng: 2.193515 },
+  { lat: 41.380844, lng: 2.193561 },
+  { lat: 41.380863, lng: 2.193504 },
+  { lat: 41.381027, lng: 2.193606 },
+  { lat: 41.381634, lng: 2.193986 },
+  { lat: 41.381698, lng: 2.194025 },
+  { lat: 41.38174, lng: 2.194051 },
+  { lat: 41.381868, lng: 2.194127 },
+  { lat: 41.382396, lng: 2.194447 },
+  { lat: 41.382842, lng: 2.194717 },
+  { lat: 41.38351, lng: 2.195126 },
+  { lat: 41.383831, lng: 2.195322 },
+  { lat: 41.384049, lng: 2.195456 },
+  { lat: 41.384357, lng: 2.19564 },
+  { lat: 41.384427, lng: 2.19567 },
+  { lat: 41.384666, lng: 2.195897 },
+  { lat: 41.384697, lng: 2.195927 },
+  { lat: 41.384711, lng: 2.195948 },
+  { lat: 41.38472, lng: 2.195961 },
+  { lat: 41.385209, lng: 2.196684 },
+  { lat: 41.38536, lng: 2.196908 },
+  { lat: 41.385514, lng: 2.197135 },
+  { lat: 41.38562, lng: 2.197292 },
+  { lat: 41.385677, lng: 2.197224 },
+  { lat: 41.385833, lng: 2.197024 },
+  { lat: 41.38588, lng: 2.197087 },
+  { lat: 41.386012, lng: 2.196912 },
+  { lat: 41.386319, lng: 2.197156 },
+  { lat: 41.386496, lng: 2.197377 },
+  { lat: 41.386537, lng: 2.197428 },
+  { lat: 41.386675, lng: 2.197251 },
+  { lat: 41.386885, lng: 2.196972 },
+  { lat: 41.386937, lng: 2.197053 },
+  { lat: 41.386967, lng: 2.197085 },
+  { lat: 41.386581, lng: 2.197593 },
+  { lat: 41.386754, lng: 2.197552 },
+  { lat: 41.386884, lng: 2.197379 },
+  { lat: 41.386754, lng: 2.197552 },
+  { lat: 41.386738, lng: 2.197763 },
+  { lat: 41.386785, lng: 2.197702 },
+  { lat: 41.386981, lng: 2.197446 },
+  { lat: 41.387062, lng: 2.197341 },
+  { lat: 41.387113, lng: 2.197278 },
+  { lat: 41.387143, lng: 2.197317 },
+  { lat: 41.387191, lng: 2.197374 },
+  { lat: 41.387202, lng: 2.197359 },
+  { lat: 41.387426, lng: 2.197066 },
+  { lat: 41.38763, lng: 2.196805 },
+  { lat: 41.387679, lng: 2.196867 },
+  { lat: 41.387737, lng: 2.19694 },
+  { lat: 41.387794, lng: 2.196877 },
+  { lat: 41.387848, lng: 2.196866 },
+  { lat: 41.387901, lng: 2.196855 },
+  { lat: 41.387965, lng: 2.19682 },
+  { lat: 41.388017, lng: 2.196787 },
+  { lat: 41.388063, lng: 2.196747 },
+  { lat: 41.388117, lng: 2.196691 },
+  { lat: 41.388452, lng: 2.197141 },
+  { lat: 41.388548, lng: 2.197012 },
+  { lat: 41.388636, lng: 2.196894 },
+  { lat: 41.388672, lng: 2.196848 },
+  { lat: 41.388706, lng: 2.196808 },
+  { lat: 41.388807, lng: 2.196689 },
+  { lat: 41.388828, lng: 2.196671 },
+  { lat: 41.38889, lng: 2.196751 },
+  { lat: 41.388921, lng: 2.196738 },
+  { lat: 41.389234, lng: 2.196333 },
+  { lat: 41.389584, lng: 2.195879 },
+  { lat: 41.389762, lng: 2.195667 },
+  { lat: 41.389774, lng: 2.195611 },
+  { lat: 41.389795, lng: 2.195635 },
+  { lat: 41.389833, lng: 2.195681 },
+  { lat: 41.389873, lng: 2.195731 },
+  { lat: 41.389889, lng: 2.19575 },
+  { lat: 41.389998, lng: 2.195865 },
+  { lat: 41.390021, lng: 2.195827 },
+  { lat: 41.390029, lng: 2.195813 },
+  { lat: 41.390054, lng: 2.19577 },
+  { lat: 41.390068, lng: 2.195746 },
+  { lat: 41.390087, lng: 2.195711 },
+  { lat: 41.390107, lng: 2.195734 },
+  { lat: 41.390399, lng: 2.196072 },
+];
+
+export const barcelonaOlympics1992: Area = {
+  id: "barcelona-olympics-1992",
+  name: "Barcelona 1992: The Olympic City",
+  city: "Barcelona",
+  description:
+    "From the Olympic ring on Montjuïc down to the beaches and the Olympic Village, discover how the 1992 Games turned a declining industrial port into a global city that opened itself to the sea, and what that success has cost the people who live here.",
+  estimatedDurationMin: 135,
+  estimatedDistanceKm: 7.1,
+  difficulty: "moderate",
+  accessNote:
+    "Starts at the top of Montjuïc (bus 150, or the funicular from Paral·lel metro); the walk is mostly downhill, with steps through the Miramar gardens. The port cable car can replace the Miramar-to-port section. Flat seafront from Columbus onwards.",
+  isContentComplete: true,
+  enableInteractiveGuide: true,
+  image: require("../../../assets/tours/barcelona-olympics-1992.jpg"),
+  price: { singleTour: 4.99 },
+  startingPoint: {
+    lat: 41.36442,
+    lng: 2.15076,
+    label: "The Calatrava tower, Anella Olímpica, Montjuïc",
+  },
+  route: [
+    {
+      id: "oly-torre-calatrava",
+      order: 1,
+      name: "The Calatrava tower: a city decides to change",
+      coordinates: { lat: 41.36442, lng: 2.15076 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 85,
+        audioSource: require("../../../assets/audio/barcelona-olympics-1992/01-torre-calatrava.mp3"),
+        scriptText: `Bon dia, and welcome. On this walk we'll follow the story of how the 1992 Olympic Games transformed Barcelona, from this hilltop down to the sea, and ask who gained and who paid.
+
+Picture the city in the early 1980s. Franco had died in 1975, and democracy was new. Barcelona was an industrial port in decline, with factories closing, polluted air, crumbling old districts and a coastline walled off by railway lines and warehouses. People said Barcelona had its back to the sea.
+
+On the 17th of October 1986, in Lausanne, the President of the International Olympic Committee, Juan Antonio Samaranch, himself a Barcelona man, read out the name of the city chosen for 1992: "à la ville de Barcelona". The city's socialist mayor, Pasqual Maragall, and his chief planner, the architect Oriol Bohigas, saw the Games as a deadline, a way to force through plans the city had dreamed about for years.
+
+This white tower is one symbol of that ambition. Designed by Santiago Calatrava and built from 1989 to 1992, it's a 136-metre telecommunications mast that carried television pictures of the Games around the world. It's meant to suggest an athlete holding up the Olympic torch, and its base is clad in broken-tile trencadís, a tribute to Gaudí.
+
+Now walk along the plaza to the great curving roof of the Palau Sant Jordi.`,
+      },
+    },
+    {
+      id: "oly-palau-sant-jordi",
+      order: 2,
+      name: "Palau Sant Jordi: building for the future",
+      coordinates: { lat: 41.36424, lng: 2.15302 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 73,
+        audioSource: require("../../../assets/audio/barcelona-olympics-1992/02-palau-sant-jordi.mp3"),
+        scriptText: `This vast indoor arena is the Palau Sant Jordi, designed by the Japanese architect Arata Isozaki. Its roof was assembled on the ground and then jacked up into place, a technique that drew engineers from around the world. In 1992 it hosted gymnastics, and the finals of handball and volleyball.
+
+A common Olympic story is the white elephant: expensive stadiums that sit empty once the athletes go home. Barcelona tried hard to avoid that. Most of the sports venues were spread across four areas of the city, and many used existing buildings. This arena has stayed busy ever since, with concerts, sports and events.
+
+But the real secret of the Barcelona model is that most of the money wasn't spent on sport. Analyses of the spending, notably by the economist Ferran Brunet, found that most of the investment went not on sports facilities but on roads, sewers, telecommunications, housing, hotels, parks and the waterfront: the city itself.
+
+You'll often hear Barcelona described as the most successful Olympic host city ever. As we walk, keep that in mind, along with the other side of the story.
+
+Now walk to the old stadium, with its classical stone walls.`,
+      },
+    },
+    {
+      id: "oly-estadi",
+      order: 3,
+      name: "The Olympic stadium: an arrow in the dark",
+      coordinates: { lat: 41.36561, lng: 2.15567 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 79,
+        audioSource: require("../../../assets/audio/barcelona-olympics-1992/03-estadi-olimpic.mp3"),
+        scriptText: `This is the Estadi Olímpic, the Olympic stadium. Its stone walls date back to 1927, built for the International Exposition of 1929. It was also meant to host the People's Olympiad of 1936, an alternative to Hitler's Berlin Games, but the Spanish Civil War broke out the day before it was due to open.
+
+For 1992, a team of architects kept the old outer walls and built a completely new stadium inside them, for around fifty-five thousand spectators. In 2001 it was renamed after Lluís Companys, the Catalan president executed by Franco's regime in 1940.
+
+On the evening of the 25th of July 1992, the opening ceremony was watched by hundreds of millions of people. Its most famous moment came when a Paralympic archer, Antonio Rebollo, fired a flaming arrow over the cauldron to light the Olympic flame.
+
+These were the first Summer Games after the end of the Cold War. Germany competed as one team again, South Africa returned after decades of exclusion, and the former Soviet republics competed together one last time. And in this stadium, Spain's Fermín Cacho won the 1,500 metres, the country's first ever Olympic gold in a running event.
+
+Now walk down towards the city, along Avinguda de Miramar, to the diving pool.`,
+      },
+    },
+    {
+      id: "oly-piscina",
+      order: 4,
+      name: "The diving pool: the most famous view in the Games",
+      coordinates: { lat: 41.36905, lng: 2.16546 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 66,
+        audioSource: require("../../../assets/audio/barcelona-olympics-1992/04-piscina-municipal.mp3"),
+        scriptText: `This is the Piscina Municipal de Montjuïc, the municipal pool, first opened in 1929. For the 1992 Games it was rebuilt to host the diving.
+
+The photographs from here became some of the most famous images of the Olympics: divers twisting in mid-air, high above the city, with the whole of Barcelona and even the towers of the Sagrada Família spread out behind them. It was exactly the picture of itself the city wanted to send to the world. Not an industrial port, but a beautiful, sunny, Mediterranean city, open for business and tourists.
+
+That image worked. In 1990, around 1.7 million tourists stayed overnight in Barcelona. By 2019 it was more than nine million, and today it's one of the most visited cities in Europe. The Olympics turned Barcelona into a global brand.
+
+But remember that number. We'll come back to what all those visitors mean for the people who live here.
+
+Today the pool is open to the public in summer, so anyone can swim with the same view.
+
+Now follow the road along the hillside to the Mirador de Miramar, the lookout over the port.`,
+      },
+    },
+    {
+      id: "oly-miramar",
+      order: 5,
+      name: "Miramar: a city with its back to the sea",
+      coordinates: { lat: 41.37054, lng: 2.17237 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 71,
+        audioSource: require("../../../assets/audio/barcelona-olympics-1992/05-miramar.mp3"),
+        scriptText: `From here, look down at the port and along the coast to the north-east, to the two tall towers in the distance. That's where our walk will end.
+
+Before 1992, almost none of that coastline was a place for people. Goods trains ran along the shore. There were factories, warehouses, sewage outlets and rubble. Where the famous beaches are now, there was little more than a polluted strip of sand. In the 1960s a huge shanty town on the beach, the Somorrostro, home to thousands of poor migrants, had been cleared away. The rest of the shore was left to industry.
+
+The Olympic plan changed that. Railway lines along the coast were moved or buried. A ring road, the Ronda del Litoral, was built along the shore, and partly sunk below ground. New sewers were dug to stop sewage pouring into the sea. Sand was brought in, and several kilometres of new public beaches were created.
+
+The planners had a phrase for it: to open the city to the sea.
+
+From here, the walk goes down the hill. Follow the paths down through the gardens to the Columbus column at the bottom of La Rambla. If your legs are tired, the cable car from Montjuïc to the port is an alternative.`,
+      },
+    },
+    {
+      id: "oly-colom",
+      order: 6,
+      name: "The Columbus column: the old port reborn",
+      coordinates: { lat: 41.3758, lng: 2.17777 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 63,
+        audioSource: require("../../../assets/audio/barcelona-olympics-1992/06-columbus.mp3"),
+        scriptText: `At the foot of La Rambla stands the Columbus column, built for the Exposition of 1888. Around it is Port Vell, the old port.
+
+Until the 1980s this was a working harbour, closed off behind fences, with cargo sheds right up to the edge of the old city. As shipping moved to a modern container port further south, the old docks were handed back to the city.
+
+The Olympics speeded everything up. Over the following years the Port Vell became a place for people: promenades, a marina, and across the water, reached by a wooden swing bridge, the Rambla de Mar, an aquarium, cinemas and the Maremàgnum shopping centre, which opened a few years after the Games.
+
+Not everything has aged well. Some architects and residents criticised the shopping and leisure complex as generic, the kind of waterfront you might find anywhere. Others point out that, for the first time in generations, ordinary Barcelonans could simply walk beside the water in the centre of their city.
+
+Now walk along the waterfront promenade, the Moll de la Fusta, to a large, colourful sculpture of a face.`,
+      },
+    },
+    {
+      id: "oly-moll-de-la-fusta",
+      order: 7,
+      name: "Moll de la Fusta: the first step",
+      coordinates: { lat: 41.3801, lng: 2.1816 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 70,
+        audioSource: require("../../../assets/audio/barcelona-olympics-1992/07-moll-de-la-fusta.mp3"),
+        scriptText: `This waterfront promenade is the Moll de la Fusta, the timber wharf, and it was one of the first big projects of the new Barcelona, in the late 1980s, under the architect Manuel de Solà-Morales.
+
+The problem was a wall of traffic between the city and the sea: the Passeig de Colom and the new coastal ring road. Solà-Morales sank part of the road below a raised promenade, so people could walk out to the water above the traffic.
+
+The colourful face is El Cap de Barcelona, the Barcelona Head, by the American pop artist Roy Lichtenstein, made for the Olympic year, 1992. It was part of a wider idea: art, good design and well-made public squares in every neighbourhood, not just in the tourist centre. The city commissioned dozens of new parks and plazas through the 1980s, many of them small, in working-class districts.
+
+In 1999, Barcelona became the first city ever to receive the Royal Gold Medal for architecture from the Royal Institute of British Architects, an award usually given to individual architects. The Barcelona model was copied around the world.
+
+Now cross to Barceloneta, the old fishermen's quarter, and walk through it to the beach.`,
+      },
+    },
+    {
+      id: "oly-barceloneta",
+      order: 8,
+      name: "Barceloneta: the price of success",
+      coordinates: { lat: 41.37941, lng: 2.19269 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 78,
+        audioSource: require("../../../assets/audio/barcelona-olympics-1992/08-barceloneta.mp3"),
+        scriptText: `You're on Barceloneta beach, and on a summer day it's packed.
+
+Barceloneta was built in the eighteenth century as a neighbourhood of fishermen and dockworkers, and it still has narrow streets of tiny flats. Before 1992 the beach here was lined with old fish restaurants, the chiringuitos, many built right on the sand. They were demolished as the beachfront was rebuilt.
+
+The new beaches were a huge success. But success brought pressure. Housing costs began rising even before the Games: according to a housing-rights report, house prices rose by around a hundred and forty per cent between 1986 and 1993, and rents by a similar amount. Many young people and poorer families were priced out.
+
+As tourism soared, flats here and across the old city were turned into holiday lets. In the summer of 2014, Barceloneta residents marched against drunken tourism and illegal tourist apartments. Similar protests have followed since. In 2024 the city announced it would not renew its roughly ten thousand tourist-flat licences when they expire in 2028.
+
+The beaches that the Olympics opened up are loved. The question Barcelona still argues about is: who is the city for?
+
+Now walk north-east along the promenade towards the two towers and the giant golden fish.`,
+      },
+    },
+    {
+      id: "oly-port-olimpic",
+      order: 9,
+      name: "Port Olímpic: towers and a golden fish",
+      coordinates: { lat: 41.3869, lng: 2.1974 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 62,
+        audioSource: require("../../../assets/audio/barcelona-olympics-1992/09-port-olimpic.mp3"),
+        scriptText: `These two towers, each over a hundred and fifty metres tall, were built for the Olympic year. One is the Hotel Arts, the other the Torre Mapfre, an office tower. They're still the tallest buildings in Barcelona.
+
+Beside them lies the Port Olímpic, the marina built for the sailing events, and shimmering above is the huge golden fish sculpture by the architect Frank Gehry, made in 1992. Gehry designed it with early aircraft-design software, years before his Guggenheim Museum in Bilbao made that approach famous.
+
+The whole Olympic waterfront here was planned as a single project: the marina, the towers, the beaches, the promenade and, just behind, the Olympic Village. It was built on land that, only a few years earlier, had been factories and rail yards.
+
+Not everyone loved the result. Critics said the marina became a strip of noisy bars and nightclubs, and the city has since redesigned it, with more space for local sailing and sport.
+
+Now walk inland, under the road, into the streets of the Olympic Village.`,
+      },
+    },
+    {
+      id: "oly-vila-olimpica",
+      order: 10,
+      name: "The Olympic Village: who was it for?",
+      coordinates: { lat: 41.3904, lng: 2.19607 },
+      triggerRadiusMeters: 25,
+      narration: {
+        durationSec: 70,
+        audioSource: require("../../../assets/audio/barcelona-olympics-1992/10-vila-olimpica.mp3"),
+        scriptText: `You're in the Vila Olímpica, the Olympic Village. In 1992 thousands of athletes and team officials lived here. Afterwards, its two thousand or so flats were sold as homes.
+
+This land was once Poblenou's industrial waterfront, the heart of what was called the Catalan Manchester, full of textile mills and factories. Many were already closing when the plan came. The architects Martorell, Bohigas, Mackay and Puigdomènech laid out a new district of streets, parks and housing blocks, with the coastal railway moved away.
+
+But a district was cleared to build it. According to housing-rights researchers, more than four hundred families were moved out for the village, with hundreds more displaced for the ring roads. And the new flats were sold at market prices, mostly to middle-class buyers, rather than to the working families who had lived and worked in Poblenou.
+
+So was Barcelona 1992 a triumph or a warning? Both, perhaps. It gave the city beaches, roads, parks and a new confidence. It also set off pressures on housing and tourism that Barcelona is still wrestling with more than thirty years later.
+
+Thank you for walking with me. Adéu!`,
+      },
+    },
+  ],
+  path,
+};
