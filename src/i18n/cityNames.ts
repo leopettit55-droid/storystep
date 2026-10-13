@@ -26,6 +26,7 @@ const CITY_NAMES: Record<string, Partial<Record<"zh" | "es" | "fr", string>>> = 
   Oslo: { zh: "奥斯陆", es: "Oslo", fr: "Oslo" },
   Dublin: { zh: "都柏林", es: "Dublín", fr: "Dublin" },
   Edinburgh: { zh: "爱丁堡", es: "Edimburgo", fr: "Édimbourg" },
+  Glasgow: { zh: "格拉斯哥", es: "Glasgow", fr: "Glasgow" },
   Athens: { zh: "雅典", es: "Atenas", fr: "Athènes" },
   Istanbul: { zh: "伊斯坦布尔", es: "Estambul", fr: "Istanbul" },
   Moscow: { zh: "莫斯科", es: "Moscú", fr: "Moscou" },
