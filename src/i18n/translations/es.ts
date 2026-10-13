@@ -125,6 +125,8 @@ const es: PartialTranslationDict = {
     continueFromStop: "Continuar desde la parada {{number}}",
     startAgain: "Empezar de nuevo",
     useScanner: "Usa nuestro escáner de monumentos",
+    watchDemo: "Mira la demo de 20 segundos",
+    demoClose: "Cerrar",
     scannerFree: "Apunta la cámara a un edificio para escuchar su historia",
     getMeToStart: "Llévame al punto de partida",
     buyTour: "Comprar recorrido — {{price}}",

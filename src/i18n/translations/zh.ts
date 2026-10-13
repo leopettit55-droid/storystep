@@ -125,6 +125,8 @@ const zh: PartialTranslationDict = {
     continueFromStop: "从第{{number}}站继续",
     startAgain: "重新开始",
     useScanner: "使用我们的地标扫描器",
+    watchDemo: "观看 20 秒演示",
+    demoClose: "关闭",
     scannerFree: "将相机对准建筑，聆听它的故事",
     getMeToStart: "带我去起点",
     buyTour: "购买行程 — {{price}}",

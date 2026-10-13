@@ -15,6 +15,7 @@ import type { RootStackParamList } from "../navigation/types";
 import { hasTourAccess } from "../purchases/entitlements";
 import { openTourCheckout, stripeIsConfigured } from "../purchases/stripeConfig";
 import OfflineTourCard from "../components/OfflineTourCard";
+import DemoVideoModal from "../components/DemoVideoModal";
 import { useOnline } from "../offline/connectivity";
 import { useOfflineStore } from "../offline/offlineStore";
 import { isBundledTour, offlineDownloadsSupported } from "../offline/tourFiles";
@@ -40,6 +41,8 @@ export default function TourPreviewScreen() {
   const [downloadOffer, setDownloadOffer] = useState<{ go: () => void } | null>(null);
   /** How many pairs have walked this tour together (shown once there are some). */
   const [duos, setDuos] = useState(0);
+  /** The demo video player is open (web only). */
+  const [showDemo, setShowDemo] = useState(false);
   useEffect(() => {
     if (!area || area.scannerOnly) return;
     let cancelled = false;
@@ -243,6 +246,14 @@ export default function TourPreviewScreen() {
           </View>
         ) : null}
 
+        {/* A 20-second look at the app, offered before the tour starts. */}
+        {!scannerOnly && !downloadOffer && !saved && area.demoVideo && Platform.OS === "web" && (
+          <PressScale style={styles.demoButton} scaleTo={0.97} onPress={() => setShowDemo(true)}>
+            <Ionicons name="play-circle" size={22} color={colors.primary} />
+            <Text style={styles.demoButtonText}>{t("tourPreview.watchDemo")}</Text>
+          </PressScale>
+        )}
+
         {!scannerOnly && !downloadOffer &&
           (owned === null ? (
             <Skeleton style={[styles.cta, styles.ctaSkeleton]} borderRadius={14} />
@@ -312,6 +323,16 @@ export default function TourPreviewScreen() {
         )}
         </View>
       </View>
+
+      {showDemo && area.demoVideo && (
+        <DemoVideoModal
+          src={area.demoVideo.src}
+          poster={area.demoVideo.poster}
+          tourId={area.id}
+          closeLabel={t("tourPreview.demoClose")}
+          onClose={() => setShowDemo(false)}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -399,6 +420,19 @@ function createStyles(colors: ThemeColors) {
     borderRadius: 10,
     padding: 10,
   },
+  demoButton: {
+    marginTop: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 12,
+    borderRadius: 14,
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  demoButtonText: { color: colors.primary, fontSize: 15, fontWeight: "700" },
   scannerButton: {
     marginTop: 10,
     flexDirection: 'row',
