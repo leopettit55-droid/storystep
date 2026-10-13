@@ -28,6 +28,10 @@ import { dublinJoyce } from "./areas/dublin-joyce";
 import { glasgowMackintosh } from "./areas/glasgow-mackintosh";
 import { glasgowTobaccoLords } from "./areas/glasgow-tobacco-lords";
 import { glasgowClydeShipbuilding } from "./areas/glasgow-clyde-shipbuilding";
+import { barcelonaGaudi } from "./areas/barcelona-gaudi";
+import { barcelonaPicasso } from "./areas/barcelona-picasso";
+import { barcelonaCatalanIndependence } from "./areas/barcelona-catalan-independence";
+import { barcelonaOlympics1992 } from "./areas/barcelona-olympics-1992";
 import type { Area } from "./schema";
 
 // Oxford first (Magdalen College leading), then London, Paris and Edinburgh.
@@ -62,6 +66,10 @@ export const areas: Area[] = [
   glasgowMackintosh,
   glasgowTobaccoLords,
   glasgowClydeShipbuilding,
+  barcelonaGaudi,
+  barcelonaPicasso,
+  barcelonaCatalanIndependence,
+  barcelonaOlympics1992,
 ];
 
 export function getAreaById(id: string): Area | undefined {

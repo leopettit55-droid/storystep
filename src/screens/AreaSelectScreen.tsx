@@ -27,7 +27,7 @@ import { CONTENT_MAX_WIDTH, type ThemeColors } from "../theme";
 
 type Nav = TabScreenNav<"Tours">;
 
-const CITIES: Area["city"][] = ["Oxford", "London", "Paris", "Edinburgh", "Dublin", "Glasgow"];
+const CITIES: Area["city"][] = ["Oxford", "London", "Paris", "Edinburgh", "Dublin", "Glasgow", "Barcelona"];
 
 const DIFFICULTY_KEYS: Record<Area["difficulty"], string> = {
   easy: "common.easy",
