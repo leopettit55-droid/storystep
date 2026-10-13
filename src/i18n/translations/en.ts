@@ -152,6 +152,8 @@ const en = {
 
   tourPreview: {
     useScanner: "Use our landmark scanner",
+    watchDemo: "Watch the 20-second demo",
+    demoClose: "Close",
     scannerFree: "Point your camera at a building to hear its story",
     getMeToStart: "Get me to the start",
     continueFromStop: "Continue from stop {{number}}",

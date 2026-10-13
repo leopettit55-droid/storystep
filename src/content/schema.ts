@@ -69,6 +69,9 @@ export interface Area {
   landmarks?: Landmark[];
   /** When true the landmark scanner is offered on the tour page without buying the tour. */
   freeLandmarkScanner?: boolean;
+  /** A short demo video offered on the tour page before the tour starts
+   * (web only). Both paths are served from the public/ folder. */
+  demoVideo?: { src: string; poster: string };
   /** The place offers only the free landmark scanner: no purchase, price, or tour start. */
   scannerOnly?: boolean;
   /** "Ask your guide" on each stop: a question answered by Claude and spoken
