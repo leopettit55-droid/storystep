@@ -17,7 +17,6 @@ export const COMING_SOON_CITIES: ComingSoonCity[] = [
   { id: "venice", name: "Venice", country: "Italy", lat: 45.4408, lng: 12.3155 },
   { id: "florence", name: "Florence", country: "Italy", lat: 43.7696, lng: 11.2558 },
   { id: "milan", name: "Milan", country: "Italy", lat: 45.4642, lng: 9.19 },
-  { id: "barcelona", name: "Barcelona", country: "Spain", lat: 41.3874, lng: 2.1686 },
   { id: "madrid", name: "Madrid", country: "Spain", lat: 40.4168, lng: -3.7038 },
   { id: "lisbon", name: "Lisbon", country: "Portugal", lat: 38.7223, lng: -9.1393 },
   { id: "berlin", name: "Berlin", country: "Germany", lat: 52.52, lng: 13.405 },

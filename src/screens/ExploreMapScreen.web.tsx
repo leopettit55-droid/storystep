@@ -15,7 +15,7 @@ import { useTheme } from "../ThemeContext";
 import type { ThemeColors } from "../theme";
 
 type Nav = TabScreenNav<"Map">;
-type City = "London" | "Paris" | "Oxford" | "Edinburgh" | "Dublin" | "Glasgow";
+type City = "London" | "Paris" | "Oxford" | "Edinburgh" | "Dublin" | "Glasgow" | "Barcelona";
 
 // Fallback if a city ever has zero content-complete tours to frame around.
 const CITY_FALLBACK_CENTER: Record<City, [number, number]> = {
@@ -25,6 +25,7 @@ const CITY_FALLBACK_CENTER: Record<City, [number, number]> = {
   Edinburgh: [-3.19, 55.9485],
   Dublin: [-6.2603, 53.3478],
   Glasgow: [-4.2518, 55.8609],
+  Barcelona: [2.1734, 41.3851],
 };
 
 // Pins previously appeared to fly off-screen under any pitch, but that was
@@ -201,7 +202,7 @@ export default function ExploreMapScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.cityToggle}
         >
-          {(["Oxford", "London", "Paris", "Edinburgh", "Dublin", "Glasgow"] as City[]).map((c) => (
+          {(["Oxford", "London", "Paris", "Edinburgh", "Dublin", "Glasgow", "Barcelona"] as City[]).map((c) => (
             <Pressable
               key={c}
               style={[styles.cityButton, city === c && styles.cityButtonActive]}
