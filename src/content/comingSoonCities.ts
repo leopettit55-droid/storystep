@@ -44,7 +44,6 @@ export const COMING_SOON_CITIES: ComingSoonCity[] = [
   { id: "toronto", name: "Toronto", country: "Canada", lat: 43.6532, lng: -79.3832 },
   { id: "mexico-city", name: "Mexico City", country: "Mexico", lat: 19.4326, lng: -99.1332 },
   { id: "rio-de-janeiro", name: "Rio de Janeiro", country: "Brazil", lat: -22.9068, lng: -43.1729 },
-  { id: "buenos-aires", name: "Buenos Aires", country: "Argentina", lat: -34.6037, lng: -58.3816 },
   { id: "lima", name: "Lima", country: "Peru", lat: -12.0464, lng: -77.0428 },
 
   // Asia
