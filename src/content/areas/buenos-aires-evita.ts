@@ -830,7 +830,7 @@ export const buenosAiresEvita: Area = {
   isContentComplete: true,
   enableInteractiveGuide: true,
   image: require("../../../assets/tours/buenos-aires-evita.jpg"),
-  price: { singleTour: 0.99 },
+  price: { singleTour: 4.99 },
   startingPoint: {
     lat: -34.60371,
     lng: -58.38163,

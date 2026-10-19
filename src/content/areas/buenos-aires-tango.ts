@@ -514,7 +514,7 @@ export const buenosAiresTango: Area = {
   enableInteractiveGuide: true,
   sequentialStops: true,
   image: require("../../../assets/tours/buenos-aires-tango.jpg"),
-  price: { singleTour: 0.99 },
+  price: { singleTour: 4.99 },
   startingPoint: {
     lat: -34.63935,
     lng: -58.36125,
