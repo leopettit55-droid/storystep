@@ -612,7 +612,7 @@ const path = [
 
 export const buenosAiresLandmarks: Area = {
   id: "buenos-aires-landmarks",
-  name: "Buenos Aires: From Colony to the Paris of South America",
+  name: "History of Buenos Aires",
   city: "Buenos Aires",
   description:
     "From the spot where Buenos Aires was first founded, and failed, to the Plaza de Mayo, the Cabildo and the Casa Rosada, then up the Parisian boulevards to Congress, the Teatro Colón and Recoleta: discover how a Spanish colonial outpost became the grand, immigrant-built capital they called the Paris of South America.",
