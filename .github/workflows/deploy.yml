@@ -37,4 +37,15 @@ jobs:
             exit 1
           fi
           export CLOUDFLARE_ACCOUNT_ID
-          npm run deploy
+          # On failure, show what the token can reach (names and IDs only).
+          diagnose() {
+            api() { curl -sS "https://api.cloudflare.com/client/v4$1" -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"; }
+            echo "::group::Cloudflare access check"
+            echo "user token:";    api /user/tokens/verify | jq -c '{success, status: .result.status, errors}'
+            echo "account token:"; api "/accounts/$CLOUDFLARE_ACCOUNT_ID/tokens/verify" | jq -c '{success, status: .result.status, errors}'
+            echo "accounts:";      api /accounts | jq -c '[.result[]? | {name, id_start: .id[0:8]}]'
+            echo "D1:";            api "/accounts/$CLOUDFLARE_ACCOUNT_ID/d1/database" | jq -c '{success, errors, dbs: [.result[]? | .name]}'
+            echo "Pages:";         api "/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" | jq -c '{success, errors, projects: [.result[]? | .name]}'
+            echo "::endgroup::"
+          }
+          npm run deploy || { diagnose; exit 1; }
