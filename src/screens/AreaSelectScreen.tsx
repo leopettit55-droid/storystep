@@ -24,6 +24,7 @@ import { useLanguage } from "../i18n/LanguageContext";
 import type { TabScreenNav } from "../navigation/types";
 import { useTheme } from "../ThemeContext";
 import { CONTENT_MAX_WIDTH, type ThemeColors } from "../theme";
+import { BETA } from "../beta/beta";
 
 type Nav = TabScreenNav<"Tours">;
 
@@ -111,7 +112,7 @@ export default function AreaSelectScreen() {
                     {t("common.km")} · {t(DIFFICULTY_KEYS[item.difficulty])}
                   </Text>
                   <Text style={styles.cardPrice}>
-                    £{item.price.singleTour.toFixed(2)}
+                    {BETA ? t("beta.freeBeta") : `£${item.price.singleTour.toFixed(2)}`}
                   </Text>
                 </>
               )}

@@ -27,6 +27,7 @@ for (const ext of [".jpg", ".jpeg", ".png", ".webp", ".mp3", ".m4a", ".wav", ".g
 }
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { areas } = require("../src/content") as typeof import("../src/content");
+const { BETA } = require("../src/beta/beta") as typeof import("../src/beta/beta");
 
 type Area = (typeof areas)[number];
 
@@ -77,7 +78,7 @@ function structuredData(area: Area, imageUrl: string | null): string {
     provider: { "@type": "Organization", name: "StoryStep", url: `${SITE}/` },
     offers: {
       "@type": "Offer",
-      price: area.price.singleTour.toFixed(2),
+      price: BETA ? "0.00" : area.price.singleTour.toFixed(2),
       priceCurrency: "GBP",
       availability: "https://schema.org/InStock",
       url: tourUrl(area),

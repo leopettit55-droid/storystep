@@ -13,6 +13,7 @@ import { localizedAreaText } from "../i18n/areaTranslations";
 import { useLanguage } from "../i18n/LanguageContext";
 import type { RootStackParamList } from "../navigation/types";
 import { hasTourAccess } from "../purchases/entitlements";
+import { BETA } from "../beta/beta";
 import { openTourCheckout, stripeIsConfigured } from "../purchases/stripeConfig";
 import OfflineTourCard from "../components/OfflineTourCard";
 import DemoVideoModal from "../components/DemoVideoModal";
@@ -197,7 +198,11 @@ export default function TourPreviewScreen() {
         <View style={styles.sheetInner}>
         <View style={styles.titleRow}>
           <Text style={styles.title}>{text.name}</Text>
-          {!scannerOnly && <Text style={styles.price}>£{area.price.singleTour.toFixed(2)}</Text>}
+          {!scannerOnly && (
+            <Text style={styles.price}>
+              {BETA ? t("beta.freeBeta") : `£${area.price.singleTour.toFixed(2)}`}
+            </Text>
+          )}
         </View>
         {!scannerOnly && (
           <>
@@ -228,6 +233,8 @@ export default function TourPreviewScreen() {
             )}
           </>
         )}
+
+        {BETA && !scannerOnly && <Text style={styles.betaNote}>{t("beta.banner")}</Text>}
 
         {area.accessNote && <Text style={styles.accessNote}>{area.accessNote}</Text>}
 
@@ -411,6 +418,7 @@ function createStyles(colors: ThemeColors) {
   offerBody: { color: colors.textMid, fontSize: 13, lineHeight: 19, marginTop: 4 },
   startAgain: { marginTop: 8, paddingVertical: 10, alignItems: "center" },
   startAgainText: { color: colors.textMid, fontSize: 14, fontWeight: "600", textDecorationLine: "underline" },
+  betaNote: { fontSize: 12, lineHeight: 17, color: colors.textMid, marginTop: 10 },
   accessNote: {
     fontSize: 12,
     lineHeight: 17,
