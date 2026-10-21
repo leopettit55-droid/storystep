@@ -48,4 +48,6 @@ jobs:
             echo "Pages:";         api "/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" | jq -c '{success, errors, projects: [.result[]? | .name]}'
             echo "::endgroup::"
           }
-          npm run deploy || { diagnose; exit 1; }
+          # Website only: build and upload to Cloudflare Pages. Database migrations and the
+          # duo worker still go out with `npm run deploy` from a computer when they change.
+          { npm run build:web && npx wrangler pages deploy --branch main; } || { diagnose; exit 1; }
