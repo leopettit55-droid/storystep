@@ -1,0 +1,23 @@
+# Checks what the CLOUDFLARE_API_TOKEN secret can reach (no secrets printed).
+name: Check Cloudflare access
+
+on: workflow_dispatch
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check token
+        env:
+          RAW_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          RAW_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          T="$(printf '%s' "$RAW_TOKEN" | tr -d '[:space:]')"
+          A="$(printf '%s' "$RAW_ACCOUNT_ID" | grep -oiE '[0-9a-f]{32}' | head -n1 || true)"
+          api() { curl -sS "https://api.cloudflare.com/client/v4$1" -H "Authorization: Bearer $T"; }
+          echo "Account ID secret: $A"
+          echo "--- user token verify"; api /user/tokens/verify | jq -c '{success, status: .result.status, errors}'
+          echo "--- account token verify"; api "/accounts/$A/tokens/verify" | jq -c '{success, status: .result.status, errors}'
+          echo "--- accounts visible"; api /accounts | jq -c '.result[]? | {id, name}'
+          echo "--- D1 in secret account"; api "/accounts/$A/d1/database" | jq -c '{success, errors, dbs: [.result[]? | {name, uuid}]}'
+          echo "--- Pages projects in secret account"; api "/accounts/$A/pages/projects" | jq -c '{success, errors, projects: [.result[]? | .name]}'
