@@ -1,6 +1,6 @@
 import type { PolicySection } from "./privacyPolicy";
 
-export const TERMS_EFFECTIVE_DATE = "18 October 2026";
+export const TERMS_EFFECTIVE_DATE = "13 October 2026";
 
 export const TERMS_INTRO =
   "These terms govern your use of the StoryStep app and website. By creating an account, buying a tour, " +
@@ -42,7 +42,7 @@ export const TERMS_SECTIONS: PolicySection[] = [
   {
     heading: "Pricing and access",
     body:
-      "Each StoryStep tour costs £4.99, a one-off payment that unlocks that tour with no subscription. The " +
+      "Each StoryStep tour costs £0.99, a one-off payment that unlocks that tour with no subscription. The " +
       "price is shown before you pay. Payments are handled by Stripe, and StoryStep never sees your card " +
       "details. A purchase is saved on the device and browser you bought it on, so clearing that browser's " +
       "data or switching device can lose access; email us with your Stripe receipt and we'll restore it. Some " +

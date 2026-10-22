@@ -625,7 +625,7 @@ export const buenosAiresLandmarks: Area = {
   enableInteractiveGuide: true,
   sequentialStops: true,
   image: require("../../../assets/tours/buenos-aires-landmarks.jpg"),
-  price: { singleTour: 4.99 },
+  price: { singleTour: 0.99 },
   startingPoint: {
     lat: -34.625709,
     lng: -58.370576,
