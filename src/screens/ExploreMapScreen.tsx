@@ -9,6 +9,7 @@ import { useLanguage } from "../i18n/LanguageContext";
 import type { TabScreenNav } from "../navigation/types";
 import { useTheme } from "../ThemeContext";
 import type { ThemeColors } from "../theme";
+import { BETA } from "../beta/beta";
 
 type Nav = TabScreenNav<"Map">;
 
@@ -42,7 +43,7 @@ export default function ExploreMapScreen() {
                   <Text style={styles.meta}>
                     {area.scannerOnly
                       ? t("tourPreview.useScanner")
-                      : `£${area.price.singleTour.toFixed(2)}`}
+                      : BETA ? t("beta.freeBeta") : `£${area.price.singleTour.toFixed(2)}`}
                   </Text>
                 </View>
               </Pressable>

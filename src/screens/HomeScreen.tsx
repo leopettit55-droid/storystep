@@ -26,6 +26,8 @@ import { useLanguage } from "../i18n/LanguageContext";
 import type { TabScreenNav } from "../navigation/types";
 import { useTheme } from "../ThemeContext";
 import { DESKTOP_BREAKPOINT, type ThemeColors } from "../theme";
+import { BETA } from "../beta/beta";
+import BetaBadge from "../components/BetaBadge";
 
 type Nav = TabScreenNav<"Home">;
 
@@ -63,7 +65,10 @@ export default function HomeScreen() {
             <View style={styles.heroScrim} />
             <View style={[styles.heroInner, isDesktop && styles.heroInnerDesktop]}>
               <View style={styles.heroTextCol}>
-                <Text style={[styles.title, isDesktop && styles.titleDesktop]}>StoryStep</Text>
+                <View style={styles.titleRow}>
+                  <Text style={[styles.title, isDesktop && styles.titleDesktop]}>StoryStep</Text>
+                  {BETA && <BetaBadge />}
+                </View>
                 <Text style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}>
                   {t("home.heroSubtitle")}
                 </Text>
@@ -263,7 +268,7 @@ function FeaturedCard({
               <Text style={styles.featuredMeta}>
                 {area.scannerOnly
                   ? t("tourPreview.useScanner")
-                  : `${area.estimatedDurationMin} ${t("common.min")} · £${area.price.singleTour.toFixed(2)}`}
+                  : `${area.estimatedDurationMin} ${t("common.min")} · ${BETA ? t("beta.freeBeta") : `£${area.price.singleTour.toFixed(2)}`}`}
               </Text>
             </View>
           </ImageBackground>
@@ -302,6 +307,7 @@ function createStyles(colors: ThemeColors) {
   },
   heroTextCol: { maxWidth: 560 },
   heroCharacterWrap: { paddingBottom: 8 },
+  titleRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   title: { fontSize: 36, fontWeight: "800", color: "#FFFFFF" },
   titleDesktop: { fontSize: 58 },
   subtitle: { fontSize: 14, color: "#F3E6DE", marginTop: 6 },

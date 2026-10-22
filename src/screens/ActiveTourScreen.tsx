@@ -65,6 +65,7 @@ import { useTheme } from "../ThemeContext";
 import type { ThemeColors } from "../theme";
 import ShareWalkButton from "../components/ShareWalkButton";
 import PubSuggestion from "../components/PubSuggestion";
+import FeedbackCard from "../components/FeedbackCard";
 import SharePhotoCard from "../components/SharePhotoCard";
 import NarrationSubtitle from "../components/NarrationSubtitle";
 import StopDetail, { type StopDetailMode } from "../components/StopDetail";
@@ -631,6 +632,7 @@ export default function ActiveTourScreen() {
           {params.duo && duoState?.summary && !duoSolo ? <DuoSummaryCard /> : null}
           <ShareWalkButton area={area} />
           <SharePhotoCard area={area} />
+          <FeedbackCard tourName={areaText.name} />
           <PubSuggestion area={area} />
           <Pressable
             style={styles.cta}

@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BETA } from "../beta/beta";
 
 const PURCHASES_KEY = "storystep.purchasedTours";
 const SUBSCRIPTION_KEY = "storystep.subscription";
@@ -37,6 +38,8 @@ export async function hasActiveSubscription(): Promise<boolean> {
 }
 
 export async function hasTourAccess(tourId: string): Promise<boolean> {
+  // Every tour is free during the beta.
+  if (BETA) return true;
   if (await hasActiveSubscription()) return true;
   const purchased = await getPurchasedTourIds();
   return purchased.includes(tourId);

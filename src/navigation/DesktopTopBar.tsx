@@ -5,6 +5,8 @@ import LanguagePicker from "../components/LanguagePicker";
 import { useLanguage } from "../i18n/LanguageContext";
 import { useTheme } from "../ThemeContext";
 import type { ThemeColors } from "../theme";
+import { BETA } from "../beta/beta";
+import BetaBadge from "../components/BetaBadge";
 
 const LABEL_KEYS: Record<string, string> = {
   Home: "nav.home",
@@ -32,6 +34,7 @@ export default function DesktopTopBar({ state, navigation }: BottomTabBarProps) 
             <Text style={styles.logoMarkText}>S</Text>
           </View>
           <Text style={styles.logoText}>StoryStep</Text>
+          {BETA && <BetaBadge />}
         </Pressable>
 
 

@@ -495,6 +495,26 @@ const en = {
     back: "Back",
   },
 
+  beta: {
+    label: "Beta",
+    freeBeta: "Free · Beta",
+    banner: "We're in beta: every tour is free while we test StoryStep. Tell us what you think after your walk!",
+  },
+
+  feedback: {
+    button: "Leave feedback",
+    title: "How was your tour?",
+    body: "We're in beta and every review helps. Your feedback goes straight to the StoryStep team.",
+    ratingLabel: "Your rating",
+    messagePlaceholder: "What did you love? What could be better?",
+    emailPlaceholder: "Your email (optional, if you'd like a reply)",
+    send: "Send feedback",
+    errorNoRating: "Tap a star rating first.",
+    errorSend: "Couldn't send that — check your connection and try again.",
+    thanksTitle: "Thank you!",
+    thanksBody: "Your feedback has been sent to the StoryStep team.",
+  },
+
   contact: {
     title: "Contact us",
     subtitle: "Tell us what's going on and we'll get back to you.",
