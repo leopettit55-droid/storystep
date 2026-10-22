@@ -52,7 +52,7 @@ export type PriceTier = {
 export interface Area {
   id: string;
   name: string;
-  city: "London" | "Paris" | "Oxford" | "Edinburgh" | "Dublin" | "Glasgow" | "Barcelona";
+  city: "London" | "Paris" | "Oxford" | "Edinburgh" | "Dublin" | "Glasgow" | "Barcelona" | "Buenos Aires";
   description: string;
   estimatedDurationMin: number;
   estimatedDistanceKm: number;

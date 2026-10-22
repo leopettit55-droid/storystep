@@ -28,7 +28,7 @@ import { BETA } from "../beta/beta";
 
 type Nav = TabScreenNav<"Tours">;
 
-const CITIES: Area["city"][] = ["Oxford", "London", "Paris", "Edinburgh", "Dublin", "Glasgow", "Barcelona"];
+const CITIES: Area["city"][] = ["Oxford", "London", "Paris", "Edinburgh", "Dublin", "Glasgow", "Barcelona", "Buenos Aires"];
 
 const DIFFICULTY_KEYS: Record<Area["difficulty"], string> = {
   easy: "common.easy",
