@@ -87,9 +87,11 @@ function createStyles(colors: ThemeColors) {
       backgroundColor: colors.primary,
       alignItems: "center",
       justifyContent: "center",
+      // A seasonal glow round the mark (Halloween: like a lit pumpkin).
+      ...(colors.glow ? { boxShadow: `0 0 14px 3px ${colors.glow}` } : {}),
     },
     logoMarkText: { color: colors.onPrimary, fontSize: 15, fontWeight: "800" },
-    logoText: { fontSize: 18, fontWeight: "800", color: colors.text },
+    logoText: { fontSize: 18, fontWeight: "800", color: colors.text, fontFamily: colors.headingFont },
     links: { flexDirection: "row", alignItems: "center", gap: 28 },
     link: { paddingVertical: 4 },
     linkText: { fontSize: 14, fontWeight: "600", color: colors.textDim },

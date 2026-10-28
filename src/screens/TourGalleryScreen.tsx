@@ -57,7 +57,7 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     scroll: { padding: 20, paddingTop: 16, gap: 12, width: "100%", maxWidth: 900, alignSelf: "center" },
-    title: { fontSize: 32, fontWeight: "700", color: colors.primary, marginTop: 4 },
+    title: { fontSize: 32, fontWeight: "700", color: colors.primary, marginTop: 4, fontFamily: colors.headingFont },
     subtitle: { fontSize: 15, color: colors.textMid, marginTop: -6, marginBottom: 6 },
     loading: { padding: 30 },
     empty: { color: colors.textDim, fontSize: 14, lineHeight: 20, paddingVertical: 20 },

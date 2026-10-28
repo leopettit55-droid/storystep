@@ -302,6 +302,9 @@ const vi: PartialTranslationDict = {
     hootArrived: "À, quả là một nơi vô cùng thú vị.",
     ollieArrived: "Đây rồi! Cá là bạn chưa biết chỗ này đâu.",
   },
+  season: {
+    halloween: "Halloween vui vẻ",
+  },
 };
 
 export default vi;

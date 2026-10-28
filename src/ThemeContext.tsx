@@ -1,7 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { loadAsync } from "expo-font";
 import { useColorScheme } from "react-native";
-import { darkColors, lightColors, type ThemeColors } from "./theme";
+import { activeSeason, type SeasonId } from "./season";
+import { darkColors, halloweenColors, lightColors, type ThemeColors } from "./theme";
+
+const SEASON_COLORS: Record<SeasonId, ThemeColors> = { halloween: halloweenColors };
 
 const STORAGE_KEY = "storystep.themeMode";
 
@@ -11,6 +15,8 @@ interface ThemeContextValue {
   mode: Mode;
   colors: ThemeColors;
   isDark: boolean;
+  /** The seasonal look in force (season.ts), which overrides light/dark. */
+  season: SeasonId | null;
   /** Explicitly sets and persists a mode, overriding the system preference
    * from then on. */
   setMode: (mode: Mode) => void;
@@ -33,7 +39,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const mode: Mode = override ?? (systemScheme === "dark" ? "dark" : "light");
+  const [season] = useState(() => activeSeason());
+  // Headings switch to the seasonal font only once it has loaded, so they
+  // never sit blank while it downloads.
+  const [fontReady, setFontReady] = useState(false);
+  useEffect(() => {
+    if (!season) return;
+    loadAsync({ "CinzelDecorative-Bold": require("../assets/fonts/CinzelDecorative-Bold.ttf") })
+      .then(() => setFontReady(true))
+      .catch((e) => console.warn("[season] heading font:", e));
+  }, [season]);
+
+  const mode: Mode = season ? "dark" : override ?? (systemScheme === "dark" ? "dark" : "light");
 
   const setMode = (next: Mode) => {
     setOverride(next);
@@ -42,16 +59,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const toggleMode = () => setMode(mode === "dark" ? "light" : "dark");
 
-  const value = useMemo<ThemeContextValue>(
-    () => ({
-      mode,
-      colors: mode === "dark" ? darkColors : lightColors,
-      isDark: mode === "dark",
-      setMode,
-      toggleMode,
-    }),
-    [mode]
-  );
+  const value = useMemo<ThemeContextValue>(() => {
+    let colors = mode === "dark" ? darkColors : lightColors;
+    if (season) {
+      colors = SEASON_COLORS[season];
+      if (!fontReady) colors = { ...colors, headingFont: undefined };
+    }
+    return { mode, colors, isDark: mode === "dark", season, setMode, toggleMode };
+  }, [mode, season, fontReady]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

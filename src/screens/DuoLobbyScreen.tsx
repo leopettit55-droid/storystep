@@ -321,7 +321,7 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     scroll: { padding: 20, paddingTop: 16, gap: 14, width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
-    title: { fontSize: 32, fontWeight: "700", color: colors.primary, marginTop: 4 },
+    title: { fontSize: 32, fontWeight: "700", color: colors.primary, marginTop: 4, fontFamily: colors.headingFont },
     tour: { fontSize: 16, fontWeight: "600", color: colors.text },
     body: { fontSize: 15, color: colors.textMid, lineHeight: 22 },
     card: { backgroundColor: colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: 18, gap: 12 },

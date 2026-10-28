@@ -302,6 +302,9 @@ const sv: PartialTranslationDict = {
     hootArrived: "Ah, en högst fascinerande plats, minsann.",
     ollieArrived: "Så, här är vi! Den här kände du väl inte till?",
   },
+  season: {
+    halloween: "Glad halloween",
+  },
 };
 
 export default sv;

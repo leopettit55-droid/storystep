@@ -176,7 +176,7 @@ function createStyles(colors: ThemeColors) {
     container: { flex: 1, backgroundColor: colors.background },
     header: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 4, width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
     back: { marginBottom: 12 },
-    title: { fontSize: 32, fontWeight: "700", color: colors.primary },
+    title: { fontSize: 32, fontWeight: "700", color: colors.primary, fontFamily: colors.headingFont },
     subtitle: { fontSize: 14, color: colors.textMid, marginTop: 4 },
     list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32, width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
     sectionHeader: {

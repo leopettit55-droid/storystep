@@ -302,6 +302,9 @@ const id: PartialTranslationDict = {
     hootArrived: "Ah, sungguh tempat yang sangat menarik.",
     ollieArrived: "Nah, kita sampai! Pasti kamu belum tahu tempat ini.",
   },
+  season: {
+    halloween: "Selamat Halloween",
+  },
 };
 
 export default id;

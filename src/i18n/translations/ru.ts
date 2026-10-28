@@ -302,6 +302,9 @@ const ru: PartialTranslationDict = {
     hootArrived: "Ах, поистине удивительное место.",
     ollieArrived: "Ну вот мы и на месте! Спорим, ты такого не знал?",
   },
+  season: {
+    halloween: "Счастливого Хэллоуина",
+  },
 };
 
 export default ru;

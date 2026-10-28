@@ -303,6 +303,9 @@ const zh: PartialTranslationDict = {
     hootArrived: "啊，这真是一个极其迷人的地方。",
     ollieArrived: "好啦，我们到了！我打赌你不知道这里。",
   },
+  season: {
+    halloween: "万圣节快乐",
+  },
 };
 
 export default zh;

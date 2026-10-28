@@ -302,6 +302,9 @@ const pt: PartialTranslationDict = {
     hootArrived: "Ah, um lugar fascinante, sem dúvida.",
     ollieArrived: "Pronto, cá estamos! Aposto que não conhecias este.",
   },
+  season: {
+    halloween: "Feliz Halloween",
+  },
 };
 
 export default pt;
