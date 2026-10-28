@@ -199,7 +199,7 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     scroll: { padding: 20, paddingTop: 16, gap: 12, width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
-    title: { fontSize: 32, fontWeight: "700", color: colors.primary, marginTop: 4 },
+    title: { fontSize: 32, fontWeight: "700", color: colors.primary, marginTop: 4, fontFamily: colors.headingFont },
     subtitle: { fontSize: 14, color: colors.textMid, lineHeight: 20 },
     tabs: { flexGrow: 1, flexDirection: "row", borderWidth: 1, borderColor: colors.border, borderRadius: 12, padding: 3, gap: 3, marginTop: 4 },
     tab: { flexGrow: 1, alignItems: "center", paddingVertical: 9, paddingHorizontal: 12, borderRadius: 9 },

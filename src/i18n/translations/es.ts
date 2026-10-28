@@ -364,6 +364,9 @@ const es: PartialTranslationDict = {
     accept: "Aceptar",
     decline: "No, gracias",
   },
+  season: {
+    halloween: "Feliz Halloween",
+  },
 };
 
 export default es;

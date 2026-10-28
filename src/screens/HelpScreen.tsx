@@ -58,7 +58,7 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   scroll: { padding: 20, paddingTop: 24, gap: 12, width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
-  title: { fontSize: 32, fontWeight: "700", color: colors.primary },
+  title: { fontSize: 32, fontWeight: "700", color: colors.primary, fontFamily: colors.headingFont },
   subtitle: { fontSize: 14, color: colors.textMid, marginTop: -6, marginBottom: 6 },
   card: {
     backgroundColor: colors.surface,

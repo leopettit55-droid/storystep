@@ -302,6 +302,9 @@ const tr: PartialTranslationDict = {
     hootArrived: "Ah, gerçekten de son derece büyüleyici bir yer.",
     ollieArrived: "İşte geldik! Bahse girerim burayı bilmiyordun.",
   },
+  season: {
+    halloween: "Mutlu Cadılar Bayramı",
+  },
 };
 
 export default tr;

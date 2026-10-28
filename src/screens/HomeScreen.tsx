@@ -18,6 +18,7 @@ import HoverLift from "../components/HoverLift";
 import IntroVideoOverlay from "../components/IntroVideoOverlay";
 import LanguagePicker from "../components/LanguagePicker";
 import PressScale from "../components/PressScale";
+import SeasonalDecor from "../components/SeasonalDecor";
 import Skeleton from "../components/Skeleton";
 import { areas } from "../content";
 import { localizedAreaText } from "../i18n/areaTranslations";
@@ -38,7 +39,7 @@ export default function HomeScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= DESKTOP_BREAKPOINT;
   const { t } = useLanguage();
-  const { colors } = useTheme();
+  const { colors, season } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const featured = areas.filter((a) => a.isContentComplete);
   const cityCount = new Set(featured.map((a) => a.city)).size;
@@ -63,12 +64,19 @@ export default function HomeScreen() {
             resizeMode="cover"
           >
             <View style={styles.heroScrim} />
+            <SeasonalDecor />
             <View style={[styles.heroInner, isDesktop && styles.heroInnerDesktop]}>
               <View style={styles.heroTextCol}>
                 <View style={styles.titleRow}>
                   <Text style={[styles.title, isDesktop && styles.titleDesktop]}>StoryStep</Text>
                   {BETA && <BetaBadge />}
                 </View>
+                {season === "halloween" && (
+                  <View style={styles.seasonBadge}>
+                    <Ionicons name="moon" size={12} color={colors.primary} />
+                    <Text style={styles.seasonBadgeText}>{t("season.halloween")}</Text>
+                  </View>
+                )}
                 <Text style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}>
                   {t("home.heroSubtitle")}
                 </Text>
@@ -308,7 +316,34 @@ function createStyles(colors: ThemeColors) {
   heroTextCol: { maxWidth: 560 },
   heroCharacterWrap: { paddingBottom: 8 },
   titleRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  title: { fontSize: 36, fontWeight: "800", color: "#FFFFFF" },
+  title: {
+    fontSize: 36,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    fontFamily: colors.headingFont,
+    ...(colors.glow ? { textShadowColor: colors.glow, textShadowRadius: 18, textShadowOffset: { width: 0, height: 0 } } : {}),
+  },
+  // "Happy Halloween" and the like, under the title while a season is on.
+  seasonBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 6,
+    marginTop: 10,
+    paddingVertical: 5,
+    paddingHorizontal: 11,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    backgroundColor: "rgba(13,11,10,0.55)",
+  },
+  seasonBadgeText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: colors.primary,
+    fontFamily: colors.headingFont,
+    letterSpacing: 0.4,
+  },
   titleDesktop: { fontSize: 58 },
   subtitle: { fontSize: 14, color: "#F3E6DE", marginTop: 6 },
   subtitleDesktop: { fontSize: 19, lineHeight: 27, marginTop: 10 },
@@ -345,7 +380,7 @@ function createStyles(colors: ThemeColors) {
   aboutTitle: { fontSize: 15, fontWeight: "700", color: colors.text },
   aboutBody: { fontSize: 13.5, color: colors.textMid, marginTop: 6, lineHeight: 20 },
 
-  sectionLabel: { fontSize: 20, fontWeight: "800", color: colors.text },
+  sectionLabel: { fontSize: 20, fontWeight: "800", color: colors.text, fontFamily: colors.headingFont },
   featuresGrid: { gap: 12, marginTop: 4 },
   featuresGridDesktop: { flexDirection: "row", flexWrap: "wrap" },
   featureCard: {
@@ -471,7 +506,7 @@ function createStyles(colors: ThemeColors) {
     paddingHorizontal: 24,
     alignItems: "center",
   },
-  ctaTitle: { fontSize: 24, fontWeight: "800", color: colors.onPrimary, textAlign: "center" },
+  ctaTitle: { fontSize: 24, fontWeight: "800", color: colors.onPrimary, textAlign: "center", fontFamily: colors.headingFont },
   ctaBody: { fontSize: 14, color: colors.onPrimary, opacity: 0.9, marginTop: 6, textAlign: "center" },
   ctaButton: {
     marginTop: 18,

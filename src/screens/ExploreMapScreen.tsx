@@ -72,7 +72,7 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   scroll: { padding: 20, paddingTop: 24, paddingBottom: 32 },
-  title: { fontSize: 32, fontWeight: "700", color: colors.primary },
+  title: { fontSize: 32, fontWeight: "700", color: colors.primary, fontFamily: colors.headingFont },
   subtitle: { fontSize: 13, color: colors.textMid, marginTop: 6, marginBottom: 16 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   card: {

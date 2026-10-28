@@ -16,6 +16,10 @@ export interface ThemeColors {
   mapStreetLine: string;
   mapPinNeutral: string;
   success: string;
+  /** Display font for big headings; undefined uses the normal system font. */
+  headingFont?: string;
+  /** Soft glow behind the brand name and seasonal accents; undefined for none. */
+  glow?: string;
 }
 
 export const lightColors: ThemeColors = {
@@ -56,6 +60,30 @@ export const darkColors: ThemeColors = {
   mapStreetLine: "#3A2E27",
   mapPinNeutral: "#F3EAE4",
   success: "#4CAF6D",
+};
+
+/** Halloween (season.ts): near-black with pumpkin orange. Text on orange is
+ * dark rather than white, which reads far better against this brighter orange. */
+export const halloweenColors: ThemeColors = {
+  background: "#0D0B0A",
+  surface: "#171311",
+  surfaceRaised: "#221B17",
+  primary: "#F07433",
+  primaryPressed: "#C95A22",
+  onPrimary: "#160E0A",
+  text: "#F6EDE6",
+  textMid: "#CFC1B6",
+  textDim: "#A09289",
+  textFaint: "#948780",
+  border: "#2E2621",
+  warnBg: "#3A2A16",
+  warnText: "#FFB74D",
+  mapStreet: "#171311",
+  mapStreetLine: "#2E2621",
+  mapPinNeutral: "#F6EDE6",
+  success: "#4CAF6D",
+  headingFont: "CinzelDecorative-Bold",
+  glow: "rgba(240,116,51,0.55)",
 };
 
 /** Static light palette — kept for the handful of call sites (e.g. modules

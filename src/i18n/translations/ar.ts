@@ -302,6 +302,9 @@ const ar: PartialTranslationDict = {
     hootArrived: "آه، مكان مثير للاهتمام حقًا.",
     ollieArrived: "ها قد وصلنا! أراهن أنك لم تعرف هذا المكان.",
   },
+  season: {
+    halloween: "هالوين سعيد",
+  },
 };
 
 export default ar;

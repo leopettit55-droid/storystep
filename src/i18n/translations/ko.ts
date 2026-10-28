@@ -302,6 +302,9 @@ const ko: PartialTranslationDict = {
     hootArrived: "아, 참으로 흥미로운 장소로군요.",
     ollieArrived: "자, 도착! 여긴 몰랐죠?",
   },
+  season: {
+    halloween: "해피 할로윈",
+  },
 };
 
 export default ko;

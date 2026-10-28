@@ -302,6 +302,9 @@ const hi: PartialTranslationDict = {
     hootArrived: "आह, सचमुच एक बेहद दिलचस्प जगह।",
     ollieArrived: "लो, हम पहुँच गए! शर्त लगा लो, ये आपको नहीं पता था।",
   },
+  season: {
+    halloween: "हैप्पी हैलोवीन",
+  },
 };
 
 export default hi;

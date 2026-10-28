@@ -1,7 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Easing, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { tapLight } from "../haptics";
+import type { ThemeColors } from "../theme";
+import { useTheme } from "../ThemeContext";
 
 interface FlagOption {
   code: string;
@@ -27,6 +29,7 @@ export default function FlagLanguagePicker({
 }) {
   const { width } = useWindowDimensions();
   const compact = width < 640;
+  const sx = useSeasonalStyles();
   // On phones: two cards per row inside a 20px gutter, with a 14px gap.
   const tileWidth = compact ? Math.min(160, (width - 40 - 14) / 2) : 176;
 
@@ -83,14 +86,14 @@ export default function FlagLanguagePicker({
       ]}
     >
       <View style={styles.brand}>
-        <View style={styles.logoMark}>
-          <Text style={styles.logoMarkText}>S</Text>
+        <View style={[styles.logoMark, sx?.logoMark]}>
+          <Text style={[styles.logoMarkText, sx?.logoMarkText]}>S</Text>
         </View>
-        <Text style={styles.logoText}>StoryStep</Text>
+        <Text style={[styles.logoText, sx?.text, sx?.heading]}>StoryStep</Text>
       </View>
 
       <Animated.Text
-        style={[styles.headerText, compact && styles.headerTextCompact, { opacity: headlineOpacity }]}
+        style={[styles.headerText, sx?.text, compact && styles.headerTextCompact, { opacity: headlineOpacity }]}
         numberOfLines={1}
         role="heading"
       >
@@ -146,6 +149,7 @@ function FlagTile({
     }).start();
   }, [hovered, lift]);
 
+  const sx = useSeasonalStyles();
   const { Flag } = option;
   return (
     <Pressable
@@ -159,20 +163,23 @@ function FlagTile({
       <Animated.View
         style={[
           styles.tile,
+          sx?.tile,
           { width, opacity: dimmed ? 0.4 : 1 },
           hovered && styles.tileHover,
+          hovered && sx?.tileHover,
           active && styles.tileActive,
+          active && sx?.tileActive,
           { transform: [{ translateY: lift.interpolate({ inputRange: [0, 1], outputRange: [0, -4] }) }] },
         ]}
       >
-        <View style={[styles.flagWrap, { height: Math.round((width - 20) * (2 / 3)) }]}>
+        <View style={[styles.flagWrap, sx?.flagWrap, { height: Math.round((width - 20) * (2 / 3)) }]}>
           <Flag />
         </View>
         <View style={styles.labelRow}>
-          <Text style={styles.label} numberOfLines={1}>
+          <Text style={[styles.label, sx?.text]} numberOfLines={1}>
             {option.label}
           </Text>
-          {active && <Ionicons name="checkmark-circle" size={18} color={ACCENT} />}
+          {active && <Ionicons name="checkmark-circle" size={18} color={sx ? sx.accent : ACCENT} />}
         </View>
       </Animated.View>
     </Pressable>
@@ -328,3 +335,26 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+
+/** While a seasonal look is on (season.ts), the language page takes its
+ * colours and heading font; otherwise it stays the usual white page. */
+function useSeasonalStyles() {
+  const { colors, season } = useTheme();
+  return useMemo(() => (season ? { accent: colors.primary, ...seasonalStyles(colors) } : null), [colors, season]);
+}
+
+function seasonalStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    text: { color: colors.text },
+    heading: { fontFamily: colors.headingFont },
+    logoMark: {
+      backgroundColor: colors.primary,
+      ...(colors.glow ? { boxShadow: `0 0 16px 4px ${colors.glow}` } : {}),
+    },
+    logoMarkText: { color: colors.onPrimary },
+    tile: { backgroundColor: colors.surface, borderColor: colors.border, shadowColor: "#000000", shadowOpacity: 0.4 },
+    tileHover: { borderColor: colors.textFaint },
+    tileActive: { borderColor: colors.primary },
+    flagWrap: { borderColor: "rgba(255,255,255,0.08)" },
+  });
+}

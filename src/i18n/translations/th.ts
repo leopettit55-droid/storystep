@@ -302,6 +302,9 @@ const th: PartialTranslationDict = {
     hootArrived: "อา ช่างเป็นสถานที่ที่น่าสนใจยิ่งนัก",
     ollieArrived: "มาถึงแล้ว! พนันได้เลยว่าคุณไม่เคยรู้จักที่นี่",
   },
+  season: {
+    halloween: "สุขสันต์วันฮาโลวีน",
+  },
 };
 
 export default th;

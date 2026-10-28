@@ -1,15 +1,17 @@
 import { useRef, useState } from "react";
 import { Animated, StyleSheet } from "react-native";
 import { useLanguage } from "../i18n/LanguageContext";
+import { useTheme } from "../ThemeContext";
 import FlagLanguagePicker from "./FlagLanguagePicker.web";
 
 const SESSION_KEY = "storystep.languageChosen";
 
-/** First page on web (the page a QR code opens): a white page of flags to
- * pick a language. Sits above the whole app, so once a flag is chosen it
+/** First page on web (the page a QR code opens): a white page (dark while a
+ * seasonal look is on) of flags to pick a language. Sits above the whole app, so once a flag is chosen it
  * fades away to reveal the usual app underneath. Shown once per session. */
 export default function LanguageGate() {
   const { language, setLanguage } = useLanguage();
+  const { colors, season } = useTheme();
   const alreadyChosen = typeof window !== "undefined" && sessionStorage.getItem(SESSION_KEY) === "1";
   const [done, setDone] = useState(alreadyChosen);
   const opacity = useRef(new Animated.Value(1)).current;
@@ -23,7 +25,7 @@ export default function LanguageGate() {
   };
 
   return (
-    <Animated.View style={[styles.page, { opacity }]}>
+    <Animated.View style={[styles.page, season && { backgroundColor: colors.background }, { opacity }]}>
       <FlagLanguagePicker current={language} onSelect={handleSelect} />
     </Animated.View>
   );

@@ -312,6 +312,9 @@ const fr: PartialTranslationDict = {
     accept: "Accepter",
     decline: "Non merci",
   },
+  season: {
+    halloween: "Joyeux Halloween",
+  },
 };
 
 export default fr;

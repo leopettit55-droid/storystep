@@ -48,7 +48,7 @@ function createStyles(colors: ThemeColors) {
   container: { flex: 1, backgroundColor: colors.background },
   centered: { flex: 1, alignItems: "center", justifyContent: "center", padding: 32, gap: 10 },
   pin: { fontSize: 40 },
-  title: { fontSize: 24, fontWeight: "700", color: colors.text, textAlign: "center" },
+  title: { fontSize: 24, fontWeight: "700", color: colors.text, textAlign: "center", fontFamily: colors.headingFont },
   body: {
     fontSize: 14,
     color: colors.textMid,

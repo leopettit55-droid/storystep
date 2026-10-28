@@ -302,6 +302,9 @@ const ja: PartialTranslationDict = {
     hootArrived: "ああ、実に興味深い場所ですな。",
     ollieArrived: "さあ着いたぞ！ここは知らなかったでしょ？",
   },
+  season: {
+    halloween: "ハッピーハロウィン",
+  },
 };
 
 export default ja;

@@ -302,6 +302,9 @@ const nl: PartialTranslationDict = {
     hootArrived: "Ah, een hoogst fascinerende plek, inderdaad.",
     ollieArrived: "Zo, daar zijn we! Wedden dat je deze nog niet kende?",
   },
+  season: {
+    halloween: "Fijne Halloween",
+  },
 };
 
 export default nl;

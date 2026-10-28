@@ -141,7 +141,7 @@ function createStyles(colors: ThemeColors) {
     container: { flex: 1, backgroundColor: colors.background },
     scroll: { padding: 20, paddingTop: 24, paddingBottom: 40 },
     backButton: { marginBottom: 12 },
-    title: { fontSize: 28, fontWeight: "700", color: colors.primary },
+    title: { fontSize: 28, fontWeight: "700", color: colors.primary, fontFamily: colors.headingFont },
     subtitle: { fontSize: 14, color: colors.textMid, marginTop: 6, marginBottom: 20 },
     card: {
       backgroundColor: colors.surface,

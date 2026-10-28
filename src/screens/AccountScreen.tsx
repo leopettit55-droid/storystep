@@ -39,7 +39,7 @@ const ERROR_KEYS: Record<AccountError, string> = {
 
 export default function AccountScreen() {
   const { t } = useLanguage();
-  const { colors, isDark, toggleMode } = useTheme();
+  const { colors, isDark, season, toggleMode } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const ready = useAccountStore((s) => s.ready);
@@ -154,19 +154,22 @@ export default function AccountScreen() {
           </View>
         </View>
 
-        <View style={styles.card}>
-          <View style={styles.themeRow}>
-            <Text style={styles.rowTitle}>{t("account.darkMode")}</Text>
-            <Switch
-              value={isDark}
-              onValueChange={handleToggleTheme}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor="#FFFFFF"
-              // The web Switch ignores thumbColor when on and draws a teal knob.
-              {...({ activeThumbColor: "#FFFFFF" } as object)}
-            />
+        {/* A seasonal look (season.ts) sets the colours itself, so the switch would do nothing. */}
+        {!season && (
+          <View style={styles.card}>
+            <View style={styles.themeRow}>
+              <Text style={styles.rowTitle}>{t("account.darkMode")}</Text>
+              <Switch
+                value={isDark}
+                onValueChange={handleToggleTheme}
+                trackColor={{ false: colors.border, true: colors.primary }}
+                thumbColor="#FFFFFF"
+                // The web Switch ignores thumbColor when on and draws a teal knob.
+                {...({ activeThumbColor: "#FFFFFF" } as object)}
+              />
+            </View>
           </View>
-        </View>
+        )}
 
         {account ? (
           <>
@@ -292,7 +295,7 @@ function createStyles(colors: ThemeColors) {
     skeletonRowTitle: { width: "50%", height: 16, borderRadius: 6, marginBottom: 10 },
     skeletonLine: { width: "90%", height: 12, borderRadius: 6, marginTop: 6 },
     skeletonAvatar: { width: 56, height: 56, marginBottom: 12 },
-    title: { fontSize: 32, fontWeight: "700", color: colors.primary },
+    title: { fontSize: 32, fontWeight: "700", color: colors.primary, fontFamily: colors.headingFont },
     card: {
       backgroundColor: colors.surface,
       borderRadius: 16,

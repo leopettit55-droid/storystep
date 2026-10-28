@@ -625,6 +625,9 @@ const en = {
     accept: "Accept",
     decline: "No thanks",
   },
+  season: {
+    halloween: "Happy Halloween",
+  },
 };
 
 export default en;
